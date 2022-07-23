@@ -1,0 +1,3 @@
+#!/bin/bash
+export CLASSPATH=$(realpath @CMAKE_CURRENT_BINARY_DIR@/../@LANGUAGE@.jar):@CMAKE_HOME_DIRECTORY@/tools/antlr-4.10.1-complete.jar
+java -Xmx500M org.antlr.v4.gui.TestRig @LANGUAGE@ $@
