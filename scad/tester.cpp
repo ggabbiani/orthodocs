@@ -23,6 +23,8 @@
 #include "SCADLexer.h"
 #include "SCADParser.h"
 
+#include "CLI11.hpp"
+
 #include <iostream>
 #include <sstream>
 
@@ -44,13 +46,13 @@ void ErrorListener::syntaxError(Recognizer *recognizer, Token * offendingSymbol,
 }
 
 int main(int argc, const char *argv[]) {
-  if (!argv[1]) {
-    cerr << "Test file missing" << endl;
-    return EXIT_FAILURE;
-  }
+  CLI::App app{"ADOX tester"};
+  string file;
+  app.add_option("file", file, "An OpenSCAD file to be checked")->required()->check(CLI::ExistingFile);
+  CLI11_PARSE(app, argc, argv);
 
   auto              result = EXIT_SUCCESS;
-  ifstream          stream(argv[1]);
+  ifstream          stream(file);
   ANTLRInputStream  input(stream);
   SCADLexer         lexer(&input);
   CommonTokenStream tokens(&lexer);

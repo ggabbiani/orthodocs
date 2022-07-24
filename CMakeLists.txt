@@ -37,4 +37,6 @@ set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
+include_directories(${CMAKE_SOURCE_DIR}/third-part)
+
 add_subdirectory(scad)
