@@ -13,11 +13,13 @@ antlr_target(${PARSER} ${PARSER}.g4 PARSER
 include_directories(${ANTLR_${LEXER}_OUTPUT_DIR})
 include_directories(${ANTLR_${PARSER}_OUTPUT_DIR})
 
-# add generated grammar to demo binary target
+###############################################################################
+# executables
 add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 target_link_libraries(scad antlr4_static)
 
-# defines Java targets
+###############################################################################
+# Java parser for testing via grun
 find_package(Java QUIET COMPONENTS Runtime REQUIRED)
 include(UseJava)
 
@@ -62,4 +64,28 @@ add_jar(
     INCLUDE_JARS ${ANTLR_EXECUTABLE}
 )
 
+###############################################################################
+# ctest(s)
+
+if (BUILD_TESTING)
+  set(TESTER_EXEC tester)
+  add_executable(${TESTER_EXEC} tester.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
+  target_link_libraries(${TESTER_EXEC} antlr4_static)
+
+  add_test(
+    NAME error
+    COMMAND ${TESTER_EXEC} error.scad
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+  )
+  set_property(TEST error PROPERTY WILL_FAIL true)
+
+   add_test(
+    NAME assignments
+    COMMAND ${TESTER_EXEC} assignment.scad
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+  )
+endif()
+
+###############################################################################
+# sub directories
 add_subdirectory(bin)

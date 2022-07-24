@@ -1,9 +1,12 @@
 # minimum required CMAKE version
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(test)
+
+option(BUILD_TESTING "generate tests" ON)
+
+include(CTest)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
