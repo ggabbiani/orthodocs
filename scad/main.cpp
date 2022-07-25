@@ -48,7 +48,7 @@ void ErrorListener::syntaxError(Recognizer *recognizer, Token * offendingSymbol,
 int main(int argc, const char *argv[]) {
   string file;
   bool show_tokens = false;
-  CLI::App app{"ADOX tester"};
+  CLI::App app{"ADOX stands for Auto Docs: it is meant for automatic documentation building from SCAD programs."};
   app.add_option("file", file, "the OpenSCAD file to be checked")
     ->required()
     ->check(CLI::ExistingFile);
