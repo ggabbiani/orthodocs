@@ -2,9 +2,12 @@ set(LANGUAGE SCAD)
 set(LEXER ${LANGUAGE}Lexer)
 set(PARSER ${LANGUAGE}Parser)
 
+###############################################################################
+# 1) C++ parser for application build
+
 # Call macro to add lexer and grammar to your build dependencies.
 antlr_target(${LEXER} ${LEXER}.g4 LEXER PACKAGE scad)
-antlr_target(${PARSER} ${PARSER}.g4 PARSER
+antlr_target(${PARSER} ${PARSER}.g4 PARSER LISTENER
             PACKAGE scad
             DEPENDS_ANTLR ${LEXER}
             COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR})
@@ -14,12 +17,12 @@ include_directories(${ANTLR_${LEXER}_OUTPUT_DIR})
 include_directories(${ANTLR_${PARSER}_OUTPUT_DIR})
 
 ###############################################################################
-# executables
+# 2) the application
 add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 target_link_libraries(scad antlr4_static)
 
 ###############################################################################
-# Java parser for testing via grun
+# 3) and a Java parser for testing grammars via grun
 find_package(Java QUIET COMPONENTS Runtime REQUIRED)
 include(UseJava)
 
@@ -37,13 +40,13 @@ add_custom_command(
     COMMAND ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}
             ${LEXER_GRAMMAR}
             -o ${JAVA_ARTIFACTS_DIR}
-            -no-listener
+            # -no-listener
     DEPENDS ${LEXER_GRAMMAR}
     COMMENT "Building Java Lexer artifacts"
 )
 # Parser
 set(PARSER_GRAMMAR ${CMAKE_CURRENT_SOURCE_DIR}/${PARSER}.g4)
-set(PARSER_JAVA_SOURCES ${JAVA_ARTIFACTS_DIR}/${PARSER}.java)
+set(PARSER_JAVA_SOURCES ${JAVA_ARTIFACTS_DIR}/${PARSER}.java ${JAVA_ARTIFACTS_DIR}/${PARSER}BaseListener.java ${JAVA_ARTIFACTS_DIR}/${PARSER}Listener.java)
 set(PARSER_JAVA_ARTIFACTS
     ${JAVA_ARTIFACTS_DIR}/${PARSER}.interp
     ${JAVA_ARTIFACTS_DIR}/${PARSER}.tokens
@@ -54,7 +57,7 @@ add_custom_command(
     COMMAND ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}
             ${PARSER_GRAMMAR}
             -o ${JAVA_ARTIFACTS_DIR}
-            -no-listener
+            # -no-listener
     DEPENDS ${LEXER_JAVA_ARTIFACTS} ${PARSER_GRAMMAR}
     COMMENT "Building Java Parser artifacts"
 )
