@@ -66,43 +66,41 @@ add_jar(
 
 ###############################################################################
 # ctest(s)
-
 configure_file(grun.in grun USE_SOURCE_PERMISSIONS @ONLY)
 set(GRUN ${CMAKE_CURRENT_BINARY_DIR}/grun)
 
+function(new_test)
+  set(options )
+  set(oneValueArgs NAME RULE FILE)
+  set(multiValueArgs PASS_REGULAR_EXPRESSION FAIL_REGULAR_EXPRESSION)
+  cmake_parse_arguments(TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(default "mismatched" "extraneous" "no viable alternative")
+  add_test(NAME "${TEST_NAME}" COMMAND "${GRUN}" "${LANGUAGE}" "${TEST_RULE}" "${TEST_FILE}" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+  if (PASS_REGULAR_EXPRESSION)
+    if (PASS_REGULAR_EXPRESSION STREQUAL DEFAULT)
+      set(value ${default})
+    else()
+      set(value ${TEST_PASS_REGULAR_EXPRESSION})
+    endif()
+    set_property(TEST "${TEST_NAME}" PROPERTY PASS_REGULAR_EXPRESSION "${value}")
+  endif()
+  if (FAIL_REGULAR_EXPRESSION)
+    if (FAIL_REGULAR_EXPRESSION STREQUAL DEFAULT)
+      set(value ${default})
+    else()
+      set(value ${TEST_FAIL_REGULAR_EXPRESSION})
+    endif()
+    set_property(TEST "${TEST_NAME}" PROPERTY FAIL_REGULAR_EXPRESSION "${value}")
+  endif()
+endfunction(new_test)
+
 if (BUILD_TESTING)
-  add_test(
-    NAME error
-    COMMAND ${GRUN} ${LANGUAGE} pkg error.scad
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  set_property(TEST error PROPERTY PASS_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
-
-  add_test(
-    NAME assignments
-    COMMAND ${GRUN} ${LANGUAGE} pkg assignment.scad
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  set_property(TEST assignments PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
-
-  add_test(
-    NAME modules
-    COMMAND ${GRUN} ${LANGUAGE} pkg modules.scad
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  set_property(TEST modules PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
-
-  add_test(
-    NAME includes
-    COMMAND ${GRUN} ${LANGUAGE} pkg includes.scad
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  set_property(TEST includes PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
-
-  add_test(
-    NAME all
-    COMMAND ${GRUN} ${LANGUAGE} pkg all.scad
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
-  )
-  set_property(TEST all PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
+  new_test(NAME comments    RULE pkg FILE comments.scad   FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME uses        RULE pkg FILE uses.scad       FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME vectors     RULE pkg FILE vectors.scad    FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME error       RULE pkg FILE error.scad      PASS_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME assignments RULE pkg FILE assignment.scad FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME modules     RULE pkg FILE modules.scad    FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME includes    RULE pkg FILE includes.scad   FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME all         RULE pkg FILE all.scad        FAIL_REGULAR_EXPRESSION DEFAULT)
 endif()
