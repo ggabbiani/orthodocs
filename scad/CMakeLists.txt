@@ -67,25 +67,21 @@ add_jar(
 ###############################################################################
 # ctest(s)
 
-if (BUILD_TESTING)
-  set(TESTER_EXEC tester)
-  add_executable(${TESTER_EXEC} tester.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
-  target_link_libraries(${TESTER_EXEC} antlr4_static)
+configure_file(grun.in grun USE_SOURCE_PERMISSIONS @ONLY)
+set(GRUN ${CMAKE_CURRENT_BINARY_DIR}/grun)
 
+if (BUILD_TESTING)
   add_test(
     NAME error
-    COMMAND ${TESTER_EXEC} error.scad
+    COMMAND ${GRUN} ${LANGUAGE} pkg error.scad
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
   )
-  set_property(TEST error PROPERTY WILL_FAIL true)
+  set_property(TEST error PROPERTY PASS_REGULAR_EXPRESSION "mismatched")
 
-   add_test(
+  add_test(
     NAME assignments
-    COMMAND ${TESTER_EXEC} assignment.scad
+    COMMAND ${GRUN} ${LANGUAGE} pkg assignment.scad
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
   )
+  set_property(TEST assignments PROPERTY FAIL_REGULAR_EXPRESSION "mismatched")
 endif()
-
-###############################################################################
-# sub directories
-add_subdirectory(bin)

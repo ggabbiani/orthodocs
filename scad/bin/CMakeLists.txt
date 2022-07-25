@@ -1,2 +1,0 @@
-configure_file(grun.in grun USE_SOURCE_PERMISSIONS @ONLY)
-set(GRUN ${CMAKE_CURRENT_BINARY_DIR}/grun PARENT_SCOPE)
