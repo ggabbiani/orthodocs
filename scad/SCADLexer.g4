@@ -1,24 +1,49 @@
+/*
+ * OpenSCAD lexer grammar
+ *
+ * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
+ * This file is part of the 'AutoDox' (ADOX) project.
+ *
+ * ADOX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ADOX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
+ */
+
 lexer grammar SCADLexer;
 
+DOT					: '.';
 COLON           	: ':';
-SEMICOLON       	: ';';
-LEFT_CURLY_BRACKET	: '{';
-RIGHT_CURLY_BRACKET	: '}';
-LEFT_PARENTHESIS  	: '(';
-RIGHT_PARENTHESIS	: ')';
-LEFT_SQUARE_BRACKET : '[';
-RIGHT_SQUARE_BRACKET: ']';
+SEMI       			: ';';
+LEFT_BRACE			: '{';
+RIGHT_BRACE			: '}';
+LEFT_PAREN  		: '(';
+RIGHT_PAREN			: ')';
+LEFT_BRACKET 		: '[';
+RIGHT_BRACKET		: ']';
 COMMA           	: ',';
-EQUAL           	: '=';
-EXCLAMATION_MARK	: '!';
-QUESTION_MARK    	: '?';
+ASSIGN           	: '=';
+NOT					: '!';
+QUESTION    		: '?';
+QUOTE				: '"';
 MINUS            	: '-';
 PLUS             	: '+';
-SLASH            	: '/';
-PERCENT          	: '%';
-GREATER_THEN        : '>';
-LESS_THEN          	: '<';
+DIV            		: '/';
+MOD          		: '%';
+GREATER        		: '>';
+LESS          		: '<';
 STAR             	: '*';
+UNDERSCORE			: '_';
+SPECIAL				: '$';
 
 LET					: 'let';
 FOR					: 'for';
@@ -30,7 +55,6 @@ USE     			: 'use';
 TRUE    			: 'true';
 FALSE   			: 'false';
 UNDEF   			: 'undef';
-
 
 GE					: '>=';
 EQ					: '==';
@@ -45,36 +69,31 @@ LINECOMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t]+ -> skip;
 NL: ( '\r' '\n'? | '\n') -> skip;
 
+// ID: NONDIGIT (NONDIGIT | DIGIT)*;
+ID: SPECIAL? NONDIGIT (NONDIGIT | DIGIT)*;
+NUMBER: FP | INT;
+
 fragment ALPHA: [a-zA-Z];
 fragment DIGIT: [0-9];
 fragment NONDIGIT: [a-zA-Z_];
-fragment INT: SIGN? DIGIT+;
+fragment INT: DIGIT+;
 
-fragment FP: FRACTIONAL EXPONENT? | DIGIT_SEQUENCE EXPONENT;
-fragment FRACTIONAL:
-	SIGN? (
-		DIGIT_SEQUENCE? '.' DIGIT_SEQUENCE
-		| DIGIT_SEQUENCE '.'
-	);
+fragment FP: (FRACTIONAL EXPONENT?) | (DIGIT_SEQUENCE EXPONENT);
+fragment FRACTIONAL
+	: DIGIT_SEQUENCE? DOT DIGIT_SEQUENCE
+	| DIGIT_SEQUENCE DOT
+	;
 fragment EXPONENT: [eE] SIGN? DIGIT_SEQUENCE;
 
-SIGN: [+-];
-NUMBER: INT | FP;
+fragment SIGN: [+-];
 
-DIGIT_SEQUENCE: DIGIT+;
-
-// ID: NONDIGIT (NONDIGIT | DIGIT)*;
-ID: '$'? [a-zA-Z0-9_]+;
-
-PATH_COMPONENT: (ALPHA | DIGIT | MINUS | '_' | '.')+;
-// PATH_COMPONENT: ([a-zA-Z0-9_-])+;
-FILE: '<' PATH_COMPONENT ('/' PATH_COMPONENT)* '>';
+fragment DIGIT_SEQUENCE: DIGIT+;
 
 fragment ESCAPE_SEQUENCE: SIMPLE_ESCAPE_SEQUENCE | UNICODE;
 
 fragment SIMPLE_ESCAPE_SEQUENCE: '\\' ["nrt\\];
 
-STRING: '"' CHAR_SEQUENCE? '"';
+STRING: QUOTE CHAR_SEQUENCE? QUOTE;
 
 fragment CHAR_SEQUENCE: CHAR+;
 
@@ -83,3 +102,7 @@ fragment CHAR: ~["\\\r\n] | ESCAPE_SEQUENCE;
 fragment UNICODE: '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
 fragment HEX_DIGIT: [0-9a-fA-F];
+
+// PATH_COMPONENT: [a-zA-Z0-9_-]+;
+fragment PATH_COMPONENT: (ALPHA | DIGIT | MINUS | UNDERSCORE | DOT)+;
+FILE: LESS PATH_COMPONENT ('/' PATH_COMPONENT)* GREATER;
