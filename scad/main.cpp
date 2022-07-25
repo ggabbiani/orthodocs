@@ -19,30 +19,66 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
 #include "SCADParser.h"
 
+#include "CLI11.hpp"
+
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 using namespace scad;
 using namespace antlr4;
 
-int main(int , const char **) {
-  // ANTLRInputStream input(u8"🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
-  ANTLRInputStream input("ident = 3;");
-  SCADLexer lexer(&input);
+class ErrorListener : public BaseErrorListener {
+  void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
+    const std::string &msg, std::exception_ptr e) override;
+};
+
+void ErrorListener::syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
+  ostringstream s;
+  // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
+  //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
+  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ")";
+  throw std::invalid_argument(s.str());
+}
+
+int main(int argc, const char *argv[]) {
+  string file;
+  string rule;
+  CLI::App app{"ADOX tester"};
+  app.add_option("file", file, "the OpenSCAD file to be checked")
+    ->required()
+    ->check(CLI::ExistingFile);
+  try {
+    app.parse(argc, argv);
+  } catch (const CLI::ParseError &e) {
+    return app.exit(e);
+  }
+
+  auto              result = EXIT_SUCCESS;
+  ifstream          stream(file);
+  ANTLRInputStream  input(stream);
+  SCADLexer         lexer(&input);
   CommonTokenStream tokens(&lexer);
 
   tokens.fill();
-  for (auto token : tokens.getTokens()) {
-    std::cout << token->toString() << std::endl;
+  for (auto token : tokens.getTokens())
+    cout << token->toString() << endl;
+
+  SCADParser    parser(&tokens);
+  parser.removeErrorListeners();
+  ErrorListener listener;
+  parser.addErrorListener(&listener);
+
+  try {
+    tree::ParseTree*  tree = parser.expr();
+    cout << tree->toStringTree(&parser) << endl << endl;
+  } catch(const exception &error) {
+    cerr << error.what() << endl;
+    result = EXIT_FAILURE;
   }
-
-  SCADParser parser(&tokens);
-  tree::ParseTree* tree = parser.pkg();
-
-  std::cout << tree->toStringTree(&parser) << std::endl << std::endl;
-
-  return 0;
+  return result;
 }
