@@ -24,6 +24,32 @@ a2  = [4,5];
 a3  = [6,7,8,9];
 b   = [a1,a2,a3];
 e   = [ [1], [], [3,4,5], "string", "x", [[10,11],[12,13,14],[[15,16],[17]]] ];
-
-
-// i = a + b;
+// expr [+-*/%] expr
+i = a + b;
+a = a - b + c * d / e % f;
+// booleans
+condition = (a+2) >= 3;
+condition   = !false;
+// [+-]expr
+value       = +3.14;
+value       = a - 3.14 * (20 / c);
+// ternary operator
+identifier = (a+2) > 0 ? "ciao" : "fuckoff";
+// lists
+list    = [1,2,3];
+list    = [a,5,b];
+list    = [];
+list    = [5.643];
+list    = ["a","b","string"];
+list    = [[1,r],[x,y,z,4,5]];
+list    = [3, 5, [6,7], [[8,9],[10,[11,12],13], c, "string"]];
+// list    = [4/3, 6*1.5, cos(60)];
+//
+a[b*5]  = 0;
+a       = b[2-c];
+a[b*5]  = b[2-c];
+a[b[c]-2*d] = e[f[g]-2*h];
+// let statement
+identifier = let (angle = i*360/20, r= i*2, distance = r*5) angle + 2;
+// function call
+identifier = func(b[2],"this is a string");

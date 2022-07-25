@@ -76,12 +76,33 @@ if (BUILD_TESTING)
     COMMAND ${GRUN} ${LANGUAGE} pkg error.scad
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
   )
-  set_property(TEST error PROPERTY PASS_REGULAR_EXPRESSION "mismatched")
+  set_property(TEST error PROPERTY PASS_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
 
   add_test(
     NAME assignments
     COMMAND ${GRUN} ${LANGUAGE} pkg assignment.scad
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
   )
-  set_property(TEST assignments PROPERTY FAIL_REGULAR_EXPRESSION "mismatched")
+  set_property(TEST assignments PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
+
+  add_test(
+    NAME modules
+    COMMAND ${GRUN} ${LANGUAGE} pkg modules.scad
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+  )
+  set_property(TEST modules PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
+
+  add_test(
+    NAME includes
+    COMMAND ${GRUN} ${LANGUAGE} pkg includes.scad
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+  )
+  set_property(TEST includes PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
+
+  add_test(
+    NAME all
+    COMMAND ${GRUN} ${LANGUAGE} pkg all.scad
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
+  )
+  set_property(TEST all PROPERTY FAIL_REGULAR_EXPRESSION "mismatched" "extraneous" "no viable alternative")
 endif()
