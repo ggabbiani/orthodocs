@@ -53,3 +53,5 @@ a[b[c]-2*d] = e[f[g]-2*h];
 identifier = let (angle = i*360/20, r= i*2, distance = r*5) angle + 2;
 // function call
 identifier = func(b[2],"this is a string");
+// function literals
+func = function (x) x * x;

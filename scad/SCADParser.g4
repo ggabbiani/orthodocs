@@ -71,8 +71,8 @@ expr:
 	| LEFT_BRACKET list_comprehension_elements RIGHT_BRACKET
 	| let_clause expr
 	| function_call
+	| function_literal
 ;
-
 
 named_module_definition:
 	MODULE ID LEFT_PAREN parameters_opt RIGHT_PAREN (
@@ -94,6 +94,8 @@ named_function_definition:
 parameters_opt: parameters?;
 parameters: parameter | parameters COMMA parameter;
 parameter: lookup | assignment;
+
+function_literal: FUNCTION LEFT_PAREN arguments_opt RIGHT_PAREN expr;
 
 incl: INCLUDE FILE;
 use: USE FILE;
