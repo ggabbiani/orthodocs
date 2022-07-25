@@ -47,11 +47,12 @@ void ErrorListener::syntaxError(Recognizer *recognizer, Token * offendingSymbol,
 
 int main(int argc, const char *argv[]) {
   string file;
-  string rule;
+  bool show_tokens = false;
   CLI::App app{"ADOX tester"};
   app.add_option("file", file, "the OpenSCAD file to be checked")
     ->required()
     ->check(CLI::ExistingFile);
+  app.add_flag("--tokens,-t",show_tokens,"when true tokens are listed");
   try {
     app.parse(argc, argv);
   } catch (const CLI::ParseError &e) {
@@ -65,8 +66,10 @@ int main(int argc, const char *argv[]) {
   CommonTokenStream tokens(&lexer);
 
   tokens.fill();
-  for (auto token : tokens.getTokens())
-    cout << token->toString() << endl;
+
+  if (show_tokens)
+    for (auto token : tokens.getTokens())
+      cout << token->toString() << endl;
 
   SCADParser    parser(&tokens);
   parser.removeErrorListeners();
