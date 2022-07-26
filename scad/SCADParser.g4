@@ -38,7 +38,9 @@ statement:
 	| module_instantiation
 	;
 
-assignment	: ID ('[' expr ']')* ASSIGN expr;
+assignment	: ID (indexing*|DOT_INDEXING?) ASSIGN expr;
+
+indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
 
 expr:
 	TRUE
@@ -66,7 +68,8 @@ expr:
 	| PLUS expr
 	| MINUS expr
 	| expr QUESTION expr COLON expr
-	| expr LEFT_BRACKET expr RIGHT_BRACKET
+	| expr indexing
+	| expr DOT_INDEXING
 	| LEFT_PAREN expr RIGHT_PAREN
 	| LEFT_BRACKET list_comprehension_elements RIGHT_BRACKET
 	| let_clause expr

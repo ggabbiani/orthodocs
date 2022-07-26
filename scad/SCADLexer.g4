@@ -73,6 +73,8 @@ NL: ( '\r' '\n'? | '\n') -> skip;
 ID: SPECIAL? NONDIGIT (NONDIGIT | DIGIT)*;
 NUMBER: FP | INT;
 
+DOT_INDEXING	: DOT [xyz];
+
 fragment ALPHA: [a-zA-Z];
 fragment DIGIT: [0-9];
 fragment NONDIGIT: [a-zA-Z_];
