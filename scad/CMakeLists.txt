@@ -99,6 +99,7 @@ function(new_test)
     set_property(TEST "${TEST_NAME}" PROPERTY FAIL_REGULAR_EXPRESSION "${value}")
     # message("${TEST_NAME} TEST_FAIL_REGULAR_EXPRESSION: ${TEST_FAIL_REGULAR_EXPRESSION} (${value})")
   endif()
+  set_property(TEST "${TEST_NAME}" PROPERTY RUN_SERIAL TRUE)
 endfunction(new_test)
 
 if (BUILD_TESTING)
