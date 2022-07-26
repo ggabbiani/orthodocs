@@ -45,9 +45,11 @@ STAR             	: '*';
 UNDERSCORE			: '_';
 SPECIAL				: '$';
 
+ASSERT				: 'assert';
 LET					: 'let';
 FOR					: 'for';
 IF					: 'if';
+ELSE				: 'else';
 FUNCTION			: 'function';
 MODULE				: 'module';
 INCLUDE				: 'include';

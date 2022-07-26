@@ -36,11 +36,19 @@ statement:
 	| named_function_definition
 	| named_module_definition
 	| module_instantiation
+	| if_statement
+	| assertion* SEMI
 	;
 
 assignment	: ID (indexing*|DOT_INDEXING?) ASSIGN expr;
 
 indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
+
+if_statement:
+  	IF LEFT_PAREN expr RIGHT_PAREN statement_or_block
+  	(ELSE statement_or_block)?;
+
+statement_or_block: statement | statement_block;
 
 expr:
 	TRUE
@@ -75,7 +83,10 @@ expr:
 	| let_clause expr
 	| function_call
 	| function_literal
+	| assertion expr
 ;
+
+assertion: ASSERT LEFT_PAREN arguments_opt RIGHT_PAREN;
 
 named_module_definition:
 	MODULE ID LEFT_PAREN parameters_opt RIGHT_PAREN (
