@@ -2,8 +2,10 @@ set(LANGUAGE SCAD)
 set(LEXER ${LANGUAGE}Lexer)
 set(PARSER ${LANGUAGE}Parser)
 
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+
 ###############################################################################
-# 1) C++ parser for application build
+# 1) C++ parser
 
 # Call macro to add lexer and grammar to your build dependencies.
 antlr_target(${LEXER} ${LEXER}.g4 LEXER PACKAGE scad)
@@ -17,12 +19,12 @@ include_directories(${ANTLR_${LEXER}_OUTPUT_DIR})
 include_directories(${ANTLR_${PARSER}_OUTPUT_DIR})
 
 ###############################################################################
-# 2) the application
+# 2) C++ application using the parser at 1)
 add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
-target_link_libraries(scad antlr4_static)
+target_link_libraries(scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 ###############################################################################
-# 3) and a Java parser for testing grammars via grun
+# 3) Java parser for testing grammars via grun
 find_package(Java QUIET COMPONENTS Runtime REQUIRED)
 include(UseJava)
 
