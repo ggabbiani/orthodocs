@@ -8,3 +8,6 @@ module mod_1(p1,p2) {
   }
 }
 
+module mod_2(p1, p2, p3=3) {
+
+}
