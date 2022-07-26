@@ -46,6 +46,7 @@ UNDERSCORE			: '_';
 SPECIAL				: '$';
 
 ASSERT				: 'assert';
+ECHO				: 'echo';
 LET					: 'let';
 FOR					: 'for';
 IF					: 'if';

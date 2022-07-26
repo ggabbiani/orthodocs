@@ -37,10 +37,10 @@ statement:
 	| named_module_definition
 	| module_instantiation
 	| if_statement
-	| assertion* SEMI
+	| special_function_call* SEMI
 	;
 
-assignment	: ID (indexing*|DOT_INDEXING?) ASSIGN expr;
+assignment	: ID (indexing+|DOT_INDEXING)? ASSIGN expr;
 
 indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
 
@@ -83,10 +83,12 @@ expr:
 	| let_clause expr
 	| function_call
 	| function_literal
-	| assertion expr
+	| special_function_call expr
 ;
 
-assertion: ASSERT LEFT_PAREN arguments_opt RIGHT_PAREN;
+special_function_call: echo_function_call|assert_function_call ;
+echo_function_call: ECHO LEFT_PAREN arguments_opt RIGHT_PAREN;
+assert_function_call: ASSERT LEFT_PAREN argument (COMMA argument)? RIGHT_PAREN;
 
 named_module_definition:
 	MODULE ID LEFT_PAREN parameters_opt RIGHT_PAREN (
