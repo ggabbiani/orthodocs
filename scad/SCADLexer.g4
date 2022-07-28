@@ -34,6 +34,7 @@ COMMA           	: ',';
 ASSIGN           	: '=';
 NOT					: '!';
 QUESTION    		: '?';
+HASH 				: '#';
 QUOTE				: '"';
 MINUS            	: '-';
 PLUS             	: '+';
@@ -44,8 +45,10 @@ LESS          		: '<';
 STAR             	: '*';
 UNDERSCORE			: '_';
 SPECIAL				: '$';
+CIRCUMFLEX			: '^';
 
 ASSERT				: 'assert';
+EACH				: 'each';
 ECHO				: 'echo';
 LET					: 'let';
 FOR					: 'for';
@@ -72,9 +75,13 @@ LINECOMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t]+ -> skip;
 NL: ( '\r' '\n'? | '\n') -> skip;
 
-// ID: NONDIGIT (NONDIGIT | DIGIT)*;
-ID: SPECIAL? NONDIGIT (NONDIGIT | DIGIT)*;
-NUMBER: FP | INT;
+ID: SPECIAL? (ALPHA|DIGIT|UNDERSCORE)+;
+// NUMBER: FP | INT;
+NUMBER:
+	D+ E?
+	| D* DOT D+ E?
+	| D+ DOT D* E?
+	;
 
 DOT_INDEXING	: DOT [xyz];
 
@@ -82,6 +89,10 @@ fragment ALPHA: [a-zA-Z];
 fragment DIGIT: [0-9];
 fragment NONDIGIT: [a-zA-Z_];
 fragment INT: DIGIT+;
+
+fragment D: [0-9];
+fragment E: [Ee][+-]? D+;
+fragment H: [0-9a-fA-F];
 
 fragment FP: (FRACTIONAL EXPONENT?) | (DIGIT_SEQUENCE EXPONENT);
 fragment FRACTIONAL

@@ -57,7 +57,7 @@ public:
     cout << "Package " << _package << endl;
   }
 
-  void enterNamed_module_definition(SCADParser::Named_module_definitionContext * ctx) override {
+  void enterModule_definition_l(SCADParser::Module_definition_lContext * ctx) override {
     auto identifier   = ctx->ID()->getText();
     auto description  = "Not implemented yet.";
     _index[identifier]  = description;

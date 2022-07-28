@@ -30,123 +30,192 @@ pkg: statements? EOF;
 statements: statement | statements statement;
 
 statement:
-	incl
-	| use
-	| assignment SEMI
-	| named_function_definition
-	| named_module_definition
-	| module_instantiation
-	| if_statement
-	| special_function_call* SEMI
+	SEMI	# empty_l
+	| incl	# include_l
+	| use	# use_l
+	| LEFT_BRACE inner_input+ RIGHT_BRACE # inner_input_l
+	| module_instantiation	# module_instantiation_l
+	| assignment			# assignment_l
+	| MODULE ID LEFT_PAREN parameters? RIGHT_PAREN statement	# module_definition_l
+	| FUNCTION ID LEFT_PAREN parameters? RIGHT_PAREN ASSIGN expr SEMI # function_definition_l
 	;
 
-assignment	: ID (indexing+|DOT_INDEXING)? ASSIGN expr;
+incl: INCLUDE FILE;
+use: USE FILE;
 
-indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
+inner_input: statement | inner_input statement;
 
-if_statement:
-  	IF LEFT_PAREN expr RIGHT_PAREN statement_or_block
-  	(ELSE statement_or_block)?;
+assignment	: ID ASSIGN expr SEMI;
 
-statement_or_block: statement | statement_block;
+module_instantiation:
+	NOT module_instantiation
+	| HASH module_instantiation
+	| MOD module_instantiation
+	| STAR module_instantiation
+	| single_module_instantiation child_statement
+	| ifelse_statement
+	;
+
+ifelse_statement:
+	if_statement
+	| if_statement ELSE child_statement
+	;
+
+if_statement: IF LEFT_PAREN expr RIGHT_PAREN child_statement;
+
+child_statements:
+	child_statement
+	| child_statements child_statement
+	| assignment
+	| child_statements assignment
+	;
+
+child_statement:
+	SEMI
+	| LEFT_BRACE child_statements? RIGHT_BRACE
+	| module_instantiation
+	;
+
+module_id:
+	ID
+	| FOR
+	| LET
+	| ASSERT
+	| ECHO
+	| EACH
+	;
+
+single_module_instantiation: module_id LEFT_PAREN arguments? RIGHT_PAREN;
 
 expr:
+	logic_or
+	| FUNCTION LEFT_PAREN parameters? RIGHT_PAREN expr
+	| logic_or QUESTION expr COLON expr
+	| LET LEFT_PAREN arguments? RIGHT_PAREN expr
+	| ASSERT LEFT_PAREN arguments? RIGHT_PAREN expr?
+	| ECHO LEFT_PAREN arguments? RIGHT_PAREN expr?
+	;
+
+logic_or:
+	logic_and
+	| logic_or OR logic_and
+	;
+
+logic_and:
+	equality
+	| logic_and AND equality
+	;
+
+equality:
+	comparison
+	| equality EQ comparison
+	| equality NE comparison
+	;
+
+comparison:
+	addition
+	| comparison GREATER addition
+	| comparison GE addition
+	| comparison LESS addition
+	| comparison LE addition
+	;
+
+addition:
+	multiplication
+	| addition PLUS multiplication
+	| addition MINUS multiplication
+	;
+
+multiplication:
+	unary
+	| multiplication STAR unary
+	| multiplication DIV unary
+	| multiplication MOD unary
+	;
+
+unary:
+	exponent
+	| PLUS unary
+	| MINUS unary
+	| NOT unary
+	;
+
+exponent:
+	call
+	| call CIRCUMFLEX unary
+	;
+
+call:
+	primary
+	| call LEFT_PAREN arguments? RIGHT_PAREN
+	| call LEFT_BRACKET expr RIGHT_BRACKET
+	| call DOT ID
+	;
+
+primary:
 	TRUE
 	| FALSE
 	| UNDEF
 	| NUMBER
 	| STRING
-	| lookup
-	| range_expression
-	| list_expression
-	| expr PLUS expr
-	| expr MINUS expr
-	| expr STAR expr
-	| expr DIV expr
-	| expr MOD expr
-	| expr GE expr
-	| expr GREATER expr
-	| expr EQ expr
-	| expr NE expr
-	| expr LE expr
-	| expr LESS expr
-	| expr AND expr
-	| expr OR expr
-	| NOT expr
-	| PLUS expr
-	| MINUS expr
-	| expr QUESTION expr COLON expr
-	| expr indexing
-	| expr DOT_INDEXING
+	| ID
 	| LEFT_PAREN expr RIGHT_PAREN
-	| LEFT_BRACKET list_comprehension_elements RIGHT_BRACKET
-	| let_clause expr
-	| function_call
-	| function_literal
-	| special_function_call expr
-;
+	| LEFT_BRACKET expr COLON expr RIGHT_BRACKET
+	| LEFT_BRACKET expr COLON expr COLON expr RIGHT_BRACKET
+	| LEFT_BRACKET RIGHT_BRACKET
+	| LEFT_BRACKET vector_elements COMMA? RIGHT_BRACKET
+	;
 
-special_function_call: echo_function_call|assert_function_call ;
-echo_function_call: ECHO LEFT_PAREN arguments_opt RIGHT_PAREN;
-assert_function_call: ASSERT LEFT_PAREN argument (COMMA argument)? RIGHT_PAREN;
-
-named_module_definition:
-	MODULE ID LEFT_PAREN parameters_opt RIGHT_PAREN (
-		statement_block
-		| statement
-	);
-
-statement_block: LEFT_BRACE statements? RIGHT_BRACE;
-
-module_instantiation: ID LEFT_PAREN arguments_opt RIGHT_PAREN sons;
-
-sons:
-	SEMI
-	| LEFT_BRACE module_instantiation* RIGHT_BRACE
-	| module_instantiation;
-
-named_function_definition:
-	FUNCTION ID LEFT_PAREN parameters_opt RIGHT_PAREN ASSIGN expr SEMI;
-parameters_opt: parameters?;
-parameters: parameter | parameters COMMA parameter;
-parameter: lookup | assignment;
-
-function_literal: FUNCTION LEFT_PAREN arguments_opt RIGHT_PAREN expr;
-
-incl: INCLUDE FILE;
-use: USE FILE;
-
-function_call: ID LEFT_PAREN arguments_opt RIGHT_PAREN;
-
-arguments_opt: arguments?;
-
-arguments: argument | arguments COMMA argument;
-argument: expr | assignment;
-
+/*
+ * The last set element may not be a "let"
+ * (as that would instead be parsed as an expression)
+ */
 list_comprehension_elements:
-	let_clause list_comprehension_elements
-	| for_clause list_comprehension_elements_or_expr
-	| if_clause list_comprehension_elements_or_expr;
+	LET LEFT_PAREN arguments? RIGHT_PAREN list_comprehension_elements_p
+	| EACH vector_element
+	| FOR LEFT_PAREN arguments? RIGHT_PAREN vector_element
+	| FOR LEFT_PAREN arguments? SEMI expr SEMI arguments? RIGHT_PAREN vector_element
+	| IF LEFT_PAREN expr RIGHT_PAREN vector_element
+	| IF LEFT_PAREN expr RIGHT_PAREN vector_element ELSE vector_element
+	;
 
-list_comprehension_elements_or_expr:
+// list_comprehension_elements with optional parenthesis
+list_comprehension_elements_p:
 	list_comprehension_elements
-	| expr;
+	| LEFT_PAREN list_comprehension_elements RIGHT_PAREN
+	;
 
-let_clause: LET LEFT_PAREN assignments_opt RIGHT_PAREN;
-for_clause: FOR LEFT_PAREN assignments RIGHT_PAREN;
-if_clause: IF LEFT_PAREN expr RIGHT_PAREN;
+vector_elements:
+	vector_element
+	| vector_elements COMMA vector_element
+	;
 
-assignments_opt: assignments?;
+vector_element:
+	list_comprehension_elements_p
+	| expr
+	;
 
-assignments: assignment | assignments COMMA assignment;
+parameters: parameter_list COMMA?;
 
-lookup		: ID;
+parameter_list:
+	parameter
+	| parameter_list COMMA parameter
+	;
 
-range_expression:
-  LEFT_BRACKET expr COLON expr RIGHT_BRACKET
-  | LEFT_BRACKET expr COLON expr COLON expr RIGHT_BRACKET;
+parameter:
+	ID
+	| ID ASSIGN expr
+	;
 
-list_expression: LEFT_BRACKET expression_opt RIGHT_BRACKET;
-expression_opt: comma_opt | expressions comma_opt;
-comma_opt: COMMA?;
-expressions: expr | expressions COMMA expr;
+arguments: argument_list COMMA?;
+
+argument_list:
+	argument
+	| argument_list COMMA argument
+	;
+
+argument:
+	expr
+	| ID ASSIGN expr
+	;
+
