@@ -72,7 +72,7 @@ private:
 };
 
 int main(int argc, const char *argv[]) {
-  CLI::App app{"ADOX stands for Auto Docs, automatic documentation generation for the OpenSCAD language."};
+  CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
   auto      result = EXIT_SUCCESS;
   fs::path  file;
   bool      show_tokens = false;
