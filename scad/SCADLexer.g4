@@ -75,10 +75,11 @@ LINECOMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t]+ -> skip;
 NL: ( '\r' '\n'? | '\n') -> skip;
 
-ID: SPECIAL? (ALPHA|DIGIT|UNDERSCORE)+;
-// NUMBER: FP | INT;
-NUMBER:
-	D+ E?
+// ID: SPECIAL? (ALPHA|D|UNDERSCORE)+;
+ID: SPECIAL? [a-zA-Z0-9_]+;
+
+NUMBER
+	: D+ E?
 	| D* DOT D+ E?
 	| D+ DOT D* E?
 	;
@@ -86,24 +87,11 @@ NUMBER:
 DOT_INDEXING	: DOT [xyz];
 
 fragment ALPHA: [a-zA-Z];
-fragment DIGIT: [0-9];
 fragment NONDIGIT: [a-zA-Z_];
-fragment INT: DIGIT+;
 
 fragment D: [0-9];
 fragment E: [Ee][+-]? D+;
 fragment H: [0-9a-fA-F];
-
-fragment FP: (FRACTIONAL EXPONENT?) | (DIGIT_SEQUENCE EXPONENT);
-fragment FRACTIONAL
-	: DIGIT_SEQUENCE? DOT DIGIT_SEQUENCE
-	| DIGIT_SEQUENCE DOT
-	;
-fragment EXPONENT: [eE] SIGN? DIGIT_SEQUENCE;
-
-fragment SIGN: [+-];
-
-fragment DIGIT_SEQUENCE: DIGIT+;
 
 fragment ESCAPE_SEQUENCE: SIMPLE_ESCAPE_SEQUENCE | UNICODE;
 
@@ -115,10 +103,8 @@ fragment CHAR_SEQUENCE: CHAR+;
 
 fragment CHAR: ~["\\\r\n] | ESCAPE_SEQUENCE;
 
-fragment UNICODE: '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
+fragment UNICODE: '\\u' H H H H;
 
-fragment HEX_DIGIT: [0-9a-fA-F];
-
-// PATH_COMPONENT: [a-zA-Z0-9_-]+;
-fragment PATH_COMPONENT: (ALPHA | DIGIT | MINUS | UNDERSCORE | DOT)+;
-FILE: LESS PATH_COMPONENT ('/' PATH_COMPONENT)* GREATER;
+// fragment PATH_COMPONENT: [a-zA-Z0-9_-.]+;
+fragment PATH_COMPONENT: (ALPHA | D | MINUS | UNDERSCORE | DOT)+;
+FILE: LESS PATH_COMPONENT (DIV PATH_COMPONENT)* GREATER;
