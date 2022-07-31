@@ -22,7 +22,7 @@
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
 #include "SCADParser.h"
-#include "SCADParserBaseListener.h"
+#include "SCADBaseListener.h"
 
 #include <tree/ParseTreeWalker.h>
 
@@ -49,7 +49,7 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
   throw std::invalid_argument(s.str());
 }
 
-class DocGenerator : public SCADParserBaseListener {
+class DocGenerator : public SCADBaseListener {
 public:
   DocGenerator(const fs::path &source) : _package(source.filename().stem().string()) {}
 
@@ -57,12 +57,12 @@ public:
     cout << "Package " << _package << endl;
   }
 
-  void enterModule_definition_l(SCADParser::Module_definition_lContext * ctx) override {
-    auto identifier   = ctx->ID()->getText();
-    auto description  = "Not implemented yet.";
-    _index[identifier]  = description;
-    cout << "Module " << identifier << " found." << endl;
-  }
+  // void enterModule_definition_l(SCADParser::Module_definition_lContext * ctx) override {
+  //   auto identifier   = ctx->ID()->getText();
+  //   auto description  = "Not implemented yet.";
+  //   _index[identifier]  = description;
+  //   cout << "Module " << identifier << " found." << endl;
+  // }
 private:
   // a little semantic...
   using ID = std::string;
