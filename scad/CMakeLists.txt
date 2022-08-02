@@ -92,6 +92,7 @@ add_custom_command(
     COMMAND ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}
             ${LANGUAGE_GRAMMAR}
             -o ${JAVA_ARTIFACTS_DIR}
+    DEPENDS ${LANGUAGE_GRAMMAR}
     COMMENT "Building Java artifacts"
 )
 
@@ -146,5 +147,5 @@ if (BUILD_TESTING)
   new_test(NAME func_lit      RULE function_literal FILE func_lit.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME assert        RULE pkg  FILE assert.scad        FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME if_statement  RULE pkg  FILE if_statement.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
-  new_test(NAME lst_compr     RULE expr  FILE list_comprehension.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
+  new_test(NAME lst_compr     RULE pkg  FILE list_comprehension.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
 endif()

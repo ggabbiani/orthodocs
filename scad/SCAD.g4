@@ -36,18 +36,16 @@ statement:
 	| special_function_call* SEMI
 	;
 
-assignment	: ID (indexing+|DOT_INDEXING)? ASSIGN expr;
+assignment	: ID ASSIGN expr;
 
 indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
 
-if_statement:
-  	IF LEFT_PAREN expr RIGHT_PAREN statement_or_block
-  	(ELSE statement_or_block)?;
+if_statement: IF '(' expr ')' statement_or_block (ELSE statement_or_block)?;
 
 statement_or_block: statement | statement_block;
 
-expr:
-	TRUE
+expr
+	: TRUE
 	| FALSE
 	| UNDEF
 	| NUMBER
@@ -75,12 +73,12 @@ expr:
 	| expr indexing
 	| expr DOT_INDEXING
 	| LEFT_PAREN expr RIGHT_PAREN
-	| LEFT_BRACKET list_comprehension_elements RIGHT_BRACKET
+	| '[' list_comprehension_elements ']'
 	| let_clause expr
 	| function_call
 	| function_literal
 	| special_function_call expr
-;
+	;
 
 special_function_call: echo_function_call|assert_function_call ;
 echo_function_call: ECHO LEFT_PAREN arguments_opt RIGHT_PAREN;
@@ -119,18 +117,20 @@ arguments_opt: arguments?;
 arguments: argument | arguments COMMA argument;
 argument: expr | assignment;
 
-list_comprehension_elements:
-	let_clause list_comprehension_elements
+list_comprehension_elements
+	: let_clause list_comprehension_elements
 	| for_clause list_comprehension_elements_or_expr
-	| if_clause list_comprehension_elements_or_expr;
+	| if_clause list_comprehension_elements_or_expr
+	;
 
-list_comprehension_elements_or_expr:
-	list_comprehension_elements
-	| expr;
+list_comprehension_elements_or_expr
+	: list_comprehension_elements
+	| expr
+	;
 
-let_clause: LET LEFT_PAREN assignments_opt RIGHT_PAREN;
-for_clause: FOR LEFT_PAREN assignments RIGHT_PAREN;
-if_clause: IF LEFT_PAREN expr RIGHT_PAREN;
+let_clause	: 'let' '(' assignments_opt ')';
+for_clause	: 'for' '(' assignments 	')';
+if_clause	: 'if' 	'(' expr 			')';
 
 assignments_opt: assignments?;
 
@@ -138,14 +138,22 @@ assignments: assignment | assignments COMMA assignment;
 
 lookup		: ID;
 
-range_expression:
-  LEFT_BRACKET expr COLON expr RIGHT_BRACKET
-  | LEFT_BRACKET expr COLON expr COLON expr RIGHT_BRACKET;
+range_expression
+	: LEFT_BRACKET expr COLON expr RIGHT_BRACKET
+	| LEFT_BRACKET expr COLON expr COLON expr RIGHT_BRACKET
+	;
 
-list_expression: LEFT_BRACKET expression_opt RIGHT_BRACKET;
-expression_opt: comma_opt | expressions comma_opt;
-comma_opt: COMMA?;
-expressions: expr | expressions COMMA expr;
+list_expression: '[' expression_opt ']';
+
+expression_opt
+	: ','?
+	| expressions ','?
+	;
+
+expressions
+	: expr
+	| expressions ',' expr
+	;
 
 DOT					: '.';
 COLON           	: ':';

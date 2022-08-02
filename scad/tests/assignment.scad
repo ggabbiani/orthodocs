@@ -45,10 +45,10 @@ list    = [[1,r],[x,y,z,4,5]];
 list    = [3, 5, [6,7], [[8,9],[10,[11,12],13], c, "string"]];
 // list    = [4/3, 6*1.5, cos(60)];
 //
-a[b*5]  = 0;
+// a[b*5]  = 0;
 a       = b[2-c];
-a[b*5]  = b[2-c];
-a[b[c]-2*d] = e[f[g]-2*h];
+// a[b*5]  = b[2-c];
+// a[b[c]-2*d] = e[f[g]-2*h];
 // let statement
 identifier = let (angle = i*360/20, r= i*2, distance = r*5) angle + 2;
 // function call
