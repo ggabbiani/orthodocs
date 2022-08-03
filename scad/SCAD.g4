@@ -73,7 +73,7 @@ expr
 	| expr indexing
 	| expr DOT_INDEXING
 	| LEFT_PAREN expr RIGHT_PAREN
-	| '[' list_comprehension_elements ']'
+	| list_comprehension_elements
 	| let_clause expr
 	| function_call
 	| function_literal
