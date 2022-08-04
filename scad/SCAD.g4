@@ -31,7 +31,7 @@ statement:
 	| assignment SEMI
 	| named_function_definition
 	| named_module_definition
-	| module_instantiation
+	| ('%'| '#'| '!'| '*')? module_instantiation
 	| special_function_call* SEMI
 	;
 
@@ -79,7 +79,7 @@ expr
 	| let_clause expr
 	| function_call
 	| function_literal
-	| special_function_call expr
+	| special_function_call expr?
 	;
 
 special_function_call
