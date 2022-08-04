@@ -137,21 +137,21 @@ echo([for(n=list) if(n%2==0 || n>=0) n%2==0 ? n/2 : n ]);
  */
 
 // even numbers are halved, positive odd numbers are preserved, negative odd numbers are eliminated
-// echo([for (a = [-3:5]) if (a % 2 == 0) [a, a/2] else if (a > 0) [a, a] ]);
+echo([for (a = [-3:5]) if (a % 2 == 0) [a, a/2] else if (a > 0) [a, a] ]);
 // ECHO: [[-2, -1], [0, 0], [1, 1], [2, 1], [3, 3], [4, 2], [5, 5]];
 
-// // Note that in the expression above the conditional operator could not substitute if-else. It is possible to express this same filter with the conditional operator but with a more cryptic logic:
+// Note that in the expression above the conditional operator could not substitute if-else. It is possible to express this same filter with the conditional operator but with a more cryptic logic:
 
-// // even numbers are halved, positive odd numbers are preserved, negative odd numbers are eliminated
-// echo([for (a = [-3:5]) if (a % 2 == 0 || (a % 2 != 0 && a > 0)) a % 2 == 0 ? [a, a / 2] : [a, a] ]);
-// // ECHO: [[-2, -1], [0, 0], [1, 1], [2, 1], [3, 3], [4, 2], [5, 5]];
+// even numbers are halved, positive odd numbers are preserved, negative odd numbers are eliminated
+echo([for (a = [-3:5]) if (a % 2 == 0 || (a % 2 != 0 && a > 0)) a % 2 == 0 ? [a, a / 2] : [a, a] ]);
+// ECHO: [[-2, -1], [0, 0], [1, 1], [2, 1], [3, 3], [4, 2], [5, 5]];
 
-// // To bind an else expression to a specific if, it's possible to use parenthesis.
+// To bind an else expression to a specific if, it's possible to use parenthesis.
 
-// // even numbers are dropped, multiples of 4 are substituted by -1
-// echo([for(i=[0:10]) if(i%2==0) (if(i%4==0) -1 ) else i]);
-// // ECHO: [-1, 1, 3, -1, 5, 7, -1, 9]
+// even numbers are dropped, multiples of 4 are substituted by -1
+echo([for(i=[0:10]) if(i%2==0) (if(i%4==0) -1 ) else i]);
+// ECHO: [-1, 1, 3, -1, 5, 7, -1, 9]
 
-// // odd numbers are dropped, multiples of 4 are substituted by -1
-// echo([for(i=[0:10]) if(i%2==0) if(i%4==0) -1 else i]);
-// // ECHO: [-1, 2, -1, 6, -1, 10]
+// odd numbers are dropped, multiples of 4 are substituted by -1
+echo([for(i=[0:10]) if(i%2==0) if(i%4==0) -1 else i]);
+// ECHO: [-1, 2, -1, 6, -1, 10]

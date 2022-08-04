@@ -126,6 +126,7 @@ list_comprehension_elements
 	: let_clause list_comprehension_elements
 	| for_clause list_comprehension_elements_or_for_variants
 	| if_clause list_comprehension_elements_or_expr
+	| ifelse_clause list_comprehension_elements_or_expr
 	;
 
 list_comprehension_elements_or_expr
@@ -142,6 +143,7 @@ list_comprehension_elements_or_for_variants
 let_clause	: 'let' '(' assignments_opt ')';
 for_clause	: 'for' '(' for_styles ')';
 if_clause	: 'if' 	'(' expr 			')';
+ifelse_clause: if_clause list_comprehension_elements_or_expr 'else';
 
 for_styles
 	: assignments
