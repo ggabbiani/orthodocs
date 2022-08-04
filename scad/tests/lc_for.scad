@@ -1,5 +1,5 @@
 /*
- * list comprehension: for
+ * list comprehension: Basic Syntax
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -155,3 +155,10 @@ echo([for(i=[0:10]) if(i%2==0) (if(i%4==0) -1 ) else i]);
 // odd numbers are dropped, multiples of 4 are substituted by -1
 echo([for(i=[0:10]) if(i%2==0) if(i%4==0) -1 else i]);
 // ECHO: [-1, 2, -1, 6, -1, 10]
+
+/*
+ * EIGHTH VARIANT: [ for (i = list) let (assignments) a ]
+ * The let element allows sequential assignment of variables inside a list comprehension definition.
+ */
+list = [ for (a = [ 1 : 4 ]) let (b = a*a, c = 2 * b) [ a, b, c ] ];
+echo(list); // ECHO: [[1, 1, 2], [2, 4, 8], [3, 9, 18], [4, 16, 32]]

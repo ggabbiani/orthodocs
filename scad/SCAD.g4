@@ -122,6 +122,8 @@ arguments_opt: arguments?;
 arguments: argument | arguments COMMA argument;
 argument: expr | assignment;
 
+/* list comprehension */
+
 list_comprehension_elements
 	: let_clause list_comprehension_elements
 	| for_clause list_comprehension_elements_or_for_variants
@@ -151,6 +153,8 @@ for_styles
 	;
 
 c_style: assignments_opt ';' expr ';' assignments_opt;
+
+// end of list comprehension
 
 assignments_opt: assignments?;
 
