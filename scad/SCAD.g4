@@ -80,8 +80,13 @@ expr
 	| special_function_call expr
 	;
 
-special_function_call: echo_function_call|assert_function_call ;
+special_function_call
+	: echo_function_call
+	| assert_function_call
+	;
+
 echo_function_call: ECHO LEFT_PAREN arguments_opt RIGHT_PAREN;
+
 assert_function_call: ASSERT LEFT_PAREN argument (COMMA argument)? RIGHT_PAREN;
 
 named_module_definition:
@@ -119,7 +124,7 @@ argument: expr | assignment;
 
 list_comprehension_elements
 	: let_clause list_comprehension_elements
-	| for_clause list_comprehension_elements_or_expr
+	| for_clause list_comprehension_elements_or_for_variants
 	| if_clause list_comprehension_elements_or_expr
 	;
 
@@ -128,9 +133,22 @@ list_comprehension_elements_or_expr
 	| expr
 	;
 
+list_comprehension_elements_or_for_variants
+	: list_comprehension_elements
+	| expr
+	| 'each' list_expression
+	;
+
 let_clause	: 'let' '(' assignments_opt ')';
-for_clause	: 'for' '(' assignments 	')';
+for_clause	: 'for' '(' for_styles ')';
 if_clause	: 'if' 	'(' expr 			')';
+
+for_styles
+	: assignments
+	| c_style
+	;
+
+c_style: assignments_opt ';' expr ';' assignments_opt;
 
 assignments_opt: assignments?;
 
