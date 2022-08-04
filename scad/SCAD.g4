@@ -32,9 +32,6 @@ statement:
 	| named_function_definition
 	| named_module_definition
 	| module_instantiation
-	| if_statement
-	| for_statement
-	| intersection_for_statement
 	| special_function_call* SEMI
 	;
 
@@ -102,14 +99,17 @@ named_module_definition:
 
 statement_block: LEFT_BRACE statements? RIGHT_BRACE;
 
-module_instantiation: ID LEFT_PAREN arguments_opt RIGHT_PAREN sons;
+module_instantiation
+	: ID LEFT_PAREN arguments_opt RIGHT_PAREN sons?
+	| for_statement
+	| intersection_for_statement
+	| if_statement
+	;
 
 sons:
 	SEMI
 	| LEFT_BRACE module_instantiation* RIGHT_BRACE
 	| module_instantiation
-	| for_statement
-	| intersection_for_statement
 	;
 
 named_function_definition:
