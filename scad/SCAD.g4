@@ -33,6 +33,8 @@ statement:
 	| named_module_definition
 	| module_instantiation
 	| if_statement
+	| for_statement
+	| intersection_for_statement
 	| special_function_call* SEMI
 	;
 
@@ -40,8 +42,10 @@ assignment	: ID ASSIGN expr;
 
 indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
 
-if_statement: IF '(' expr ')' statement_or_block else_statement?;
-else_statement: ELSE statement_or_block;
+if_statement	: IF '(' expr ')' statement_or_block else_statement?;
+else_statement	: ELSE statement_or_block;
+for_statement	: 'for' '(' assignments ')' statement_or_block;
+intersection_for_statement	: 'intersection_for' '(' assignments ')' statement_or_block;
 
 statement_or_block: statement | statement_block;
 
@@ -103,7 +107,10 @@ module_instantiation: ID LEFT_PAREN arguments_opt RIGHT_PAREN sons;
 sons:
 	SEMI
 	| LEFT_BRACE module_instantiation* RIGHT_BRACE
-	| module_instantiation;
+	| module_instantiation
+	| for_statement
+	| intersection_for_statement
+	;
 
 named_function_definition:
 	FUNCTION ID LEFT_PAREN parameters_opt RIGHT_PAREN ASSIGN expr SEMI;
