@@ -40,7 +40,8 @@ assignment	: ID ASSIGN expr;
 
 indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
 
-if_statement: IF '(' expr ')' statement_or_block (ELSE statement_or_block)?;
+if_statement: IF '(' expr ')' statement_or_block else_statement?;
+else_statement: ELSE statement_or_block;
 
 statement_or_block: statement | statement_block;
 
