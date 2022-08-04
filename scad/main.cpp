@@ -57,12 +57,25 @@ public:
     cout << "Package " << _package << endl;
   }
 
-  // void enterModule_definition_l(SCADParser::Module_definition_lContext * ctx) override {
-  //   auto identifier   = ctx->ID()->getText();
-  //   auto description  = "Not implemented yet.";
-  //   _index[identifier]  = description;
-  //   cout << "Module " << identifier << " found." << endl;
-  // }
+  void enterNamed_function_definition(SCADParser::Named_function_definitionContext *ctx) override {
+    auto identifier = ctx->ID()->getText();
+    auto t = ctx->parameters_opt()->parameters();
+    auto parms      = t ? t->getText() : string();
+
+    cout << "Function " << identifier << "(" << parms <<  ")" << endl;
+  }
+
+  void enterNamed_module_definition(SCADParser::Named_module_definitionContext * ctx) override {
+    auto identifier   = ctx->ID()->getText();
+    auto parms        = ctx->parameters_opt()->parameters() ? ctx->parameters_opt()->parameters()->getText() : string("-");
+    auto description  = "Not implemented yet.";
+    ostringstream  ss;
+    ss << identifier << "(" << parms <<  ")";
+    auto signature    = ss.str();
+
+    _index[identifier]  = description;
+    cout << "Module " << signature << endl;
+  }
 private:
   // a little semantic...
   using ID = std::string;
