@@ -28,8 +28,9 @@ include_directories(${ANTLR_${LANGUAGE}_OUTPUT_DIR})
 # add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 # target_link_libraries(scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-add_executable(scad main.cpp ${ANTLR_${LANGUAGE}_CXX_OUTPUTS})
-target_link_libraries(scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+add_executable(listener src/listener.cpp src/generator.cpp src/formatters.cpp ${ANTLR_${LANGUAGE}_CXX_OUTPUTS})
+target_include_directories(listener PUBLIC include)
+target_link_libraries(listener antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 ###############################################################################
 # 3) Java parser for testing grammars via grun
@@ -113,7 +114,7 @@ function(new_test)
   set(multiValueArgs PASS_REGULAR_EXPRESSION FAIL_REGULAR_EXPRESSION)
   cmake_parse_arguments(TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   set(test_default "^line")
-  add_test(NAME "${TEST_NAME}" COMMAND "${GRUN}" "${LANGUAGE}" "${TEST_RULE}" "${TEST_FILE}" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+  add_test(NAME "${TEST_NAME}" COMMAND "${GRUN}" "${LANGUAGE}" "${TEST_RULE}" "${TEST_FILE}" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/parse-tests")
   if (DEFINED TEST_PASS_REGULAR_EXPRESSION)
     if (TEST_PASS_REGULAR_EXPRESSION STREQUAL "DEFAULT")
       set(value ${test_default})

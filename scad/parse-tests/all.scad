@@ -59,11 +59,12 @@ v = let(a=2,b="string") a;
 // function calls
 fc_1 = abs(-3);
 
-// function definition
+//! function definition
 function func_1(p1,p2) = let(
   p = p1 + p2
 ) p * p;
 
+//! this module has a special character
 module $mod_1(p1,p2) {
   var = func_1(1,2);
   children();

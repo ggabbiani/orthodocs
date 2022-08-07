@@ -19,21 +19,23 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "formatters.h"
+#include "generator.h"
+
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
 #include "SCADParser.h"
-#include "SCADBaseListener.h"
 
 #include <tree/ParseTreeWalker.h>
 
 #include "CLI11.hpp"
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <sstream>
 
 using namespace std;
 using namespace scad;
 using namespace antlr4;
+
 namespace fs=boost::filesystem;
 
 class ErrorHandler : public BaseErrorListener {
@@ -49,40 +51,6 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
   throw std::invalid_argument(s.str());
 }
 
-class DocGenerator : public SCADBaseListener {
-public:
-  DocGenerator(const fs::path &source) : _package(source.filename().stem().string()) {}
-
-  void enterPkg(SCADParser::PkgContext * ctx) override {
-    cout << "Package " << _package << endl;
-  }
-
-  void enterNamed_function_definition(SCADParser::Named_function_definitionContext *ctx) override {
-    auto identifier = ctx->ID()->getText();
-    auto t = ctx->parameters_opt()->parameters();
-    auto parms      = t ? t->getText() : string();
-
-    cout << "Function " << identifier << "(" << parms <<  ")" << endl;
-  }
-
-  void enterNamed_module_definition(SCADParser::Named_module_definitionContext * ctx) override {
-    auto identifier   = ctx->ID()->getText();
-    auto parms        = ctx->parameters_opt()->parameters() ? ctx->parameters_opt()->parameters()->getText() : string("-");
-    auto description  = "Not implemented yet.";
-    ostringstream  ss;
-    ss << identifier << "(" << parms <<  ")";
-    auto signature    = ss.str();
-
-    _index[identifier]  = description;
-    cout << "Module " << signature << endl;
-  }
-private:
-  // a little semantic...
-  using ID = std::string;
-  using Description = std::string;
-  string _package;
-  map<ID,Description> _index;
-};
 
 int main(int argc, const char *argv[]) {
   CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
@@ -115,11 +83,15 @@ int main(int argc, const char *argv[]) {
     ErrorHandler listener;
     parser.addErrorListener(&listener);
 
-    DocGenerator  generator(file.c_str());
+    doc::Generator  generator(file.c_str());
     // parse tree depth-first traverse
     tree::ParseTreeWalker  walker;
     tree::ParseTree       *tree = parser.pkg();
     walker.walk(&generator,tree);
+
+    doc::formatter::Mdown out(cout);
+    out.format(generator.items);
+
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {

@@ -21,30 +21,36 @@
 
 grammar SCAD;
 
-pkg: statements? EOF;
+pkg: annotation_opt stats? EOF;
 
-statements: statement | statements statement;
+stats: stat | stats stat;
 
-statement:
-	incl
+stat
+	: incl
 	| use
-	| assignment SEMI
-	| named_function_definition
-	| named_module_definition
-	| ('%'| '#'| '!'| '*')? module_instantiation
-	| special_function_call* SEMI
+	| assignment ';'
+	| function_def
+	| module_def
+	| ('%'|'#'|'!'|'*')? module_inst
+	| special_function_call* ';'
 	;
 
-assignment	: ID ASSIGN expr;
+annotation_opt: annotation?;
 
-indexing	: LEFT_BRACKET expr RIGHT_BRACKET;
+annotation
+	: BLOCK_ANNO
+	| LINE_ANNO
+	;
 
-if_statement	: IF '(' expr ')' statement_or_block else_statement?;
-else_statement	: ELSE statement_or_block;
-for_statement	: 'for' '(' assignments ')' statement_or_block;
-intersection_for_statement	: 'intersection_for' '(' assignments ')' statement_or_block;
+assignment	: annotation_opt ID '=' expr;
 
-statement_or_block: statement | statement_block;
+indexing	: '[' expr ']';
+
+if_stat			: let_clause? IF '(' expr ')' stat_or_block else_stat?;
+else_stat		: ELSE stat_or_block;
+for_stat		: FOR 		'(' assignments ')' stat_or_block;
+int_for_stat	: INT_FOR	'(' assignments ')' stat_or_block;
+stat_or_block	: stat | stat_block;
 
 expr
 	: TRUE
@@ -53,28 +59,28 @@ expr
 	| NUMBER
 	| STRING
 	| lookup
-	| range_expression
-	| list_expression
-	| expr PLUS expr
-	| expr MINUS expr
-	| expr STAR expr
-	| expr DIV expr
-	| expr MOD expr
-	| expr GE expr
-	| expr GREATER expr
-	| expr EQ expr
-	| expr NE expr
-	| expr LE expr
-	| expr LESS expr
-	| expr AND expr
-	| expr OR expr
-	| NOT expr
-	| PLUS expr
-	| MINUS expr
-	| expr QUESTION expr COLON expr
+	| range_expr
+	| list_expr
+	| expr '+'	expr
+	| expr '-' 	expr
+	| expr '*' 	expr
+	| expr '/' 	expr
+	| expr '%' 	expr
+	| expr '>=' expr
+	| expr '>' 	expr
+	| expr '==' expr
+	| expr '!=' expr
+	| expr '<=' expr
+	| expr '<' 	expr
+	| expr '&&' expr
+	| expr '||' expr
+	| '!' expr
+	| '+' expr
+	| '-' expr
+	| expr '?' expr ':' expr
 	| expr indexing
 	| expr DOT_INDEXING
-	| LEFT_PAREN expr RIGHT_PAREN
+	| '(' expr ')'
 	| list_comprehension_elements
 	| let_clause expr
 	| function_call
@@ -86,48 +92,42 @@ special_function_call
 	: echo_function_call
 	| assert_function_call
 	;
+echo_function_call	: ECHO 		'(' arguments_opt ')';
+assert_function_call: ASSERT	'(' argument (',' argument)? ')';
 
-echo_function_call: ECHO LEFT_PAREN arguments_opt RIGHT_PAREN;
+module_def
+	: annotation_opt MODULE ID '(' parameters_opt ')' (stat_block|stat);
 
-assert_function_call: ASSERT LEFT_PAREN argument (COMMA argument)? RIGHT_PAREN;
+stat_block: '{' stats? '}';
 
-named_module_definition:
-	MODULE ID LEFT_PAREN parameters_opt RIGHT_PAREN (
-		statement_block
-		| statement
-	);
-
-statement_block: LEFT_BRACE statements? RIGHT_BRACE;
-
-module_instantiation
-	: ID LEFT_PAREN arguments_opt RIGHT_PAREN sons?
-	| for_statement
-	| intersection_for_statement
-	| if_statement
+module_inst
+	: ID '(' arguments_opt ')' sons?
+	| for_stat
+	| int_for_stat
+	| if_stat
 	;
 
-sons:
-	SEMI
-	| LEFT_BRACE module_instantiation* RIGHT_BRACE
-	| module_instantiation
+sons
+	: ';'
+	| '{' module_inst* '}'
+	| module_inst
 	;
 
-named_function_definition:
-	FUNCTION ID LEFT_PAREN parameters_opt RIGHT_PAREN ASSIGN expr SEMI;
-parameters_opt: parameters?;
-parameters: parameter | parameters COMMA parameter;
-parameter: lookup | assignment;
+function_def	: annotation_opt FUNCTION ID '(' parameters_opt ')' '=' expr ';';
+parameters_opt	: parameters?;
+parameters		: parameter | parameters ',' parameter;
+parameter		: lookup | assignment;
 
-function_literal: FUNCTION LEFT_PAREN arguments_opt RIGHT_PAREN expr;
+function_literal: FUNCTION '(' arguments_opt ')' expr;
 
 incl: INCLUDE FILE;
-use: USE FILE;
+use	: USE FILE;
 
-function_call: ID LEFT_PAREN arguments_opt RIGHT_PAREN;
+function_call: ID '(' arguments_opt ')';
 
 arguments_opt: arguments?;
 
-arguments: argument | arguments COMMA argument;
+arguments: argument | arguments ',' argument;
 argument: expr | assignment;
 
 /* list comprehension */
@@ -147,44 +147,52 @@ list_comprehension_elements_or_expr
 list_comprehension_elements_or_for_variants
 	: list_comprehension_elements
 	| expr
-	| 'each' list_expression
+	| EACH list_expr
 	;
 
-let_clause	: 'let' '(' assignments_opt ')';
-for_clause	: 'for' '(' for_styles ')';
-if_clause	: 'if' 	'(' expr 			')';
-ifelse_clause: if_clause list_comprehension_elements_or_expr 'else';
+let_clause
+	: LET 	'(' assignments_opt ')';
+for_clause
+	: FOR 	'(' for_styles 		')';
+if_clause
+	: IF	'(' expr 			')';
+ifelse_clause
+	: if_clause list_comprehension_elements_or_expr ELSE;
 
 for_styles
 	: assignments
 	| c_style
 	;
 
-c_style: assignments_opt ';' expr ';' assignments_opt;
+c_style
+	: assignments_opt ';' expr ';' assignments_opt;
 
 // end of list comprehension
 
-assignments_opt: assignments?;
+assignments_opt
+	: assignments?;
+assignments
+	: assignment
+	| assignments ',' assignment
+	;
+lookup
+	: annotation_opt ID;
 
-assignments: assignment | assignments COMMA assignment;
-
-lookup		: ID;
-
-range_expression
-	: LEFT_BRACKET expr COLON expr RIGHT_BRACKET
-	| LEFT_BRACKET expr COLON expr COLON expr RIGHT_BRACKET
+range_expr
+	: '[' expr COLON expr ']'
+	| '[' expr COLON expr COLON expr ']'
 	;
 
-list_expression: '[' expression_opt ']';
+list_expr: '[' expr_opt ']';
 
-expression_opt
+expr_opt
 	: ','?
-	| expressions ','?
+	| exprs ','?
 	;
 
-expressions
+exprs
 	: expr
-	| expressions ',' expr
+	| exprs ',' expr
 	;
 
 DOT					: '.';
@@ -218,6 +226,7 @@ EACH				: 'each';
 ECHO				: 'echo';
 LET					: 'let';
 FOR					: 'for';
+INT_FOR				: 'intersection_for';
 IF					: 'if';
 ELSE				: 'else';
 FUNCTION			: 'function';
@@ -235,13 +244,16 @@ LE					: '<=';
 AND					: '&&';
 OR					: '||';
 
-BLOCKCOMMENT: '/*' .*? '*/' -> skip;
-LINECOMMENT: '//' ~[\r\n]* -> skip;
+MODIFIER		: '%'| '#'| '!'| '*';
+BLOCK_ANNO		: '/*!' .*? '*/';
+LINE_ANNO		: '//!' ~[\r\n]*;
+
+BLOCK_COMMENT	: '/*' .*? '*/' -> skip;
+LINE_COMMENT	: '//' ~[\r\n]*	-> skip;
 
 WS: [ \t]+ -> skip;
 NL: ( '\r' '\n'? | '\n') -> skip;
 
-// ID: SPECIAL? (ALPHA|D|UNDERSCORE)+;
 ID: SPECIAL? [a-zA-Z0-9_]+;
 
 NUMBER
@@ -271,6 +283,5 @@ fragment CHAR: ~["\\\r\n] | ESCAPE_SEQUENCE;
 
 fragment UNICODE: '\\u' H H H H;
 
-// fragment PATH_COMPONENT: [a-zA-Z0-9_-.]+;
 fragment PATH_COMPONENT: (ALPHA | D | MINUS | UNDERSCORE | DOT)+;
 FILE: LESS PATH_COMPONENT (DIV PATH_COMPONENT)* GREATER;

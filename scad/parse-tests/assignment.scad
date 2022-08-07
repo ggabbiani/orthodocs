@@ -1,7 +1,7 @@
 ident_1     = true;
 ident_2     = false;
 ident_3     = undef;
-// expr == NUMBER
+/* expr == NUMBER */
 ident_4     = 1;
 ident_5     = +1;
 ident_6     = -1;
