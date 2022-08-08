@@ -95,3 +95,6 @@ echo(cat([1,2,3],[4,5])); //concatenates two OpenSCAD lists [1,2,3] and [4,5], g
 
 function cat(L1, L2) = [for(L=[L1, L2], a=L) a];
 echo(cat([1,2,3],[4,5])); //concatenates two OpenSCAD lists [1,2,3] and [4,5], giving [1, 2, 3, 4, 5]
+
+function fl_push(list,item) = [each list,item];
+A = [each list,a,[]];

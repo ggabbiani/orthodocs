@@ -60,7 +60,7 @@ expr
 	| STRING
 	| lookup
 	| range_expr
-	| list_expr
+	| sequence
 	| expr '+'	expr
 	| expr '-' 	expr
 	| expr '*' 	expr
@@ -100,12 +100,12 @@ module_def
 
 stat_block: '{' stats? '}';
 
-module_inst
-	: ID '(' arguments_opt ')' sons?
+module_inst: let_clause?
+	( ID '(' arguments_opt ')' sons?
 	| for_stat
 	| int_for_stat
 	| if_stat
-	;
+	);
 
 sons
 	: ';'
@@ -146,8 +146,7 @@ list_comprehension_elements_or_expr
 
 list_comprehension_elements_or_for_variants
 	: list_comprehension_elements
-	| expr
-	| EACH list_expr
+	| seq_item
 	;
 
 let_clause
@@ -183,17 +182,19 @@ range_expr
 	| '[' expr COLON expr COLON expr ']'
 	;
 
-list_expr: '[' expr_opt ']';
+sequence: '[' optional_items ']';
 
-expr_opt
+optional_items
 	: ','?
-	| exprs ','?
+	| items ','?
 	;
 
-exprs
-	: expr
-	| exprs ',' expr
+items
+	: seq_item
+	| items ',' seq_item
 	;
+
+seq_item: EACH? expr;
 
 DOT					: '.';
 COLON           	: ':';
