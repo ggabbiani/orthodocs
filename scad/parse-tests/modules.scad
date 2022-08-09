@@ -1,10 +1,19 @@
+mod_0(p1,p2) {
+  mod_1(p1,p2);
+
+  assert(p2,p3)
+    mod_3(p);
+}
+
 module mod_1(p1,p2) {
   var = func_1(1,2);
   children();
   pippo() {}
+  assert(axis*align==0,"Alignment and layout direction must be orthogonal");
   # pluto() {
     first(2,"ciao");
-    second(0);
+    assert(axis*align==0,"Alignment and layout direction must be orthogonal")
+      second(0);
   }
 }
 
