@@ -1,5 +1,7 @@
 /*! test package */
 
+glb1 = "I'm a global variable";
+
 //! general 2d polygon bounding box
 function fl_bb_polygon(
   //! points used for bounding box calculation
@@ -20,7 +22,7 @@ function f(
   p3=undef) = 0;
 
   module one() {
-
+    loc1 = "I'm a local variable";
   }
 
   module two(
