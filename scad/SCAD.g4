@@ -32,7 +32,6 @@ stat
 	| function_def
 	| module_def
 	| ('%'|'#'|'!'|'*')? module_inst
-	| special_function_call* ';'
 	;
 
 annotation_opt: annotation?;
@@ -101,7 +100,9 @@ module_def
 stat_block: '{' stats? '}';
 
 module_inst: let_clause?
-	( ID '(' arguments_opt ')' sons?
+	( ECHO '(' arguments_opt ')' sons?
+	| ASSERT '(' argument (',' argument)? ')' sons?
+	| ID '(' arguments_opt ')' sons?
 	| for_stat
 	| int_for_stat
 	| if_stat
