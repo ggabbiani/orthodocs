@@ -83,7 +83,8 @@ void Mdown::function(const doc::Item &func) {
       << endl
       << BOLD("Syntax:") << endl
       << endl
-      << CODE(signature(func)) << endl
+      // << CODE(signature(func)) << endl
+      << "    " << signature(func) << endl
       << endl;
   if (!func.annotation.empty())
     out << func.annotation << endl
@@ -114,7 +115,8 @@ void Mdown::module(const doc::Item &mod) {
       << endl
       << BOLD("Syntax:") << endl
       << endl
-      << CODE(signature(mod)) << endl
+      // << CODE(signature(mod)) << endl
+      << "    " << signature(mod) << endl
       << endl;
   if (!mod.annotation.empty())
     out << mod.annotation << endl
