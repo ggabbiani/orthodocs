@@ -53,43 +53,77 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
 }
 
 // return a vector containing all the file path with extension ".scad"
-vector<fs::path> filter(const vector<fs::path> &sources,const char *extension) {
-  vector<fs::path> files;
+void lookup(const vector<fs::path> &sources,const char *extension,vector<fs::path> *result) {
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (path.extension()==".scad")
-        files.push_back(path);
+        result->push_back(path);
     } else if (fs::is_directory(path)) {
-      for (auto &entry: fs::directory_iterator{path}) 
-        if (fs::is_regular_file(entry.path()) && entry.path().extension()==".scad")
-          files.push_back(entry.path());
+      for (auto &entry: fs::directory_iterator{path}) {
+        auto path = entry.path();
+        if (fs::is_regular_file(path)) {
+          if (path.extension()==".scad")
+            result->push_back(path);
+        } else if (fs::is_directory(path)) {
+          lookup(vector<fs::path>{path},extension,result);
+        }
+      }
     }
   }
-  return files;
+}
+
+fs::path make_relative(fs::path root, fs::path file) {
+  auto aroot  = fs::absolute(root.remove_filename());
+  auto afile  = fs::absolute(file);
+  auto f      = afile.begin();
+  cout << "afile: " << afile << endl
+    << "aroot: " << aroot << endl;
+  for(auto r=aroot.begin();r!=aroot.end()&&f!=afile.end();++r,++f) {
+    if (*r!=*f) {
+      stringstream ss;
+      ss << *r << "!=" << *f;
+      throw runtime_error(ss.str());
+    }
+    cout << "r: " << *r << endl
+      << (*r==*f) << endl
+      << (r!=aroot.end()) << endl;
+  }
+  cout << "f: " << *f << endl;
+  return accumulate(
+    next(--f), 
+    afile.end(), 
+    fs::path{}, 
+    divides{}
+  );
 }
 
 int main(int argc, const char *argv[]) {
   CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
   auto              result = EXIT_SUCCESS;
   vector<fs::path>  sources, src_files;
-  fs::path          destination;
+  fs::path          sroot,droot;
   bool              show_tokens = false;
 
   app.add_option("sources", sources, "Source directories or files in any combination")
     ->required()
-    ->type_name("DIR|FILE");
-  app.add_option("-d,--destination-directory", destination, "Destination directory")
+    // ->type_name("DIR|FILE")
+    ->check(CLI::ExistingPath);
+  app.add_option("-s,--source-root", sroot, "Source directory root")
+    ->check(CLI::ExistingDirectory);
+  app.add_option("-d,--doc-root",droot, "Document root")
     ->required()
     ->check(CLI::ExistingDirectory);
   app.add_flag("--tokens,-t",show_tokens,"Manages token listing");
 
   try {
     app.parse(argc, argv);
-    src_files = filter(sources,".scad");
+    lookup(sources,".scad",&src_files);
 
     cout  << "Source files:" << endl;
     for(auto file: src_files)
-      cout << file << endl;
+      cout 
+        // << file << endl
+        << make_relative(sroot,file) << endl;
 
     // ifstream          is(file);
     // ANTLRInputStream  in(is);
