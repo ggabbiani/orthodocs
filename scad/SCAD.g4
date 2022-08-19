@@ -32,6 +32,7 @@ stat
 	| function_def
 	| module_def
 	| ('%'|'#'|'!'|'*')? module_inst
+	| let_clause stat_or_block
 	;
 
 annotation_opt: annotation?;
@@ -95,18 +96,18 @@ echo_function_call	: ECHO 		'(' arguments_opt ')';
 assert_function_call: ASSERT	'(' argument (',' argument)? ')';
 
 module_def
-	: annotation_opt MODULE ID '(' parameters_opt ')' (stat_block|stat);
+	: annotation_opt MODULE ID '(' parameters_opt COMMA? ')' (stat_block|stat);
 
 stat_block: '{' stats? '}';
 
-module_inst: let_clause?
-	( ECHO '(' arguments_opt ')' sons?
-	| ASSERT '(' argument (',' argument)? ')' sons?
+module_inst
+	: ECHO '(' arguments_opt ')' sons?
+	| ASSERT '(' argument (COMMA argument)? ')' sons?
 	| ID '(' arguments_opt ')' sons?
 	| for_stat
 	| int_for_stat
 	| if_stat
-	);
+	;
 
 sons
 	: ';'
@@ -114,9 +115,9 @@ sons
 	| module_inst
 	;
 
-function_def	: annotation_opt FUNCTION ID '(' parameters_opt ')' '=' expr ';';
+function_def	: annotation_opt FUNCTION ID '(' parameters_opt COMMA? ')' '=' expr ';';
 parameters_opt	: parameters?;
-parameters		: parameter | parameters ',' parameter;
+parameters		: parameter | parameters COMMA parameter;
 parameter		: lookup | assignment;
 
 function_literal: FUNCTION '(' arguments_opt ')' expr;
@@ -128,7 +129,7 @@ function_call: ID '(' arguments_opt ')';
 
 arguments_opt: arguments?;
 
-arguments: argument | arguments ',' argument;
+arguments: argument | arguments COMMA argument;
 argument: expr | assignment;
 
 /* list comprehension */
@@ -173,7 +174,7 @@ assignments_opt
 	: assignments?;
 assignments
 	: assignment
-	| assignments ',' assignment
+	| assignments COMMA assignment
 	;
 lookup
 	: annotation_opt ID;
@@ -186,7 +187,7 @@ range_expr
 sequence: '[' optional_items ']';
 
 optional_items
-	: ','?
+	: COMMA?
 	| items ','?
 	;
 

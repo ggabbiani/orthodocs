@@ -17,7 +17,7 @@ module mod_1(p1,p2) {
   }
 }
 
-module mod_2(p1, p2, p3=3) {
+module mod_2(p1, p2, p3=3,) {
   if (p1)
     mod_3(p2,p3) children();
   else
