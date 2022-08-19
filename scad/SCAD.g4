@@ -31,8 +31,9 @@ stat
 	| assignment ';'
 	| function_def
 	| module_def
-	| ('%'|'#'|'!'|'*')? module_inst
 	| let_clause stat_or_block
+	| ('%'|'#'|'!'|'*')? module_inst
+	| ';'
 	;
 
 annotation_opt: annotation?;
@@ -111,8 +112,7 @@ module_inst
 
 sons
 	: ';'
-	| '{' module_inst* '}'
-	| module_inst
+	| stat_or_block
 	;
 
 function_def	: annotation_opt FUNCTION ID '(' parameters_opt COMMA? ')' '=' expr ';';
