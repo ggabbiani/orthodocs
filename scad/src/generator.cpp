@@ -50,12 +50,10 @@ void Generator::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
 }
 
 void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
+  bool guard = dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent) && dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent)->ID()->getText()=="fl_intersection";
+
   // remove comment start
   auto value  = ctx->getText().substr(4);
-  // remove comment end
-  auto pos = value.find_last_of("*/");
-  if (pos!=string::npos)
-    value = value.erase(pos-1,string::npos);
   // trim leading/trailing white spaces
   value = trim(value);
 
