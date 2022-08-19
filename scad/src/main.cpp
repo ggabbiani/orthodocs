@@ -19,6 +19,8 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+// #define NDEBUG 
+
 #include "formatters.h"
 #include "generator.h"
 
@@ -48,7 +50,7 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
   ostringstream s;
   // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
   //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
-  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ")";
+  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ") Offending(" << offendingSymbol->getText() << ')';
   throw std::invalid_argument(s.str());
 }
 
@@ -73,34 +75,66 @@ void lookup(const vector<fs::path> &sources,const char *extension,vector<fs::pat
 }
 
 fs::path make_relative(fs::path root, fs::path file) {
-  auto aroot  = fs::absolute(root.remove_filename());
+  assert(fs::is_directory(root));
+  assert(fs::is_regular_file(file));
+  auto aroot  = fs::absolute(root);
   auto afile  = fs::absolute(file);
-  auto f      = afile.begin();
-  cout << "afile: " << afile << endl
-    << "aroot: " << aroot << endl;
-  for(auto r=aroot.begin();r!=aroot.end()&&f!=afile.end();++r,++f) {
-    if (*r!=*f) {
-      stringstream ss;
-      ss << *r << "!=" << *f;
-      throw runtime_error(ss.str());
-    }
-    cout << "r: " << *r << endl
-      << (*r==*f) << endl
-      << (r!=aroot.end()) << endl;
+
+  auto      r_elem = aroot.begin();
+  auto      f_elem = afile.begin();
+  fs::path  result;
+
+  while(r_elem!=aroot.end() && f_elem!=afile.end() && *r_elem==*f_elem) {
+    ++r_elem;
+    ++f_elem;
   }
-  cout << "f: " << *f << endl;
-  return accumulate(
-    next(--f), 
-    afile.end(), 
-    fs::path{}, 
-    divides{}
-  );
+
+  while(f_elem!=afile.end()) 
+    result /= *f_elem++;
+
+  return result;
+}
+
+void make_doc(const fs::path &sroot, fs::path file, const fs::path &droot) {
+  assert(file.is_relative());
+
+  cout << file << endl;
+  fs::current_path(sroot);
+  ifstream          is(file);
+  ANTLRInputStream  in(is);
+  SCADLexer         lexer(&in);
+  CommonTokenStream tokens(&lexer);
+  SCADParser        parser(&tokens);
+
+  // error management
+  parser.removeErrorListeners();
+  ErrorHandler listener;
+  parser.addErrorListener(&listener);
+
+  // source parsing
+  doc::Generator  generator(file.c_str());
+  // parse tree depth-first traverse
+  tree::ParseTreeWalker  walker;
+  tree::ParseTree       *tree = parser.pkg();
+  walker.walk(&generator,tree);
+
+  // documentation generation
+  if (!file.has_filename())
+    throw runtime_error("'" + file.string() + "' has no file part");
+  auto directory = file.parent_path();
+
+  fs::current_path(droot);
+  if (file.has_parent_path() && !fs::exists(file.parent_path()))
+    fs::create_directory(file.parent_path());
+  ofstream os(file.replace_extension("md"));
+  doc::formatter::Mdown markdown(os);
+  markdown.format(generator.items);
 }
 
 int main(int argc, const char *argv[]) {
   CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
   auto              result = EXIT_SUCCESS;
-  vector<fs::path>  sources, src_files;
+  vector<fs::path>  sources;
   fs::path          sroot,droot;
   bool              show_tokens = false;
 
@@ -108,7 +142,8 @@ int main(int argc, const char *argv[]) {
     ->required()
     // ->type_name("DIR|FILE")
     ->check(CLI::ExistingPath);
-  app.add_option("-s,--source-root", sroot, "Source directory root")
+  app.add_option("-s,--src-root", sroot, "Source root")
+    ->required()
     ->check(CLI::ExistingDirectory);
   app.add_option("-d,--doc-root",droot, "Document root")
     ->required()
@@ -117,43 +152,11 @@ int main(int argc, const char *argv[]) {
 
   try {
     app.parse(argc, argv);
+    vector<fs::path>  src_files;
     lookup(sources,".scad",&src_files);
 
-    cout  << "Source files:" << endl;
     for(auto file: src_files)
-      cout 
-        // << file << endl
-        << make_relative(sroot,file) << endl;
-
-    // ifstream          is(file);
-    // ANTLRInputStream  in(is);
-    // SCADLexer         lexer(&in);
-    // CommonTokenStream tokens(&lexer);
-
-    // if (show_tokens) {
-    //   tokens.fill();
-    //   for (auto token : tokens.getTokens())
-    //     cout << token->toString() << endl;
-    // }
-
-    // SCADParser    parser(&tokens);
-
-    // // error management
-    // parser.removeErrorListeners();
-    // ErrorHandler listener;
-    // parser.addErrorListener(&listener);
-
-    // doc::Generator  generator(file.c_str());
-    // // parse tree depth-first traverse
-    // tree::ParseTreeWalker  walker;
-    // tree::ParseTree       *tree = parser.pkg();
-    // walker.walk(&generator,tree);
-
-    // // documentation generation
-    // ofstream os;
-    // doc::formatter::Mdown markdown(os);
-    // markdown.format(generator.items);
-
+      make_doc(sroot,make_relative(sroot,file),droot);
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
