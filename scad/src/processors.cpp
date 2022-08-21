@@ -39,6 +39,9 @@ void Processor::operator () (const fs::path &sroot, fs::path file, const fs::pat
   assert(file.is_relative());
 
   cout << file << endl;
+
+  // current ABSOLUTE pwd cache. TODO: use a more consistent approach (maybe with RAII?)
+  auto old = fs::current_path();
   fs::current_path(sroot);
   ifstream          is(file);
   ANTLRInputStream  in(is);
@@ -62,6 +65,9 @@ void Processor::operator () (const fs::path &sroot, fs::path file, const fs::pat
     throw runtime_error("'" + file.string() + "' has no file part");
   auto directory = file.parent_path();
 
+  // back to previous pwd
+  fs::current_path(old);
+  // change to document root
   fs::current_path(droot);
   if (file.has_parent_path() && !fs::exists(file.parent_path()))
     fs::create_directory(file.parent_path());
