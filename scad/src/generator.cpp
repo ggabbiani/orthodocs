@@ -3,16 +3,16 @@
 
 using namespace std;
 
-namespace fs=boost::filesystem;
+namespace fs=std::filesystem;
 
-namespace doc {
+namespace scad {
 
 Generator::Generator(const fs::path &source) : _package(source.filename().stem().string()) {
   // items[_package] = make_unique<doc::Item>(_package,Item::package);
 }
 
 void Generator::enterPkg(scad::SCADParser::PkgContext *ctx) {
-  curr_item.push(make_unique<doc::Item>(_package,Item::package));
+  curr_item.push(make_unique<doc::Item>(_package,doc::Item::package));
 }
 
 void Generator::exitPkg(scad::SCADParser::PkgContext *ctx) {
@@ -23,8 +23,8 @@ void Generator::exitPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Generator::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
   auto identifier = ctx->ID()->getText();
-  auto nested     = curr_item.top()->type==Item::module;
-  curr_item.push(make_unique<doc::Item>(identifier,Item::function,nested));
+  auto nested     = curr_item.top()->type==doc::Item::module;
+  curr_item.push(make_unique<doc::Item>(identifier,doc::Item::function,nested));
 }
 
 void Generator::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
@@ -37,8 +37,8 @@ void Generator::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
 
 void Generator::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto identifier = ctx->ID()->getText();
-  auto nested     = curr_item.top()->type==Item::module;
-  curr_item.push(make_unique<doc::Item>(identifier,Item::module,nested));
+  auto nested     = curr_item.top()->type==doc::Item::module;
+  curr_item.push(make_unique<doc::Item>(identifier,doc::Item::module,nested));
 }
 
 void Generator::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
@@ -50,12 +50,10 @@ void Generator::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
 }
 
 void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
-  bool guard = dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent) && dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent)->ID()->getText()=="fl_intersection";
+  static doc::style::Factory factory;
 
-  // remove comment start
-  auto value  = ctx->getText().substr(4);
-  // trim leading/trailing white spaces
-  value = trim(value);
+  auto style  = factory(ctx->getText());
+  auto value  = style->manage(ctx->getText());
 
   if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent->parent->parent)) {   // parameter's annotation
     curr_parameter->annotation = value;
@@ -92,10 +90,10 @@ void Generator::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
   auto id       = ctx->ID()->getText();
   auto defaults = ctx->expr()->getText();
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
-    auto nested         = curr_item.top()->type==Item::module;
-    Item *variable      = new Item(id,Item::variable,nested);
+    auto nested         = curr_item.top()->type==doc::Item::module;
+    doc::Item *variable      = new doc::Item(id,doc::Item::variable,nested);
     variable->defaults  = defaults;
-    curr_variable.push(ItemPtr(variable));
+    curr_variable.push(doc::ItemPtr(variable));
   } else if (curr_parameter) {
     curr_parameter->name      = id;
     curr_parameter->defaults  = defaults;

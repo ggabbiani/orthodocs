@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generator.h"
+#include "document.h"
 
 #include <iostream>
 
@@ -8,7 +8,7 @@ namespace doc {
 
 extern size_t size(const ItemMap &items,Item::Type type);
 
-/**
+/*!
  * abstract output formatter
  */
 class Formatter {

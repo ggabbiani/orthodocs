@@ -1,48 +1,25 @@
 #pragma once
 
+#include "document.h"
+
 #include "SCADBaseListener.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
+namespace fs=std::filesystem;
 
-namespace doc {
+namespace scad {
 
-struct Parameter {
-  std::string name;
-  std::string annotation;
-  std::string defaults;
-};
-using ParameterPtr  = std::unique_ptr<Parameter>;
-using ParameterVec  = std::vector<ParameterPtr>;
+class Generator : public scad::SCADBaseListener {
+public:
+  doc::ItemMap              items;
+  std::stack<doc::ItemPtr>  curr_item;
+  std::stack<doc::ItemPtr>  curr_variable;
+  doc::ParameterPtr         curr_parameter;
+  std::string               _package;
 
-struct Item {
-  enum Type {
-    function,module,package,variable
-  };
-  Item(const std::string &name,Type type,bool nested=false) : name(name),type(type),nested(nested) {}
-  std::string   name;
-  std::string   annotation;
-  Type          type;
-  ParameterVec  parameters;
-  std::string   defaults;
-  bool nested;
-};
-using ItemPtr = std::unique_ptr<Item>;
-using ItemMap = std::map<std::string,ItemPtr>;
+  Generator(const fs::path &source);
 
-struct Generator : public scad::SCADBaseListener {
-  ItemMap             items;
-  std::stack<ItemPtr> curr_item;
-  std::stack<ItemPtr> curr_variable;
-  ParameterPtr        curr_parameter;
-  std::string         _package;
-
-  Generator(const boost::filesystem::path &source);
-  
   void enterAnnotation(scad::SCADParser::AnnotationContext *ctx)      override;
   void enterAssignment(scad::SCADParser::AssignmentContext *ctx)      override;
   void enterFunction_def(scad::SCADParser::Function_defContext *ctx)  override;

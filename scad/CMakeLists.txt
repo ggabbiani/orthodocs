@@ -28,7 +28,14 @@ include_directories(${ANTLR_${LANGUAGE}_OUTPUT_DIR})
 # add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 # target_link_libraries(scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-add_executable(adox-scad src/main.cpp src/generator.cpp src/formatters.cpp ${ANTLR_${LANGUAGE}_CXX_OUTPUTS})
+add_executable(adox-scad 
+  src/main.cpp 
+  src/document.cpp 
+  src/generator.cpp 
+  src/formatters.cpp 
+  src/processors.cpp 
+  ${ANTLR_${LANGUAGE}_CXX_OUTPUTS}
+)
 target_include_directories(adox-scad PUBLIC include)
 target_link_libraries(adox-scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 

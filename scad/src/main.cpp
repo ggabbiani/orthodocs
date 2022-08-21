@@ -21,22 +21,14 @@
 
 // #define NDEBUG 
 
-#include "formatters.h"
-#include "generator.h"
+#include "processors.h"
 
 #include "antlr4-runtime.h"
-#include "SCADLexer.h"
-#include "SCADParser.h"
-
-#include <tree/ParseTreeWalker.h>
-
 #include "CLI11.hpp"
-#include <filesystem>
-#include <iostream>
-#include <sstream>
+
+#include <algorithm>
 
 using namespace std;
-using namespace scad;
 using namespace antlr4;
 
 namespace fs=std::filesystem;
@@ -50,12 +42,19 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
   ostringstream s;
   // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
   //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
-  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ") Offending(" << offendingSymbol->getText() << ')';
+  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ')';
   throw std::invalid_argument(s.str());
 }
 
-// return a vector containing all the file path with extension ".scad"
-void lookup(const vector<fs::path> &sources,const char *extension,vector<fs::path> *result) {
+//! return a vector containing all the file paths with «extension»
+void lookup(
+  //! list of source directories/files
+  const vector<fs::path> &sources,
+  //! extension to filter out
+  const char *extension, 
+  //! list of source files matching «extension»
+  vector<fs::path> *result
+) {
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (path.extension()==".scad")
@@ -80,55 +79,23 @@ fs::path make_relative(fs::path root, fs::path file) {
   auto aroot  = fs::absolute(root);
   auto afile  = fs::absolute(file);
 
-  auto      r_elem = aroot.begin();
-  auto      f_elem = afile.begin();
+  // auto      r_elem = aroot.begin();
+  // auto      f_elem = afile.begin();
   fs::path  result;
 
-  while(r_elem!=aroot.end() && f_elem!=afile.end() && *r_elem==*f_elem) {
-    ++r_elem;
-    ++f_elem;
-  }
+  // while(r_elem!=aroot.end() && f_elem!=afile.end() && *r_elem==*f_elem) {
+  //   ++r_elem;
+  //   ++f_elem;
+  // }
 
-  while(f_elem!=afile.end()) 
-    result /= *f_elem++;
+  // while(f_elem!=afile.end()) 
+  //   result /= *f_elem++;
+
+  auto elem = mismatch(aroot.begin(),aroot.end(),afile.begin(),afile.end()).second;
+  while (elem!=afile.end())
+    result /= *elem++;
 
   return result;
-}
-
-void make_doc(const fs::path &sroot, fs::path file, const fs::path &droot) {
-  assert(file.is_relative());
-
-  cout << file << endl;
-  fs::current_path(sroot);
-  ifstream          is(file);
-  ANTLRInputStream  in(is);
-  SCADLexer         lexer(&in);
-  CommonTokenStream tokens(&lexer);
-  SCADParser        parser(&tokens);
-
-  // error management
-  parser.removeErrorListeners();
-  ErrorHandler listener;
-  parser.addErrorListener(&listener);
-
-  // source parsing
-  doc::Generator  generator(file.c_str());
-  // parse tree depth-first traverse
-  tree::ParseTreeWalker  walker;
-  tree::ParseTree       *tree = parser.pkg();
-  walker.walk(&generator,tree);
-
-  // documentation generation
-  if (!file.has_filename())
-    throw runtime_error("'" + file.string() + "' has no file part");
-  auto directory = file.parent_path();
-
-  fs::current_path(droot);
-  if (file.has_parent_path() && !fs::exists(file.parent_path()))
-    fs::create_directory(file.parent_path());
-  ofstream os(file.replace_extension("md"));
-  doc::formatter::Mdown markdown(os);
-  markdown.format(generator.items);
 }
 
 int main(int argc, const char *argv[]) {
@@ -155,8 +122,10 @@ int main(int argc, const char *argv[]) {
     vector<fs::path>  src_files;
     lookup(sources,".scad",&src_files);
 
+    ErrorHandler    handler;
+    scad::Processor proc(handler);
     for(auto file: src_files)
-      make_doc(sroot,make_relative(sroot,file),droot);
+      proc(sroot,make_relative(sroot,file),droot);
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
