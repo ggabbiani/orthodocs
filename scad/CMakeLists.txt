@@ -34,13 +34,25 @@ add_executable(adox-scad
   src/generator.cpp 
   src/formatters.cpp 
   src/processors.cpp 
+  src/utils.cpp 
   ${ANTLR_${LANGUAGE}_CXX_OUTPUTS}
 )
 target_include_directories(adox-scad PUBLIC include)
-target_link_libraries(adox-scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(adox-scad antlr4_static)
 
 ###############################################################################
-# 3) Java parser for testing grammars via grun
+# 3) C++ application for annotation style testing
+
+add_executable(style-tester
+  src/style-tester.cpp 
+  src/utils.cpp 
+  src/document.cpp
+)
+target_include_directories(style-tester PUBLIC include)
+target_link_libraries(style-tester)
+
+###############################################################################
+# 4) Java parser for testing grammars via grun
 find_package(Java QUIET COMPONENTS Runtime REQUIRED)
 include(UseJava)
 

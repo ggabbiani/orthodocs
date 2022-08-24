@@ -19,9 +19,10 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include <processors.h>
-#include <generator.h>
-#include <formatters.h>
+#include "formatters.h"
+#include "generator.h"
+#include "processors.h"
+#include "utils.h"
 
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
@@ -33,47 +34,49 @@
 using namespace std;
 using namespace antlr4;
 
+namespace fs = std::filesystem;
+
 namespace scad {
 
 void Processor::operator () (const fs::path &sroot, fs::path file, const fs::path &droot) {
   assert(file.is_relative());
+  try {
+    // change to source root
+    cwd source_root(sroot);
+    ifstream          is(file);
+    ANTLRInputStream  in(is);
+    SCADLexer         lexer(&in);
+    CommonTokenStream tokens(&lexer);
+    SCADParser        parser(&tokens);
 
-  cout << file << endl;
+    // error management
+    parser.removeErrorListeners();
+    parser.addErrorListener(&_handler);
 
-  // current ABSOLUTE pwd cache. TODO: use a more consistent approach (maybe with RAII?)
-  auto old = fs::current_path();
-  fs::current_path(sroot);
-  ifstream          is(file);
-  ANTLRInputStream  in(is);
-  SCADLexer         lexer(&in);
-  CommonTokenStream tokens(&lexer);
-  SCADParser        parser(&tokens);
+    // source parsing
+    Generator  generator(file.c_str());
+    // parse tree depth-first traverse
+    tree::ParseTreeWalker  walker;
+    tree::ParseTree       *tree = parser.pkg();
+    walker.walk(&generator,tree);
 
-  // error management
-  parser.removeErrorListeners();
-  parser.addErrorListener(&_handler);
+    // documentation generation
+    if (!file.has_filename())
+      throw runtime_error("'" + file.string() + "' has no file part");
+    auto directory = file.parent_path();
 
-  // source parsing
-  Generator  generator(file.c_str());
-  // parse tree depth-first traverse
-  tree::ParseTreeWalker  walker;
-  tree::ParseTree       *tree = parser.pkg();
-  walker.walk(&generator,tree);
-
-  // documentation generation
-  if (!file.has_filename())
-    throw runtime_error("'" + file.string() + "' has no file part");
-  auto directory = file.parent_path();
-
-  // back to previous pwd
-  fs::current_path(old);
-  // change to document root
-  fs::current_path(droot);
-  if (file.has_parent_path() && !fs::exists(file.parent_path()))
-    fs::create_directory(file.parent_path());
-  ofstream os(file.replace_extension("md"));
-  doc::formatter::Mdown markdown(os);
-  markdown.format(generator.items);
+    {
+      // change to document root
+      cwd doc_root(droot);
+      if (file.has_parent_path() && !fs::exists(file.parent_path()))
+        fs::create_directory(file.parent_path());
+      ofstream os(file.replace_extension("md"));
+      doc::formatter::Mdown markdown(os);
+      markdown.format(generator.items);
+    }
+  } catch(...) {
+    throw_with_nested(runtime_error("error while processing '"+file.string()+'\''));
+  }
 }
 
-} // namespace scad
+}

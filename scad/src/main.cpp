@@ -22,10 +22,12 @@
 // #define NDEBUG 
 
 #include "processors.h"
+#include "utils.h"
 
 #include "antlr4-runtime.h"
 #include "CLI11.hpp"
 
+#include <boost/timer/progress_display.hpp>
 #include <algorithm>
 
 using namespace std;
@@ -46,58 +48,6 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
   throw std::invalid_argument(s.str());
 }
 
-//! return a vector containing all the file paths with «extension»
-void lookup(
-  //! list of source directories/files
-  const vector<fs::path> &sources,
-  //! extension to filter out
-  const char *extension, 
-  //! list of source files matching «extension»
-  vector<fs::path> *result
-) {
-  for(auto &path: sources) {
-    if (fs::is_regular_file(path)) {
-      if (path.extension()==".scad")
-        result->push_back(path);
-    } else if (fs::is_directory(path)) {
-      for (auto &entry: fs::directory_iterator{path}) {
-        auto path = entry.path();
-        if (fs::is_regular_file(path)) {
-          if (path.extension()==".scad")
-            result->push_back(path);
-        } else if (fs::is_directory(path)) {
-          lookup(vector<fs::path>{path},extension,result);
-        }
-      }
-    }
-  }
-}
-
-fs::path make_relative(fs::path root, fs::path file) {
-  assert(fs::is_directory(root));
-  assert(fs::is_regular_file(file));
-  auto aroot  = fs::absolute(root);
-  auto afile  = fs::absolute(file);
-
-  // auto      r_elem = aroot.begin();
-  // auto      f_elem = afile.begin();
-  fs::path  result;
-
-  // while(r_elem!=aroot.end() && f_elem!=afile.end() && *r_elem==*f_elem) {
-  //   ++r_elem;
-  //   ++f_elem;
-  // }
-
-  // while(f_elem!=afile.end()) 
-  //   result /= *f_elem++;
-
-  auto elem = mismatch(aroot.begin(),aroot.end(),afile.begin(),afile.end()).second;
-  while (elem!=afile.end())
-    result /= *elem++;
-
-  return result;
-}
-
 int main(int argc, const char *argv[]) {
   CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
   auto              result = EXIT_SUCCESS;
@@ -105,17 +55,24 @@ int main(int argc, const char *argv[]) {
   fs::path          sroot,droot;
   bool              show_tokens = false;
 
-  app.add_option("sources", sources, "Source directories or files in any combination")
+  app.add_option("-s,--src-root", sroot, "Source root directory")
     ->required()
-    // ->type_name("DIR|FILE")
+    ->check(CLI::ExistingDirectory);
+  app.add_option("sources", sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
+    ->required()
+    ->transform(CLI::Validator(
+      [&sroot] (string &file) -> string {
+        auto path = fs::path(file);
+        if (path.is_relative())
+          file = fs::path(sroot / path).string();
+        return string();
+      }
+      ,"RELATIVE|ABSOLUTE"
+    ))
     ->check(CLI::ExistingPath);
-  app.add_option("-s,--src-root", sroot, "Source root")
+  app.add_option("-d,--doc-root",droot, "Document root directory")
     ->required()
     ->check(CLI::ExistingDirectory);
-  app.add_option("-d,--doc-root",droot, "Document root")
-    ->required()
-    ->check(CLI::ExistingDirectory);
-  app.add_flag("--tokens,-t",show_tokens,"Manages token listing");
 
   try {
     app.parse(argc, argv);
@@ -124,12 +81,15 @@ int main(int argc, const char *argv[]) {
 
     ErrorHandler    handler;
     scad::Processor proc(handler);
-    for(auto file: src_files)
-      proc(sroot,make_relative(sroot,file),droot);
+    boost::timer::progress_display progress(src_files.size());
+    for(auto file: src_files) {
+      proc(sroot,fs::relative(file,sroot),droot);
+      ++progress;
+    }
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
-    cerr << error.what() << endl;
+    print_exception(error);
     result  = EXIT_FAILURE;
   }
   return result;

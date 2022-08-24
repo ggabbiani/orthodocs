@@ -54,6 +54,7 @@ using ItemMap = std::map<std::string,ItemPtr>;
 struct AbstractStyle {
   virtual bool check(const std::string &text) = 0;
   virtual std::string manage(const std::string &text) = 0;
+  virtual const char *id() = 0;
 };
 
 namespace style {
@@ -65,21 +66,37 @@ public:
 
 class Single : public AbstractStyle {
   friend class Factory;
+
+  static constexpr const char *ID = "SINGLE";
   bool check(const std::string &text) override;
   std::string manage(const std::string &text) override;
+  const char *id() override;
 };
 
 class Simple : public AbstractStyle {
   friend class Factory;
+
+  static constexpr const char *ID = "SIMPLE";
+  enum Decoration {start,end};
   bool check(const std::string &text) override;
   std::string manage(const std::string &text) override;
+  const char *id() override;
+
+  int column;
+  static const char *decoration[2];
 };
 
 class Fine : public AbstractStyle {
   friend class Factory;
+
+  static constexpr const char *ID = "FINE";
+  enum Decoration {start,end,body};
   bool check(const std::string &text) override;
   std::string manage(const std::string &text) override;
+  const char *id() override;
+
   int column;
+  static const char *decoration[3];
 };
 
 }

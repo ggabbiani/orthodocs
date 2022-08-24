@@ -52,8 +52,9 @@ void Generator::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
 void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   static doc::style::Factory factory;
 
-  auto style  = factory(ctx->getText());
-  auto value  = style->manage(ctx->getText());
+  auto anno   = ctx->getText();
+  auto style  = factory(anno);
+  auto value  = style->manage(anno);
 
   if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent->parent->parent)) {   // parameter's annotation
     curr_parameter->annotation = value;

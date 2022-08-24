@@ -70,7 +70,9 @@ void Mdown::variable(const doc::Item &var) {
       << H("variable "+var.name,3)
       << endl;
   if (!var.defaults.empty())
-    out << BOLD("Default:") << ' ' << var.defaults << endl
+    out << BOLD("Default:") << endl
+        << endl
+        << "    " << var.defaults << endl
         << endl;
   if (!var.annotation.empty())
     out << var.annotation << endl
