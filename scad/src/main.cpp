@@ -49,11 +49,10 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
 }
 
 int main(int argc, const char *argv[]) {
-  CLI::App app{"ADOX: automatic documentation generation for the OpenSCAD language."};
-  auto              result = EXIT_SUCCESS;
-  vector<fs::path>  sources;
-  fs::path          sroot,droot;
-  bool              show_tokens = false;
+  CLI::App  app{"ADOX: automatic documentation generation for the OpenSCAD language."};
+  auto      result = EXIT_SUCCESS;
+  fs::path  sroot,droot;
+  FileSet   sources;
 
   app.add_option("-s,--src-root", sroot, "Source root directory")
     ->required()
@@ -76,7 +75,7 @@ int main(int argc, const char *argv[]) {
 
   try {
     app.parse(argc, argv);
-    vector<fs::path>  src_files;
+    FileSet src_files;
     lookup(sources,".scad",&src_files);
 
     ErrorHandler    handler;

@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <string>
-#include <vector>
+#include <set>
 
 inline std::string trim(std::string str) {
   const char* ws = " \t\n\r\f\v";
@@ -15,14 +15,16 @@ inline bool priv(const std::string &s) {
   return s.find("__")==0 ? true : false;
 }
 
-//! return a vector containing all the file paths with «extension»
+using FileSet = std::set<std::filesystem::path>;
+
+//! return a FileSet matching «extension»
 extern void lookup(
   //! list of source directories/files
-  const std::vector<std::filesystem::path> &sources,
+  const FileSet &sources,
   //! extension to filter out
   const char *extension, 
   //! list of source files matching «extension»
-  std::vector<std::filesystem::path> *result
+  FileSet *result
 );
 
 /*!

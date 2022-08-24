@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <set>
 
 using namespace std;
 
@@ -31,24 +32,24 @@ namespace fs=std::filesystem;
 //! return a vector containing all the file paths with «extension»
 void lookup(
   //! list of source directories/files
-  const vector<fs::path> &sources,
+  const FileSet &sources,
   //! extension to filter out
   const char *extension, 
   //! list of source files matching «extension»
-  vector<fs::path> *result
+  FileSet *result
 ) {
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)
-        result->push_back(path);
+        result->insert(path);
     } else if (fs::is_directory(path)) {
       for (auto &entry: fs::directory_iterator{path}) {
         auto path = entry.path();
         if (fs::is_regular_file(path)) {
           if (!extension || path.extension()==extension)
-            result->push_back(path);
+            result->insert(path);
         } else if (fs::is_directory(path)) {
-          lookup(vector<fs::path>{path},extension,result);
+          lookup(FileSet{path},extension,result);
         }
       }
     }

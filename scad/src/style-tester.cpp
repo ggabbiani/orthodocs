@@ -13,11 +13,10 @@ namespace fs=std::filesystem;
 
 int main(int argc, const char *argv[]) {
   CLI::App app{"style-tester: outputs the checked annotation text or the detected annotation styles from the passed .anno files."};
-  auto              result = EXIT_SUCCESS;
-  fs::path          sroot;
-  vector<fs::path>  sources;
-  bool              show_tokens = false;
-  string            expected;
+  auto      result = EXIT_SUCCESS;
+  fs::path  sroot;
+  FileSet   sources;
+  string    expected;
 
   app.add_option("-s,--src-root", sroot, "Source root directory")
     ->required()
@@ -41,7 +40,7 @@ int main(int argc, const char *argv[]) {
     app.parse(argc, argv);
 
     // lookup for annotation files (*.anno)
-    vector<fs::path>  src_files;
+    FileSet src_files;
     lookup(sources,".anno",&src_files);
 
     string annotation;
