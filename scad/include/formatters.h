@@ -12,7 +12,6 @@ extern size_t size(const ItemMap &items,const std::type_info &type);
  * abstract output formatter
  */
 class Formatter {
-
 protected:
   virtual void variable(const doc::Variable &var)   = 0;
   virtual void function(const doc::Function &func)  = 0;
@@ -27,8 +26,7 @@ protected:
   virtual std::string H(const std::string &text,int level=1)  = 0;
   virtual std::string HRULE()                                 = 0;
 
-// private:
-  std::string signature(const doc::Item &item);
+private:
 };
 
 namespace formatter {
@@ -39,11 +37,11 @@ public:
   void format(const doc::ItemMap &items) override;
 
 private:
-  void package(const doc::Package &pkg)      override;
-  void parameter(const doc::Parameter &p) override;
-  void function(const doc::Function &func)    override;
+  void package(const doc::Package &pkg)     override;
+  void parameter(const doc::Parameter &p)   override;
+  void function(const doc::Function &func)  override;
   void module(const doc::Module &mod)       override;
-  void variable(const doc::Variable &var)     override;
+  void variable(const doc::Variable &var)   override;
 
   std::string BOLD(const std::string &text)           override;
   std::string BR()                                    override;

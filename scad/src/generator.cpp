@@ -55,9 +55,9 @@ void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   auto anno   = ctx->getText();
   auto style  = factory(anno);
   auto value  = style->manage(anno);
-
+  // FIXME: a sigle if with multiple OR sould be ok
   if (is<scad::SCADParser::ParameterContext>(*ctx->parent->parent->parent)) {   // parameter's annotation
-    curr_parameter->annotation = value;
+    curr_parameter->_annotation = value;
   } else if (is<scad::SCADParser::Function_defContext>(*ctx->parent->parent)) { // function's annotation
     curr_item.top()->annotation = value;
   } else if (is<scad::SCADParser::Module_defContext>(*ctx->parent->parent)) {   // module's annotation
@@ -82,8 +82,8 @@ void Generator::exitParameter(scad::SCADParser::ParameterContext *ctx) {
 void Generator::enterLookup(scad::SCADParser::LookupContext *ctx) {
   auto value = ctx->ID()->getText();
   if (curr_parameter) {
-    if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent)) 
-      curr_parameter->name = value;
+    if (is<scad::SCADParser::ParameterContext>(*ctx->parent)) 
+      curr_parameter->_name = value;
   }
 }
 
@@ -95,7 +95,7 @@ void Generator::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
     doc::Variable *variable = new doc::Variable(id,defaults,nested);
     curr_variable.push(doc::ItemPtr(variable));
   } else if (curr_parameter) {
-    curr_parameter->name      = id;
+    curr_parameter->_name      = id;
     curr_parameter->defaults  = defaults;
   }
 }

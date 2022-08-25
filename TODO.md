@@ -9,3 +9,4 @@
 [ ] implement c++ target;
 [x] rewrite generator;
 [ ] implement toc
+[ ] implement cross-reference

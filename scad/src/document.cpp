@@ -9,6 +9,21 @@ using namespace std;
 
 namespace doc {
 
+Signature Item::signature() const {
+  ostringstream ss;
+  ss << name << "(";
+  for(auto i=parameters.begin();i!=parameters.end();i++) {
+    if (i!=parameters.begin())
+      ss << ",";
+    auto parameter = i->get();
+    ss << parameter->name();
+    if (!parameter->defaults.empty())
+      ss << "=" << parameter->defaults;
+  }
+  ss << ")";
+  return ss.str();
+}
+
 namespace style {
 
 static char        buffer[256];

@@ -26,16 +26,31 @@
 #include <string>
 #include <vector>
 
+namespace scad {
+
+class Generator;
+
+}
+
 namespace doc {
 
 using Annotation  = std::string;
+//! Item or parameter identifier
 using Name        = std::string;
+//! used for both function and modules
+using Signature   = std::string;
+//! defaults for variables and parameters
 using Value       = std::string;
 
-struct Parameter {
-  Name        name;
-  Annotation  annotation;
+class Parameter {
+  friend class ::scad::Generator;
+public:
+  const Name &name() const {return _name;}
+  const Annotation &annotation() const {return _annotation;}
   Value       defaults;
+protected:
+  Name        _name;
+  Annotation  _annotation;
 };
 using ParameterPtr  = std::unique_ptr<Parameter>;
 using ParameterVec  = std::vector<ParameterPtr>;
@@ -50,6 +65,7 @@ public:
   const bool    nested;
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
+  Signature signature() const; 
 };
 using ItemPtr = std::unique_ptr<Item>;
 using ItemMap = std::map<std::string,ItemPtr>;
@@ -63,12 +79,14 @@ private:
 class Function : public Item {
 public:
   Function(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
+  Signature signature() const {return Item::signature();}
 private:
 };
 
 class Module : public Item {
 public:
   Module(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
+  Signature signature() const {return Item::signature();}
 private:
 };
 

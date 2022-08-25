@@ -16,22 +16,6 @@ size_t size(const ItemMap &items,const type_info &type) {
   return size;
 }
 
-
-string Formatter::signature(const doc::Item &item) {
-  ostringstream ss;
-  ss << item.name << "(";
-  for(auto i=item.parameters.begin();i!=item.parameters.end();i++) {
-    if (i!=item.parameters.begin())
-      ss << ",";
-    auto parameter = i->get();
-    ss << parameter->name;
-    if (!parameter->defaults.empty())
-      ss << "=" << parameter->defaults;
-  }
-  ss << ")";
-  return ss.str();
-}
-
 namespace formatter {
 
 Mdown::Mdown(ostream &out) : out(out) {}
@@ -45,8 +29,8 @@ void Mdown::package(const doc::Package &pkg) {
 }
 
 void Mdown::parameter(const doc::Parameter &p) {
-  out << BOLD(p.name) << BR()
-      << p.annotation << endl
+  out << BOLD(p.name()) << BR()
+      << p.annotation() << endl
       << endl;
 }
 
@@ -71,7 +55,7 @@ void Mdown::function(const doc::Function &func) {
       << BOLD("Syntax:") << endl
       << endl
       // << CODE(signature(func)) << endl
-      << "    " << signature(func) << endl
+      << "    " << func.signature() << endl
       << endl;
   if (!func.annotation.empty())
     out << func.annotation << endl
@@ -81,14 +65,14 @@ void Mdown::function(const doc::Function &func) {
     // how many annotated parameters do we have in place?
     auto annotations  = 0;
     for(auto i=func.parameters.begin();i!=func.parameters.end();++i) {
-      annotations +=(!(*i)->annotation.empty());
+      annotations +=(!(*i)->annotation().empty());
     }
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
       for(auto i=func.parameters.begin();i!=func.parameters.end();i++) {
         auto p = **i;
-        if (!p.annotation.empty())
+        if (!p.annotation().empty())
           parameter(**i);
       }
       out << endl;
@@ -103,7 +87,7 @@ void Mdown::module(const doc::Module &mod) {
       << BOLD("Syntax:") << endl
       << endl
       // << CODE(signature(mod)) << endl
-      << "    " << signature(mod) << endl
+      << "    " << mod.signature() << endl
       << endl;
   if (!mod.annotation.empty())
     out << mod.annotation << endl
@@ -113,14 +97,14 @@ void Mdown::module(const doc::Module &mod) {
     // how many annotated parameters do we have in place?
     auto annotations  = 0;
     for(auto i=mod.parameters.begin();i!=mod.parameters.end();++i) {
-      annotations +=(!(*i)->annotation.empty());
+      annotations +=(!(*i)->annotation().empty());
     }
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
       for(auto i=mod.parameters.begin();i!=mod.parameters.end();i++) {
         auto p = **i;
-        if (!p.annotation.empty())
+        if (!p.annotation().empty())
           parameter(**i);
       }
       out << endl;
