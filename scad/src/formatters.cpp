@@ -1,4 +1,5 @@
 #include "formatters.h"
+#include "utils.h"
 
 #include <sstream>
 
@@ -6,31 +7,15 @@ using namespace std;
 
 namespace doc {
 
-size_t size(const ItemMap &items,Item::Type type) {
+size_t size(const ItemMap &items,const type_info &type) {
   auto size  = 0;
   for(auto i=items.begin(); i!=items.end(); ++i) {
     auto var  = i->second.get();
-    size += (var->type==type);
+    size += (typeid(*var)==type);
   }
   return size;
 }
 
-void Formatter::item(const doc::Item& i) {
-  switch (i.type) {
-  case Item::function:
-    function(i);
-    break;
-  case Item::module:
-    module(i);
-    break;
-  case Item::package:
-    package(i);
-    break;
-  case Item::variable:
-    variable(i);
-    break;
-  }
-}
 
 string Formatter::signature(const doc::Item &item) {
   ostringstream ss;
@@ -51,7 +36,7 @@ namespace formatter {
 
 Mdown::Mdown(ostream &out) : out(out) {}
 
-void Mdown::package(const doc::Item &pkg) {
+void Mdown::package(const doc::Package &pkg) {
   out << H("package "+pkg.name) << endl
       << endl;
   if (!pkg.annotation.empty())
@@ -65,7 +50,7 @@ void Mdown::parameter(const doc::Parameter &p) {
       << endl;
 }
 
-void Mdown::variable(const doc::Item &var) {
+void Mdown::variable(const doc::Variable &var) {
   out << HRULE()
       << H("variable "+var.name,3)
       << endl;
@@ -79,7 +64,7 @@ void Mdown::variable(const doc::Item &var) {
         << endl;
 }
 
-void Mdown::function(const doc::Item &func) {
+void Mdown::function(const doc::Function &func) {
   out << HRULE()
       << H("function "+func.name,3)
       << endl
@@ -111,7 +96,7 @@ void Mdown::function(const doc::Item &func) {
   }
 }
 
-void Mdown::module(const doc::Item &mod) {
+void Mdown::module(const doc::Module &mod) {
   out << HRULE()
       << H("module "+mod.name,3)
       << endl
@@ -146,38 +131,38 @@ void Mdown::module(const doc::Item &mod) {
 void Mdown::format(const doc::ItemMap &items) {
 
   for (auto i=items.begin(); i!=items.end(); ++i) {
-    auto itm = i->second.get();
-    if (itm->type==Item::package)
-      item(*itm);
+    auto pkg = i->second.get();
+    if (is<Package>(*pkg))
+      package(dynamic_cast<const Package&>(*pkg));
   }
 
-  if (size(items,Item::variable)) {
+  if (size(items,typeid(Variable))) {
     out << H("Variables",2) << endl 
         << endl;
     for (auto i=items.begin(); i!=items.end(); ++i) {
       auto var  = i->second.get();
-      if (var->type==Item::variable)
-        item(*var);
+      if (is<Variable>(*var))
+        variable(dynamic_cast<const Variable&>(*var));
     }
   }
 
-  if (size(items,Item::function)) {
+  if (size(items,typeid(Function))) {
     out << H("Functions",2) << endl 
         << endl;
     for (auto i=items.begin(); i!=items.end(); ++i) {
       auto func = i->second.get();
-      if (func->type==Item::function)
-        item(*func);
+      if (is<Function>(*func))
+        function(dynamic_cast<const Function&>(*func));
     }
   }
 
-  if (size(items,Item::module)) {
+  if (size(items,typeid(Module))) {
     out << H("Modules",2) << endl 
         << endl;
     for (auto i=items.begin(); i!=items.end(); ++i) {
       auto mod = i->second.get();
-      if (mod->type==Item::module)
-        item(*mod);
+      if (is<Module>(*mod))
+        module(dynamic_cast<const Module&>(*mod));
     }
   }
 }

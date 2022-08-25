@@ -6,7 +6,7 @@
 
 namespace doc {
 
-extern size_t size(const ItemMap &items,Item::Type type);
+extern size_t size(const ItemMap &items,const std::type_info &type);
 
 /*!
  * abstract output formatter
@@ -14,14 +14,12 @@ extern size_t size(const ItemMap &items,Item::Type type);
 class Formatter {
 
 protected:
-  void item(const doc::Item& i);
-
-  virtual void variable(const doc::Item &f)       = 0;
-  virtual void function(const doc::Item &f)       = 0;
-  virtual void module(const doc::Item &m)         = 0;
-  virtual void package(const doc::Item &m)        = 0;
-  virtual void format(const doc::ItemMap &items)  = 0;
-  virtual void parameter(const doc::Parameter &p) = 0;
+  virtual void variable(const doc::Variable &var)   = 0;
+  virtual void function(const doc::Function &func)  = 0;
+  virtual void module(const doc::Module &mod)       = 0;
+  virtual void package(const doc::Package &pkg)     = 0;
+  virtual void format(const doc::ItemMap &items)    = 0;
+  virtual void parameter(const doc::Parameter &p)   = 0;
 
   virtual std::string BOLD(const std::string &text)           = 0;
   virtual std::string BR()                                    = 0;
@@ -41,11 +39,11 @@ public:
   void format(const doc::ItemMap &items) override;
 
 private:
-  void package(const doc::Item &pkg)      override;
+  void package(const doc::Package &pkg)      override;
   void parameter(const doc::Parameter &p) override;
-  void function(const doc::Item &func)    override;
-  void module(const doc::Item &mod)       override;
-  void variable(const doc::Item &var)     override;
+  void function(const doc::Function &func)    override;
+  void module(const doc::Module &mod)       override;
+  void variable(const doc::Variable &var)     override;
 
   std::string BOLD(const std::string &text)           override;
   std::string BR()                                    override;

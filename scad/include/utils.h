@@ -44,3 +44,8 @@ public:
 private:
   std::filesystem::path _old;
 };
+
+template <class A,class B>
+bool is(B &b) {
+  return dynamic_cast<A*>(&b)!=nullptr;
+}

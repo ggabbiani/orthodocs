@@ -28,28 +28,55 @@
 
 namespace doc {
 
+using Annotation  = std::string;
+using Name        = std::string;
+using Value       = std::string;
+
 struct Parameter {
-  std::string name;
-  std::string annotation;
-  std::string defaults;
+  Name        name;
+  Annotation  annotation;
+  Value       defaults;
 };
 using ParameterPtr  = std::unique_ptr<Parameter>;
 using ParameterVec  = std::vector<ParameterPtr>;
 
-struct Item {
-  enum Type {
-    function,module,package,variable
-  };
-  Item(const std::string &name,Type type,bool nested=false) : name(name),type(type),nested(nested) {}
-  std::string   name;
-  std::string   annotation;
-  Type          type;
+class Item {
+public:
+  virtual ~Item() = default;
+  Name          name;
+  Annotation    annotation;
   ParameterVec  parameters;
-  std::string   defaults;
-  bool nested;
+  const Value   defaults;
+  const bool    nested;
+protected:
+  Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
 };
 using ItemPtr = std::unique_ptr<Item>;
 using ItemMap = std::map<std::string,ItemPtr>;
+
+class Variable : public Item {
+public:
+  Variable(const Name &name,const Value &defaults,bool nested=false) : Item(name,&defaults,nested) {}
+private:
+};
+
+class Function : public Item {
+public:
+  Function(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
+private:
+};
+
+class Module : public Item {
+public:
+  Module(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
+private:
+};
+
+class Package : public Item {
+public:
+  Package(const Name &name) : Item(name,nullptr,false) {}
+private:
+};
 
 struct AbstractStyle {
   virtual bool check(const std::string &text) = 0;
