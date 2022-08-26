@@ -23,11 +23,12 @@
 
 #include "processors.h"
 #include "utils.h"
-
 #include "antlr4-runtime.h"
+
+#include "indicators/block_progress_bar.hpp"
+#include "indicators/cursor_control.hpp"
 #include "CLI11.hpp"
 
-#include <boost/timer/progress_display.hpp>
 #include <algorithm>
 
 using namespace std;
@@ -80,11 +81,24 @@ int main(int argc, const char *argv[]) {
 
     ErrorHandler    handler;
     scad::Processor proc(handler);
-    boost::timer::progress_display progress(src_files.size());
+
+    // Hide cursor
+    indicators::show_console_cursor(false);
+    indicators::BlockProgressBar bar{
+      indicators::option::BarWidth{50},
+      indicators::option::MaxProgress{src_files.size()}
+    };
+    cout << "Processing " << src_files.size() << " source files:\n";
     for(auto file: src_files) {
+      // update postfix text with current file working on
+      bar.set_option(indicators::option::PostfixText{file});
       proc(sroot,fs::relative(file,sroot),droot);
-      ++progress;
+      bar.tick(); // update progress bar
     }
+    bar.set_option(indicators::option::PostfixText{"done."});
+    bar.mark_as_completed();
+    // Show cursor
+    indicators::show_console_cursor(true);
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
