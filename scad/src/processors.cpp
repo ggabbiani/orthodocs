@@ -27,9 +27,7 @@
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
 #include "SCADParser.h"
-#include <tree/ParseTreeWalker.h>
-
-#include <iostream>
+#include "tree/ParseTreeWalker.h"
 
 using namespace std;
 using namespace antlr4;
@@ -38,12 +36,12 @@ namespace fs = std::filesystem;
 
 namespace scad {
 
-void Processor::operator () (const fs::path &sroot, fs::path file, const fs::path &droot) {
-  assert(file.is_relative());
+void Processor::operator () (const fs::path &sroot, const fs::path &source, const fs::path &droot) {
+  assert(source.is_relative());
   try {
     // change to source root
     cwd source_root(sroot);
-    ifstream          is(file);
+    ifstream          is(source);
     ANTLRInputStream  in(is);
     SCADLexer         lexer(&in);
     CommonTokenStream tokens(&lexer);
@@ -54,28 +52,19 @@ void Processor::operator () (const fs::path &sroot, fs::path file, const fs::pat
     parser.addErrorListener(&_handler);
 
     // source parsing
-    Generator  generator(file.c_str());
+    Generator  generator(source.c_str());
     // parse tree depth-first traverse
     tree::ParseTreeWalker  walker;
     tree::ParseTree       *tree = parser.pkg();
     walker.walk(&generator,tree);
 
     // documentation generation
-    if (!file.has_filename())
-      throw runtime_error("'" + file.string() + "' has no file part");
-    auto directory = file.parent_path();
+    if (!source.has_filename())
+      throw runtime_error("'" + source.string() + "' has no file part");
 
-    {
-      // change to document root
-      cwd doc_root(droot);
-      if (file.has_parent_path() && !fs::exists(file.parent_path()))
-        fs::create_directory(file.parent_path());
-      ofstream os(file.replace_extension("md"));
-      doc::formatter::Mdown markdown(os);
-      markdown.format(generator.items);
-    }
+    doc::formatter::Mdown(droot,source).format(generator.items);
   } catch(...) {
-    throw_with_nested(runtime_error("error while processing '"+file.string()+'\''));
+    throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));
   }
 }
 

@@ -47,8 +47,8 @@ public:
   void operator () (
     //! Source root directory
     const fs::path &sroot, 
-    //! OpenSCAD source file
-    fs::path file, 
+    //! OpenSCAD source file relative to source root
+    const fs::path &source, 
     //! Document root directory
     const fs::path &droot
   );

@@ -4,6 +4,7 @@
 #include <sstream>
 
 using namespace std;
+namespace fs  = std::filesystem;
 
 namespace doc {
 
@@ -16,9 +17,19 @@ size_t size(const ItemMap &items,const type_info &type) {
   return size;
 }
 
+Formatter::Formatter(const fs::path &droot,const fs::path &source) : source(source),doc_root(droot) {
+  if (source.has_parent_path()) {
+    auto directory  = source.parent_path();
+    if (!fs::exists(directory))
+      fs::create_directory(directory);
+  }
+}
+
 namespace formatter {
 
-Mdown::Mdown(ostream &out) : out(out) {}
+Mdown::Mdown(const fs::path &droot,const fs::path &source) : Formatter(droot,source),document(source.parent_path() / source.stem().replace_extension(".md")) {
+  out.open(document);
+}
 
 void Mdown::package(const doc::Package &pkg) {
   out << H("package "+pkg.name) << endl
@@ -114,6 +125,8 @@ void Mdown::module(const doc::Module &mod) {
 
 void Mdown::format(const doc::ItemMap &items) {
 
+  
+
   for (auto i=items.begin(); i!=items.end(); ++i) {
     auto pkg = i->second.get();
     if (is<Package>(*pkg))
@@ -149,6 +162,7 @@ void Mdown::format(const doc::ItemMap &items) {
         module(dynamic_cast<const Module&>(*mod));
     }
   }
+
 }
 
 std::string Mdown::BOLD(const std::string &text) {

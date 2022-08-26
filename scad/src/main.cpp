@@ -63,15 +63,26 @@ int main(int argc, const char *argv[]) {
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
         auto path = fs::path(file);
-        if (path.is_relative())
-          file = (sroot / path).string();
-        return fs::is_regular_file(file)||fs::is_directory(file) ? string() : string("Path does not exist : "+file) ;
+        if (path.is_relative()) {
+          path  = sroot / path;
+          file  = path.string();
+        }
+        return fs::is_regular_file(path)||fs::is_directory(path) ? string() : string("Source path does not exist : ")+path.string();
       }
       ,"PATH(existing)"
     ));
   app.add_option("-d,--doc-root",droot, "Document root directory")
     ->required()
-    ->check(CLI::ExistingDirectory);
+    ->transform(CLI::Validator(
+      [&sroot] (string &file) -> string {
+        auto path = fs::path(file);
+        if (path.is_relative()) {
+          path  = fs::absolute(path);
+          file  = path.string();
+        }
+        return fs::is_directory(path) ? string() : string("Document root directory does not exist : ")+path.string();
+      }
+      ,"DIR(existing)"));
 
   try {
     app.parse(argc, argv);
