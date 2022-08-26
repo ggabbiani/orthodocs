@@ -50,7 +50,7 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
 }
 
 int main(int argc, const char *argv[]) {
-  CLI::App  app{"ADOX: automatic documentation generation for the OpenSCAD language."};
+  CLI::App  app{"Automatic documentation generation for the OpenSCAD language.","adox-scad"};
   auto      result = EXIT_SUCCESS;
   fs::path  sroot,droot;
   FileSet   sources;
@@ -64,12 +64,11 @@ int main(int argc, const char *argv[]) {
       [&sroot] (string &file) -> string {
         auto path = fs::path(file);
         if (path.is_relative())
-          file = fs::path(sroot / path).string();
-        return string();
+          file = (sroot / path).string();
+        return fs::is_regular_file(file)||fs::is_directory(file) ? string() : string("Path does not exist : "+file) ;
       }
-      ,"RELATIVE|ABSOLUTE"
-    ))
-    ->check(CLI::ExistingPath);
+      ,"PATH(existing)"
+    ));
   app.add_option("-d,--doc-root",droot, "Document root directory")
     ->required()
     ->check(CLI::ExistingDirectory);
