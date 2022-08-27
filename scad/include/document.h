@@ -65,6 +65,9 @@ class Item {
   friend class ::Index;
 public:
   virtual ~Item() = default;
+
+  virtual std::string type() = 0;
+
   Name          name;
   Annotation    annotation;
   ParameterVec  parameters;
@@ -103,27 +106,27 @@ namespace doc {
 class Variable : public Item {
 public:
   Variable(const Name &name,const Value &defaults,bool nested=false) : Item(name,&defaults,nested) {}
-private:
+  std::string type() override {return "variable";}
 };
 
 class Function : public Item {
 public:
   Function(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
   Signature signature() const {return Item::signature();}
-private:
+  std::string type() override {return "function";}
 };
 
 class Module : public Item {
 public:
   Module(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
   Signature signature() const {return Item::signature();}
-private:
+  std::string type() override {return "module";}
 };
 
 class Package : public Item {
 public:
   Package(const Name &name) : Item(name,nullptr,false) {}
-private:
+  std::string type() override {return "package";}
 };
 
 struct AbstractStyle {

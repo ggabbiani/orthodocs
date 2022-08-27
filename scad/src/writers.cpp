@@ -203,7 +203,17 @@ void Mdown::operator () (const std::filesystem::path &droot, const Index &index)
   cwd pwd(droot);
   _out = new ofstream("toc.md");
 
-  index.serialize(*this);
+  out() << H("Table of Contents",1) << endl;
+  // ToC format:
+  // Key    ==> "<item name> (function|module|variable)"
+  // Value  ==> unique_ptr<doc::Item>
+  for(auto &item: index._map) {
+    // see https://www.markdownguide.org/extended-syntax/#heading-ids
+    auto id     = item.second->type()+'-'+item.second->name;
+    auto link   = item.second->uri.string();
+    auto title  = item.first;
+    out() << "- [" << title << "](" << link << "#" << id << ")" << endl;
+  }
 
   _out->close();
   delete _out;
