@@ -7,8 +7,7 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Generator::Generator(const fs::path &source) : _package(source.filename().stem().string()) {
-  // items[_package] = make_unique<doc::Item>(_package,Item::package);
+Generator::Generator(const char *pkg_name) : _package(pkg_name) {
 }
 
 void Generator::enterPkg(scad::SCADParser::PkgContext *ctx) {
@@ -17,7 +16,7 @@ void Generator::enterPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Generator::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto index    = "package "+_package;
-  items[index]  = move(curr_item.top());
+  document[index]  = move(curr_item.top());
   curr_item.pop();
 }
 
@@ -31,7 +30,7 @@ void Generator::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto name   = curr_item.top()->name;
   auto index  = string("function ")+name;
   if (!priv(name))
-    items[index] = move(curr_item.top());
+    document[index] = move(curr_item.top());
   curr_item.pop();
 }
 
@@ -45,7 +44,7 @@ void Generator::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto name   = curr_item.top()->name;
   auto index  = "module "+name;
   if (!curr_item.top()->nested && !priv(name))
-    items[index] = move(curr_item.top());
+    document[index] = move(curr_item.top());
   curr_item.pop();
 }
 
@@ -106,7 +105,7 @@ void Generator::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
       auto id     = curr_variable.top()->name;
       auto index  = "variable "+id;
       if (!curr_variable.top()->nested && !priv(id))
-        items[index] = move(curr_variable.top());
+        document[index] = move(curr_variable.top());
       curr_variable.pop();
     }
   }

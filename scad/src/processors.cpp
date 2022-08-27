@@ -19,10 +19,11 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include "formatters.h"
+#include "writers.h"
 #include "generator.h"
 #include "processors.h"
 #include "utils.h"
+#include "xref.h"
 
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
@@ -34,13 +35,30 @@ using namespace antlr4;
 
 namespace fs = std::filesystem;
 
+class ErrorHandler : public BaseErrorListener {
+  void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
+    const string &msg, exception_ptr e) override;
+};
+
+void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
+  ostringstream s;
+  // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
+  //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
+  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ')';
+  throw std::invalid_argument(s.str());
+}
+
+static ErrorHandler handler;
+
 namespace scad {
 
-void Processor::operator () (const fs::path &sroot, const fs::path &source, const fs::path &droot) {
+void Processor::operator () (const fs::path &source) {
   assert(source.is_relative());
+  assert(source.has_filename());
   try {
     // change to source root
-    cwd source_root(sroot);
+    cwd source_root(_sroot);
+
     ifstream          is(source);
     ANTLRInputStream  in(is);
     SCADLexer         lexer(&in);
@@ -49,20 +67,22 @@ void Processor::operator () (const fs::path &sroot, const fs::path &source, cons
 
     // error management
     parser.removeErrorListeners();
-    parser.addErrorListener(&_handler);
+    parser.addErrorListener(&handler);
 
-    // source parsing
-    Generator  generator(source.c_str());
+    // source parse listener
+    Generator  listener(source.filename().stem().c_str());
     // parse tree depth-first traverse
     tree::ParseTreeWalker  walker;
+    // parsing
     tree::ParseTree       *tree = parser.pkg();
-    walker.walk(&generator,tree);
+    // creation of the document
+    walker.walk(&listener,tree);
 
-    // documentation generation
-    if (!source.has_filename())
-      throw runtime_error("'" + source.string() + "' has no file part");
+    // document writing
 
-    doc::formatter::Mdown(droot,source).format(generator.items);
+    _writer->operator()(source,_droot,listener.document);
+    _toc.add(listener.document);
+
   } catch(...) {
     throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));
   }

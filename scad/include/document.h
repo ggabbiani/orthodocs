@@ -21,10 +21,13 @@
 
 #pragma once
 
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
+class Index;
 
 namespace scad {
 
@@ -39,6 +42,8 @@ using Annotation  = std::string;
 using Name        = std::string;
 //! used for both function and modules
 using Signature   = std::string;
+//! always relative to document root
+using URI         = std::filesystem::path;
 //! defaults for variables and parameters
 using Value       = std::string;
 
@@ -56,6 +61,7 @@ using ParameterPtr  = std::unique_ptr<Parameter>;
 using ParameterVec  = std::vector<ParameterPtr>;
 
 class Item {
+  friend class ::Index;
 public:
   virtual ~Item() = default;
   Name          name;
@@ -63,6 +69,8 @@ public:
   ParameterVec  parameters;
   const Value   defaults;
   const bool    nested;
+  // filled by concrete generators
+  URI           document;
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
   Signature signature() const; 

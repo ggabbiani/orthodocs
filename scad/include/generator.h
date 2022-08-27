@@ -12,13 +12,13 @@ namespace scad {
 
 class Generator : public scad::SCADBaseListener {
 public:
-  doc::ItemMap              items;
+  doc::ItemMap              document;
   std::stack<doc::ItemPtr>  curr_item;
   std::stack<doc::ItemPtr>  curr_variable;
   doc::ParameterPtr         curr_parameter;
   std::string               _package;
 
-  Generator(const fs::path &source);
+  Generator(const char *pkg_name);
 
   void enterAnnotation(scad::SCADParser::AnnotationContext *ctx)      override;
   void enterAssignment(scad::SCADParser::AssignmentContext *ctx)      override;

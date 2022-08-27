@@ -36,19 +36,6 @@ using namespace antlr4;
 
 namespace fs=std::filesystem;
 
-class ErrorHandler : public BaseErrorListener {
-  void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
-    const string &msg, exception_ptr e) override;
-};
-
-void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
-  ostringstream s;
-  // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
-  //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
-  s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ')';
-  throw std::invalid_argument(s.str());
-}
-
 int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation for the OpenSCAD language.","adox-scad"};
   auto      result = EXIT_SUCCESS;
@@ -86,11 +73,11 @@ int main(int argc, const char *argv[]) {
 
   try {
     app.parse(argc, argv);
+    assert(droot.is_absolute());
+    assert(sroot.is_relative());
+
     FileSet src_files;
     lookup(sources,".scad",&src_files);
-
-    ErrorHandler    handler;
-    scad::Processor proc(handler);
 
     // Hide cursor
     indicators::show_console_cursor(false);
@@ -99,10 +86,11 @@ int main(int argc, const char *argv[]) {
       indicators::option::MaxProgress{src_files.size()}
     };
     cout << "Processing " << src_files.size() << " source files:\n";
+    scad::Processor proc(sroot,droot,new doc::writer::Mdown);
     for(auto file: src_files) {
       // update postfix text with current file working on
       bar.set_option(indicators::option::PostfixText{file});
-      proc(sroot,fs::relative(file,sroot),droot);
+      proc(fs::relative(file,sroot));
       bar.tick(); // update progress bar
     }
     bar.set_option(indicators::option::PostfixText{"done."});

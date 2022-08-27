@@ -21,39 +21,42 @@
 
 #pragma once
 
+#include "writers.h"
+#include "xref.h"
 #include "antlr4-runtime.h"
 
 #include <filesystem>
-
-namespace fs=std::filesystem;
+#include <memory>
 
 namespace scad {
 
 /**
- * Process a OpenSCAD source producing the documentation for:
- * 
- * - global variables
- * - public functions
- * - global public modules
+ * Process OpenSCAD sources producing the ItemMap document via a scad parser listener
  */
 class Processor {
 public:
-  Processor(antlr4::BaseErrorListener &handler) : _handler(handler) {}
+  Processor(const std::filesystem::path &sroot, const std::filesystem::path &droot, doc::Writer *writer) 
+    : _sroot(sroot), _droot(droot), _writer(writer) {
+  }
+
+  ~Processor() {
+    _writer->operator()(_droot,_toc);
+  }
+
   /*!
    * Elaborate an OpenSCAD source and produce a Markdown document
    *
    * TODO: other kind of formatter (i.e not only Markdown)
    */
   void operator () (
-    //! Source root directory
-    const fs::path &sroot, 
-    //! OpenSCAD source file relative to source root
-    const fs::path &source, 
-    //! Document root directory
-    const fs::path &droot
+    // OpenSCAD source file relative to source root or absolute
+    const std::filesystem::path &source
   );
 private:
-  antlr4::BaseErrorListener &_handler;
+  const std::filesystem::path &_sroot;
+  const std::filesystem::path &_droot;
+  std::unique_ptr<doc::Writer> _writer;
+  Index _toc;
 };
 
-} // namespace scad
+}
