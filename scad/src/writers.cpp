@@ -10,7 +10,7 @@ namespace fs  = std::filesystem;
 
 namespace doc {
 
-size_t size(const ItemMap &items,const type_info &type) {
+size_t size(const Document &items,const type_info &type) {
   auto size  = 0;
   for(auto i=items.begin(); i!=items.end(); ++i) {
     auto var  = i->second.get();
@@ -113,7 +113,7 @@ void Mdown::module(const doc::Module &mod) {
   }
 }
 
-void Mdown::operator () (const fs::path &source, const fs::path &droot, const doc::ItemMap &document) {
+void Mdown::operator () (const fs::path &source, const fs::path &droot, const Document &document) {
   assert(source.is_relative());
   assert(droot.is_absolute());
 
@@ -131,7 +131,7 @@ void Mdown::operator () (const fs::path &source, const fs::path &droot, const do
   for (auto i=document.begin(); i!=document.end(); ++i) {
     auto pkg = i->second.get();
     if (is<Package>(*pkg)) {
-      pkg->document = md;
+      pkg->uri = md;
       package(dynamic_cast<const Package&>(*pkg));
     }
   }
@@ -142,7 +142,7 @@ void Mdown::operator () (const fs::path &source, const fs::path &droot, const do
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto var  = i->second.get();
       if (is<Variable>(*var)) {
-        var->document = md;
+        var->uri = md;
         variable(dynamic_cast<const Variable&>(*var));
       }
     }
@@ -154,7 +154,7 @@ void Mdown::operator () (const fs::path &source, const fs::path &droot, const do
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto func = i->second.get();
       if (is<Function>(*func)) {
-        func->document = md;
+        func->uri = md;
         function(dynamic_cast<const Function&>(*func));
       }
     }
@@ -166,7 +166,7 @@ void Mdown::operator () (const fs::path &source, const fs::path &droot, const do
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto mod = i->second.get();
       if (is<Module>(*mod)) {
-        mod->document = md;
+        mod->uri = md;
         module(dynamic_cast<const Module&>(*mod));
       }
     }
@@ -209,7 +209,6 @@ void Mdown::operator () (const std::filesystem::path &droot, const Index &index)
   delete _out;
   _out = nullptr;
 }
-
 
 }
 

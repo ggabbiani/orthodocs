@@ -15,7 +15,7 @@ public:
   
   Index() {}
   // move items into index, contextually enriching item with source uri
-  void add(doc::ItemMap &items);
+  void add(Document &items);
   void serialize(const doc::Writer &writer) const;
   void deserialize(std::istream &is) {}
 private:

@@ -24,6 +24,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -69,14 +70,35 @@ public:
   ParameterVec  parameters;
   const Value   defaults;
   const bool    nested;
-  // filled by concrete generators
-  URI           document;
+  // filled by writers
+  URI           uri;
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
   Signature signature() const; 
 };
-using ItemPtr = std::unique_ptr<Item>;
-using ItemMap = std::map<std::string,ItemPtr>;
+
+using ItemPtr       = std::unique_ptr<Item>;
+// used by generators for stackable items (modules and variables)
+using ItemPtrStack  = std::stack<ItemPtr>;
+
+}
+
+/**
+ * Document format:
+ * Key    ==> "function|module|variable <item name>"
+ * Value  ==> unique_ptr<doc::Item>
+ * 
+ * valid key examples:
+ * 
+ * "variable $FL_ADD"
+ * "function fl_description"
+ * "module fl_manage"
+ * "package defs"
+ * 
+ */
+using Document = std::map<std::string,doc::ItemPtr>;
+
+namespace doc {
 
 class Variable : public Item {
 public:

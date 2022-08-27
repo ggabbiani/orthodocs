@@ -31,7 +31,7 @@
 namespace scad {
 
 /**
- * Process OpenSCAD sources producing the ItemMap document via a scad parser listener
+ * Process OpenSCAD sources producing the Document via a scad parser listener
  */
 class Processor {
 public:

@@ -8,14 +8,14 @@
 
 namespace doc {
 
-extern size_t size(const ItemMap &items,const std::type_info &type);
+extern size_t size(const Document &items,const std::type_info &type);
 
 /*!
  * abstract output formatter
  */
 class Writer {
 public:
-  virtual void operator () (const std::filesystem::path &droot, const std::filesystem::path &parent, const doc::ItemMap &document) = 0;
+  virtual void operator () (const std::filesystem::path &droot, const std::filesystem::path &parent, const Document &document) = 0;
   virtual void operator () (const std::filesystem::path &droot, const Index &index) = 0;
   virtual std::ostream &out() const = 0;
 
@@ -35,11 +35,11 @@ public:
 namespace writer {
 
 /**
- * write the document in Markdown format 
+ * Markdown writer 
  */
 class Mdown : public Writer {
 public:
-  void operator () (const std::filesystem::path &source, const std::filesystem::path &droot, const doc::ItemMap &document) override;
+  void operator () (const std::filesystem::path &source, const std::filesystem::path &droot, const Document &document) override;
   void operator () (const std::filesystem::path &droot, const Index &index) override;
   std::ostream &out() const override {return *_out;}
 
