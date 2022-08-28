@@ -53,3 +53,10 @@ template <class A,class B>
 bool is(B &b) {
   return dynamic_cast<A*>(&b)!=nullptr;
 }
+
+namespace nocase {
+
+// Try to find sub in str - no case version
+extern size_t find(const std::string &str, const std::string &sub);
+
+}

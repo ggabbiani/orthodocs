@@ -1,4 +1,7 @@
+
+#include "annotations.h"
 #include "generator.h"
+#include "globals.h"
 #include "utils.h"
 
 using namespace std;
@@ -54,6 +57,10 @@ void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   auto anno   = ctx->getText();
   auto style  = factory(anno);
   auto value  = style->manage(anno);
+
+  if (admonitions)
+    mk_admonitions(value);
+
   // FIXME: a sigle if with multiple OR sould be ok
   if (is<scad::SCADParser::ParameterContext>(*ctx->parent->parent->parent)) {   // parameter's annotation
     curr_parameter->_annotation = value;

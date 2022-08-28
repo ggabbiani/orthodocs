@@ -21,6 +21,7 @@
 
 // #define NDEBUG 
 
+#include "globals.h"
 #include "processors.h"
 #include "utils.h"
 #include "antlr4-runtime.h"
@@ -70,7 +71,7 @@ int main(int argc, const char *argv[]) {
         return fs::is_directory(path) ? string() : string("Document root directory does not exist : ")+path.string();
       }
       ,"DIR(existing)"));
-
+  app.add_flag("-a,--admonitions",admonitions,"When enabled any admonition (NNOTE,TIP and WARNING) found in annotations will be enriched with emoji.");
   try {
     app.parse(argc, argv);
     assert(droot.is_absolute());

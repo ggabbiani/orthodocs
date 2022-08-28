@@ -21,6 +21,7 @@
 
 #include "utils.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <set>
@@ -63,4 +64,17 @@ void print_exception(const exception& e, int level) {
   } catch(const exception &nestedException) {
     print_exception(nestedException, level+1);
   } catch(...) {}
+}
+
+namespace nocase {
+
+size_t find(const string &str, const string &sub) {
+  auto it = std::search(
+    str.begin(), str.end(),
+    sub.begin(), sub.end(),
+    [](char ch1, char ch2) {return std::toupper(ch1) == std::toupper(ch2);}
+  );
+  return it!=str.end() ? it-str.begin() : string::npos;
+}
+
 }
