@@ -10,4 +10,5 @@
 - [x] rewrite generator;
 - [ ] implement [Table of Contents](https://www.markdownguide.org/hacks/#table-of-contents)
 - [ ] implement cross-reference
-- [ ] implement [Admonitions](https://www.markdownguide.org/hacks/#admonitions)
+- [ ] implement [Admonitions](https://www.markdownguide.org/hacks/#admonitions) with regex
+- [ ] fix packages with proper path (a package can be nested)
