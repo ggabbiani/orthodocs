@@ -3,7 +3,7 @@
 #include "writers.h"
 
 #include <cassert>
-#include <sstream>
+#include <fstream>
 
 using namespace std;
 namespace fs  = std::filesystem;
@@ -21,36 +21,36 @@ size_t size(const Document &items,const type_info &type) {
 
 namespace writer {
 
-void Mdown::package(const doc::Package &pkg) {
-  out() << H("package "+pkg.name) << endl
+void Mdown::package(ostream &out, const doc::Package &pkg) {
+  out << H("package "+pkg.name) << endl
       << endl;
   if (!pkg.annotation.empty())
-    out() << pkg.annotation << endl
+    out << pkg.annotation << endl
         << endl;
 }
 
-void Mdown::parameter(const doc::Parameter &p) {
-  out() << BOLD(p.name()) << BR()
+void Mdown::parameter(ostream &out, const doc::Parameter &p) {
+  out << BOLD(p.name()) << BR()
       << p.annotation() << endl
       << endl;
 }
 
-void Mdown::variable(const doc::Variable &var) {
-  out() << HRULE()
+void Mdown::variable(ostream &out, const doc::Variable &var) {
+  out << HRULE()
       << H("variable "+var.name,3)
       << endl;
   if (!var.defaults.empty())
-    out() << BOLD("Default:") << endl
+    out << BOLD("Default:") << endl
         << endl
         << "    " << var.defaults << endl
         << endl;
   if (!var.annotation.empty())
-    out() << var.annotation << endl
+    out << var.annotation << endl
         << endl;
 }
 
-void Mdown::function(const doc::Function &func) {
-  out() << HRULE()
+void Mdown::function(ostream &out, const doc::Function &func) {
+  out << HRULE()
       << H("function "+func.name,3)
       << endl
       << BOLD("Syntax:") << endl
@@ -59,7 +59,7 @@ void Mdown::function(const doc::Function &func) {
       << "    " << func.signature() << endl
       << endl;
   if (!func.annotation.empty())
-    out() << func.annotation << endl
+    out << func.annotation << endl
         << endl;
 
   if (func.parameters.size()) {
@@ -69,20 +69,20 @@ void Mdown::function(const doc::Function &func) {
       annotations +=(!(*i)->annotation().empty());
     }
     if (annotations) {
-      out() << BOLD("Parameters:") << endl
+      out << BOLD("Parameters:") << endl
           << endl;
       for(auto i=func.parameters.begin();i!=func.parameters.end();i++) {
         auto p = **i;
         if (!p.annotation().empty())
-          parameter(**i);
+          parameter(out,**i);
       }
-      out() << endl;
+      out << endl;
     }
   }
 }
 
-void Mdown::module(const doc::Module &mod) {
-  out() << HRULE()
+void Mdown::module(ostream &out, const doc::Module &mod) {
+  out << HRULE()
       << H("module "+mod.name,3)
       << endl
       << BOLD("Syntax:") << endl
@@ -91,7 +91,7 @@ void Mdown::module(const doc::Module &mod) {
       << "    " << mod.signature() << endl
       << endl;
   if (!mod.annotation.empty())
-    out() << mod.annotation << endl
+    out << mod.annotation << endl
         << endl;
 
   if (mod.parameters.size()) {
@@ -101,14 +101,14 @@ void Mdown::module(const doc::Module &mod) {
       annotations +=(!(*i)->annotation().empty());
     }
     if (annotations) {
-      out() << BOLD("Parameters:") << endl
+      out << BOLD("Parameters:") << endl
           << endl;
       for(auto i=mod.parameters.begin();i!=mod.parameters.end();i++) {
         auto p = **i;
         if (!p.annotation().empty())
-          parameter(**i);
+          parameter(out,**i);
       }
-      out() << endl;
+      out << endl;
     }
   }
 }
@@ -126,53 +126,51 @@ void Mdown::operator () (const fs::path &source, const fs::path &droot, const Do
   }
 
   auto md = source.parent_path() / source.stem().replace_extension(".md");
-  _out = new ofstream(md);
+  ofstream out(md);
 
   for (auto i=document.begin(); i!=document.end(); ++i) {
     auto pkg = i->second.get();
     if (is<Package>(*pkg)) {
       pkg->uri = md;
-      package(dynamic_cast<const Package&>(*pkg));
+      package(out,dynamic_cast<const Package&>(*pkg));
     }
   }
 
   if (size(document,typeid(Variable))) {
-    out() << H("Variables",2) << endl 
+    out << H("Variables",2) << endl 
         << endl;
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto var  = i->second.get();
       if (is<Variable>(*var)) {
         var->uri = md;
-        variable(dynamic_cast<const Variable&>(*var));
+        variable(out,dynamic_cast<const Variable&>(*var));
       }
     }
   }
 
   if (size(document,typeid(Function))) {
-    out() << H("Functions",2) << endl 
+    out << H("Functions",2) << endl 
         << endl;
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto func = i->second.get();
       if (is<Function>(*func)) {
         func->uri = md;
-        function(dynamic_cast<const Function&>(*func));
+        function(out,dynamic_cast<const Function&>(*func));
       }
     }
   }
 
   if (size(document,typeid(Module))) {
-    out() << H("Modules",2) << endl 
+    out << H("Modules",2) << endl 
         << endl;
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto mod = i->second.get();
       if (is<Module>(*mod)) {
         mod->uri = md;
-        module(dynamic_cast<const Module&>(*mod));
+        module(out,dynamic_cast<const Module&>(*mod));
       }
     }
   }
-  delete _out;
-  _out = nullptr;
 }
 
 std::string Mdown::BOLD(const std::string &text) const {
@@ -199,11 +197,10 @@ std::string Mdown::CODE(const std::string &text) const {
 
 void Mdown::operator () (const std::filesystem::path &droot, const Index &index) {
   assert(droot.is_absolute());
-
   cwd pwd(droot);
-  _out = new ofstream("toc.md");
 
-  out() << H("Table of Contents",1) << endl;
+  ofstream out("toc.md");
+  out << H("Table of Contents",1) << endl;
   // ToC format:
   // Key    ==> "<item name> (function|module|variable)"
   // Value  ==> unique_ptr<doc::Item>
@@ -212,12 +209,8 @@ void Mdown::operator () (const std::filesystem::path &droot, const Index &index)
     auto id     = item.second->type()+'-'+item.second->name;
     auto link   = item.second->uri.string();
     auto title  = item.first;
-    out() << "- [" << title << "](" << link << "#" << id << ")" << endl;
+    out << "- [" << title << "](" << link << "#" << id << ")" << endl;
   }
-
-  _out->close();
-  delete _out;
-  _out = nullptr;
 }
 
 }
