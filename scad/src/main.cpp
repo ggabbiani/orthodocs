@@ -43,10 +43,7 @@ int main(int argc, const char *argv[]) {
   fs::path  sroot,droot;
   FileSet   sources;
 
-  app.add_option("-s,--src-root", sroot, "Source root directory")
-    ->required()
-    ->check(CLI::ExistingDirectory);
-  app.add_option("sources", sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
+  app.add_option("sources", sources, "directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
     ->required()
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
@@ -59,7 +56,9 @@ int main(int argc, const char *argv[]) {
       }
       ,"PATH(existing)"
     ));
-  app.add_option("-d,--doc-root",droot, "Document root directory")
+
+  app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
+  app.add_option("-d,--doc-root",droot, "document root directory")
     ->required()
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
@@ -71,7 +70,11 @@ int main(int argc, const char *argv[]) {
         return fs::is_directory(path) ? string() : string("Document root directory does not exist : ")+path.string();
       }
       ,"DIR(existing)"));
-  app.add_flag("-a,--admonitions",admonitions,"When enabled any admonition (NNOTE,TIP and WARNING) found in annotations will be enriched with emoji.");
+  app.add_option("-s,--src-root", sroot, "source root directory")
+    ->required()
+    ->check(CLI::ExistingDirectory);
+  app.add_flag("-t,--toc",option::toc,"when true, toc generation on the document root is enabled.");
+
   try {
     app.parse(argc, argv);
     assert(droot.is_absolute());

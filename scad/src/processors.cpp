@@ -19,11 +19,12 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include "writers.h"
 #include "generator.h"
+#include "globals.h"
 #include "processors.h"
 #include "utils.h"
 #include "xref.h"
+#include "writers.h"
 
 #include "antlr4-runtime.h"
 #include "SCADLexer.h"
@@ -81,7 +82,8 @@ void Processor::operator () (const fs::path &source) {
     // document writing
 
     _writer->operator()(source,_droot,listener.document);
-    _toc.add(listener.document);
+    if (option::toc)
+      _toc.add(listener.document);
 
   } catch(...) {
     throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));

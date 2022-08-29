@@ -21,4 +21,15 @@
 
 #pragma once
 
+namespace option {
+
+/**
+ * when true, adminitions emoji are enabled for the annotation.
+ */
 extern bool admonitions;
+/**
+ * when true, toc generation on the document root is enabled
+ */
+extern bool toc;
+
+}

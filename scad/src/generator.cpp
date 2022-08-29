@@ -58,7 +58,7 @@ void Generator::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   auto style  = factory(anno);
   auto value  = style->manage(anno);
 
-  if (admonitions)
+  if (option::admonitions)
     mk_admonitions(value);
 
   // FIXME: a sigle if with multiple OR sould be ok
