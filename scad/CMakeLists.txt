@@ -176,3 +176,5 @@ if (BUILD_TESTING)
   new_test(NAME statement_for RULE pkg  FILE statement_for.scad FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME vars          RULE pkg  FILE vars.scad          FAIL_REGULAR_EXPRESSION DEFAULT)
 endif()
+
+add_subdirectory("tests-other")

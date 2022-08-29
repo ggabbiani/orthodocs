@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <set>
@@ -56,7 +57,24 @@ bool is(B &b) {
 
 namespace nocase {
 
-// Try to find sub in str - no case version
-extern size_t find(const std::string &str, const std::string &sub);
+template <class InputIt1,class InputIt2>
+InputIt1 find(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
+  auto it = std::search(
+    first1, last1, 
+    first2, last2,
+    [](char ch1, char ch2) {return std::toupper(ch1) == std::toupper(ch2);}
+  );
+  return it;
+}
+
+inline size_t find(const std::string &str, const std::string &sub, size_t pos=0) {
+  auto it = find(str.begin()+pos,str.end(),sub.begin(),sub.end());
+  return it!=str.end() ? it-str.begin() : std::string::npos;
+}
+
+inline size_t rfind(const std::string &str, const std::string &sub, size_t pos=0) {
+  auto it = find(str.rbegin()+pos,str.rend(),sub.rbegin(),sub.rend());
+  return it!=str.rend() ? it-str.rbegin() : std::string::npos;
+}
 
 }

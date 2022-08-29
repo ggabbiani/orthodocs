@@ -23,5 +23,12 @@
 
 #include <string>
 
-// Expands any admontion eventually present in the annotation with a corresponding emoji
+/**
+ * Modifies the passed annotation inserting the corresponding emoji
+ * to each admonition found inside the annotation text.
+ * The supported admonition are taken from 
+ * [Admonitions | Asciidoctor Docs](https://docs.asciidoctor.org/asciidoc/latest/blocks/admonitions/)
+ * 
+ * See also [Using emoji](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#using-emoji)
+ */
 extern void mk_admonitions(std::string &annotation);

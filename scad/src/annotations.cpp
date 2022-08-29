@@ -30,16 +30,23 @@
 using namespace std;
 
 void mk_admonitions(std::string &anno) {
-  static array<pair<string,string>,3> admonitions = {
+  static array<pair<string,string>,5> admonitions = {
     {
-      {"**note:**",     ":memo: "},
-      {"**tip:**",      ":bulb: "},
-      {"**warning:**",  ":warning: "}
+      {"**caution:**",    ":caution: "  },
+      {"**important:**",  ":important: "},
+      {"**note:**",       ":memo: "     },
+      {"**tip:**",        ":bulb: "     },
+      {"**warning:**",    ":warning: "  },
     }
   };
   for(const auto adm: admonitions) {
-    auto pos = nocase::find(anno,adm.first);
-    if (pos!=string::npos)
-      anno.insert(pos,adm.second);
+    auto search_s = adm.first;
+    auto insert_s = adm.second;
+    auto pos = 0;
+    while ((pos = nocase::rfind(anno,search_s,pos)) != std::string::npos) {
+        anno.insert(anno.length()-pos-search_s.length(),insert_s);
+        pos += insert_s.length();
+    }
   }
+
 }
