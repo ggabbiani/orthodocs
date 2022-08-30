@@ -48,6 +48,7 @@ target_link_libraries(adox-scad antlr4_static)
 
 add_executable(style-tester
   src/style-tester.cpp 
+  src/globals.cpp 
   src/utils.cpp 
   src/document.cpp
 )

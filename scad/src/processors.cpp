@@ -82,8 +82,7 @@ void Processor::operator () (const fs::path &source) {
     // document writing
 
     _writer->operator()(source,_droot,listener.document);
-    if (option::toc)
-      _toc.add(listener.document);
+    _toc.add(listener.document);
 
   } catch(...) {
     throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));

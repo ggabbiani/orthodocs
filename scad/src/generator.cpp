@@ -4,6 +4,8 @@
 #include "globals.h"
 #include "utils.h"
 
+#include <regex>
+
 using namespace std;
 
 namespace fs=std::filesystem;

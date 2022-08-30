@@ -187,6 +187,12 @@ std::string Mdown::H(const std::string &text,int level) const {
   return prefix + ' ' + text + '\n';
 }
 
+std::string Mdown::H(char c,int level) const {
+  string prefix;
+  prefix.append(level,'#');
+  return prefix+' '+c+'\n';
+}
+
 std::string Mdown::HRULE() const {
   return string("---\n\n");
 }
@@ -195,21 +201,43 @@ std::string Mdown::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Mdown::operator () (const std::filesystem::path &droot, const Index &index) {
+void Mdown::operator () (const fs::path &droot, const Index &index) {
   assert(droot.is_absolute());
   cwd pwd(droot);
 
   ofstream out("toc.md");
   out << H("Table of Contents",1) << endl;
-  // ToC format:
-  // Key    ==> "<item name> (function|module|variable)"
-  // Value  ==> unique_ptr<doc::Item>
+
+  multimap<const string&,Item*> sub;
+  char                          current = 0;
   for(auto &item: index._map) {
     // see https://www.markdownguide.org/extended-syntax/#heading-ids
-    auto id     = item.second->type()+'-'+item.second->name;
-    auto link   = item.second->uri.string();
-    auto title  = item.first;
-    out << "- [" << title << "](" << link << "#" << id << ")" << endl;
+    char  initial = std::toupper(Index::key(*item.second)[0]);
+    if (current!=initial) {  // new sub toc
+      if (sub.size()) { // write previous sub toc
+        out << H(current,2) << '\n';
+        for(auto &i: sub) {
+          auto id     = i.second->type()+'-'+i.second->name;
+          auto link   = i.second->uri.string();
+          auto title  = Index::title(*i.second);
+          out << "- [" << title << "](" << link << "#" << id << ")\n";
+        }
+        out << endl;
+        sub.clear();
+      }
+      current = initial;
+    }
+    sub.emplace(item.first,item.second.get());
+  }
+  // write last sub toc
+  if (sub.size()) { 
+    out << H(current,2) << endl;
+    for(auto &i: sub) {
+      auto id     = i.second->type()+'-'+i.second->name;
+      auto link   = i.second->uri.string();
+      auto title  = Index::title(*i.second);
+      out << "- [" << title << "](" << link << "#" << id << ")" << endl;
+    }
   }
 }
 

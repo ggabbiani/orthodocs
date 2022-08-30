@@ -30,13 +30,18 @@
 using namespace std;
 
 void mk_admonitions(std::string &anno) {
-  static array<pair<string,string>,5> admonitions = {
+  static array<pair<string,string>,10> admonitions = {
     {
       {"**caution:**",    ":caution: "  },
       {"**important:**",  ":important: "},
       {"**note:**",       ":memo: "     },
       {"**tip:**",        ":bulb: "     },
       {"**warning:**",    ":warning: "  },
+      {"__caution:__",    ":caution: "  },
+      {"__important:__",  ":important: "},
+      {"__note:__",       ":memo: "     },
+      {"__tip:__",        ":bulb: "     },
+      {"__warning:__",    ":warning: "  },
     }
   };
   for(const auto adm: admonitions) {

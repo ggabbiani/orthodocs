@@ -66,7 +66,7 @@ class Item {
 public:
   virtual ~Item() = default;
 
-  virtual std::string type() = 0;
+  virtual std::string type() const = 0;
 
   Name          name;
   Annotation    annotation;
@@ -75,12 +75,14 @@ public:
   const bool    nested;
   // filled by writers
   URI           uri;
+
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
   Signature signature() const; 
 };
 
 using ItemPtr       = std::unique_ptr<Item>;
+using ConstItemPtr  = std::unique_ptr<const Item>;
 // used by generators for stackable items (modules and variables)
 using ItemPtrStack  = std::stack<ItemPtr>;
 
@@ -98,6 +100,7 @@ using ItemPtrStack  = std::stack<ItemPtr>;
  * "module fl_manage"
  * "package defs"
  * 
+ * NOTE: see doc::Key()
  */
 using Document = std::map<std::string,doc::ItemPtr>;
 
@@ -106,28 +109,35 @@ namespace doc {
 class Variable : public Item {
 public:
   Variable(const Name &name,const Value &defaults,bool nested=false) : Item(name,&defaults,nested) {}
-  std::string type() override {return "variable";}
+  std::string type() const override {return "variable";}
 };
 
 class Function : public Item {
 public:
   Function(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
   Signature signature() const {return Item::signature();}
-  std::string type() override {return "function";}
+  std::string type() const override {return "function";}
 };
 
 class Module : public Item {
 public:
   Module(const Name &name,bool nested=false) : Item(name,nullptr,nested) {}
   Signature signature() const {return Item::signature();}
-  std::string type() override {return "module";}
+  std::string type() const override {return "module";}
 };
 
 class Package : public Item {
 public:
   Package(const Name &name) : Item(name,nullptr,false) {}
-  std::string type() override {return "package";}
+  std::string type() const override {return "package";}
 };
+
+/**
+ * returns the key used by Document
+ */
+inline std::string key(const Item &item) {
+  return item.type()+' '+item.name;
+}
 
 struct AbstractStyle {
   virtual bool check(const std::string &text) = 0;

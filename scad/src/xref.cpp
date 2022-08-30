@@ -1,3 +1,4 @@
+#include "globals.h"
 #include "xref.h"
 
 #include <algorithm>
@@ -6,12 +7,21 @@
 using namespace std;
 
 void Index::add(Document &document) {
-  // ItemMap format:
-  // Key    ==> "function|module|variable <item name>"
-  // Value  ==> unique_ptr<doc::Item>
-  for(auto &item: document) {
-    // toc Key ==> "<item name> (function|module|variable)"
-    auto key  = item.second->name+" ("+item.second->type()+')';
-    insert(key,item.second);
-  }
+  for(auto &item: document) 
+    insert(item.second);
+}
+
+string Index::key(const doc::Item &item) {
+  auto len    = option::prefix.length();
+  string name = option::prefix.empty() || !nocase::compare(item.name.substr(0,len),option::prefix) ? item.name : item.name.substr(len);
+  auto res = name+" ("+item.type()+')';
+  return res;
+}
+
+std::string Index::title(const doc::Item &item) {
+  return item.name+" ("+item.type()+')';
+}
+
+void Index::insert(Map::mapped_type &item) {
+  _map.emplace(key(*item),std::move(item));
 }

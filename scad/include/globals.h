@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace option {
 
 /**
@@ -31,5 +33,7 @@ extern bool admonitions;
  * when true, toc generation on the document root is enabled
  */
 extern bool toc;
+
+extern std::string prefix;
 
 }

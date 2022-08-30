@@ -27,6 +27,7 @@ namespace writer {
 class Mdown : public Writer {
 public:
   void operator () (const std::filesystem::path &source, const std::filesystem::path &droot, const Document &document) override;
+private:
   void operator () (const std::filesystem::path &droot, const Index &index) override;
 
 private:
@@ -40,6 +41,7 @@ private:
   std::string BR() const;
   std::string CODE(const std::string &text) const;
   std::string H(const std::string &text,int level=1) const;
+  std::string H(char c,int level=1) const;
   std::string HRULE() const;
 };
 

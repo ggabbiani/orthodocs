@@ -26,6 +26,7 @@
 #include "antlr4-runtime.h"
 
 #include <filesystem>
+#include <iostream>
 #include <memory>
 
 namespace scad {
@@ -39,8 +40,9 @@ public:
     : _sroot(sroot), _droot(droot), _writer(writer) {
   }
 
-  ~Processor() {
-    _writer->operator()(_droot,_toc);
+  void writeToC() {
+    if (option::toc)
+      _writer->operator()(_droot,_toc);
   }
 
   /*!

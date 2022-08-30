@@ -21,14 +21,16 @@ public:
     }
   };
 
-  using KeyType     = doc::Name;
-  using MappedType  = doc::ItemPtr;
-  using Map         = std::map<KeyType,MappedType,NoCase>;
+  using Map = std::multimap<doc::Name,doc::ItemPtr,NoCase>;
   
-  Index() {}
   // move Document items into index, contextually enriching with source uri
-  void add(Document &items);
+  void add(Document &document);
+  /**
+   * builds key value used by Index::_map
+   */
+  static std::string key(const doc::Item &item);
+  static std::string title(const doc::Item &item);
 private:
-  void insert(const doc::Name &index,MappedType &item) {_map.emplace(index,std::move(item));}
+  void insert(Map::mapped_type &item);
   Map _map;
 };

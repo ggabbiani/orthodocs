@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <string>
 #include <set>
@@ -77,4 +78,8 @@ inline size_t rfind(const std::string &str, const std::string &sub, size_t pos=0
   return it!=str.rend() ? it-str.rbegin() : std::string::npos;
 }
 
+inline bool compare(std::string str1,std::string str2) {
+  return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](char & c1, char & c2) {return (std::toupper(c1) == std::toupper(c2));})
+  ;
+}
 }

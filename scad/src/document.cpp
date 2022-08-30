@@ -1,4 +1,6 @@
 #include "document.h"
+#include "globals.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <cassert>
