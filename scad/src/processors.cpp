@@ -19,7 +19,7 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include "generator.h"
+#include "listener.h"
 #include "globals.h"
 #include "processors.h"
 #include "utils.h"
@@ -71,7 +71,7 @@ void Processor::operator () (const fs::path &source) {
     parser.addErrorListener(&handler);
 
     // source parse listener
-    Generator  listener(source.filename().stem().c_str());
+    Listener  listener(source.filename().stem().c_str());
     // parse tree depth-first traverse
     tree::ParseTreeWalker  walker;
     // parsing

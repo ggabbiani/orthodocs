@@ -32,7 +32,7 @@ add_executable(adox-scad
   src/main.cpp 
   src/annotations.cpp 
   src/document.cpp 
-  src/generator.cpp 
+  src/listener.cpp
   src/globals.cpp 
   src/processors.cpp 
   src/utils.cpp 

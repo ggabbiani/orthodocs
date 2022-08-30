@@ -24,6 +24,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <set>
 #include <stack>
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@ class Index;
 
 namespace scad {
 
-class Generator;
+class Listener;
 
 }
 
@@ -49,7 +50,7 @@ using URI         = std::filesystem::path;
 using Value       = std::string;
 
 class Parameter {
-  friend class ::scad::Generator;
+  friend class ::scad::Listener;
 public:
   const Name &name() const {return _name;}
   const Annotation &annotation() const {return _annotation;}
@@ -130,6 +131,8 @@ class Package : public Item {
 public:
   Package(const Name &name) : Item(name,nullptr,false) {}
   std::string type() const override {return "package";}
+  std::set<std::string> uses;
+  std::set<std::string> includes;
 };
 
 /**

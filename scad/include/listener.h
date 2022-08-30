@@ -6,7 +6,7 @@
 
 namespace scad {
 
-class Generator : public scad::SCADBaseListener {
+class Listener : public scad::SCADBaseListener {
 public:
   using Parser = scad::SCADParser;
 
@@ -15,7 +15,7 @@ public:
   doc::ItemPtrStack curr_variable;
   doc::ParameterPtr curr_parameter;
 
-  Generator(const char *pkg_name);
+  Listener(const char *pkg_name);
 
   void enterAnnotation(Parser::AnnotationContext *ctx)      override;
   void enterAssignment(Parser::AssignmentContext *ctx)      override;
