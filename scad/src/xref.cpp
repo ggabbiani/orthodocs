@@ -19,7 +19,7 @@ string Index::key(const doc::Item &item) {
 }
 
 std::string Index::title(const doc::Item &item) {
-  return item.name+" ("+item.type()+')';
+  return (is<const doc::Package>(item) ? dynamic_cast<const doc::Package&>(item).path.string() : item.name)+" ("+item.type()+')';
 }
 
 void Index::insert(Map::mapped_type &item) {

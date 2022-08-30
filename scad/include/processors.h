@@ -36,13 +36,12 @@ namespace scad {
  */
 class Processor {
 public:
-  Processor(const std::filesystem::path &sroot, const std::filesystem::path &droot, doc::Writer *writer) 
-    : _sroot(sroot), _droot(droot), _writer(writer) {
+  explicit Processor(doc::Writer *writer) : _writer(writer) {
   }
 
   void writeToC() {
     if (option::toc)
-      _writer->operator()(_droot,_toc);
+      _writer->operator()(_toc);
   }
 
   /*!
@@ -55,8 +54,6 @@ public:
     const std::filesystem::path &source
   );
 private:
-  const std::filesystem::path &_sroot;
-  const std::filesystem::path &_droot;
   std::unique_ptr<doc::Writer> _writer;
   Index _toc;
 };

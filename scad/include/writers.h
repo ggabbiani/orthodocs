@@ -15,8 +15,8 @@ extern size_t size(const Document &items,const std::type_info &type);
  */
 class Writer {
 public:
-  virtual void operator () (const std::filesystem::path &source, const std::filesystem::path &droot, const Document &document) = 0;
-  virtual void operator () (const std::filesystem::path &droot, const Index &index) = 0;
+  virtual void operator () (const std::filesystem::path &source, const Document &document) = 0;
+  virtual void operator () (const Index &index) = 0;
 };
 
 namespace writer {
@@ -26,9 +26,9 @@ namespace writer {
  */
 class Mdown : public Writer {
 public:
-  void operator () (const std::filesystem::path &source, const std::filesystem::path &droot, const Document &document) override;
+  void operator () (const std::filesystem::path &source, const Document &document) override;
 private:
-  void operator () (const std::filesystem::path &droot, const Index &index) override;
+  void operator () (const Index &index) override;
 
 private:
   void package(std::ostream &out,const doc::Package &pkg);

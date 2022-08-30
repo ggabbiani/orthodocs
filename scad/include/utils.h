@@ -56,6 +56,13 @@ bool is(B &b) {
   return dynamic_cast<A*>(&b)!=nullptr;
 }
 
+/**
+ * check if sub is a subdirectory of root.
+ * 
+ * **NOTE:** both the arguments must be in **CANONICAL** form.
+ */
+extern bool is_sub_of(const std::filesystem::path &sub, const std::filesystem::path &root);
+
 namespace nocase {
 
 template <class InputIt1,class InputIt2>

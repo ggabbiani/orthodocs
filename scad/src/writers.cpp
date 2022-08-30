@@ -1,3 +1,4 @@
+#include "globals.h"
 #include "xref.h"
 #include "utils.h"
 #include "writers.h"
@@ -22,8 +23,24 @@ size_t size(const Document &items,const type_info &type) {
 namespace writer {
 
 void Mdown::package(ostream &out, const doc::Package &pkg) {
-  out << H("package "+pkg.name) << endl
+  out << H("package "+(pkg.path.parent_path()/pkg.path.stem()).string()) << endl
       << endl;
+  if (!pkg.includes.empty()) {
+    out << BOLD("Includes:") << '\n'
+        << endl;
+    for(auto p: pkg.includes) {
+      out << "    " << p << '\n';
+    }
+    out << endl;
+  }
+  if (!pkg.uses.empty()) {
+    out << BOLD("Uses:") << endl
+        << endl;
+    for(auto p: pkg.uses) {
+      out << "    " << p << endl
+          << endl;
+    }
+  }
   if (!pkg.annotation.empty())
     out << pkg.annotation << endl
         << endl;
@@ -113,11 +130,11 @@ void Mdown::module(ostream &out, const doc::Module &mod) {
   }
 }
 
-void Mdown::operator () (const fs::path &source, const fs::path &droot, const Document &document) {
+void Mdown::operator () (const fs::path &source, const Document &document) {
   assert(source.is_relative());
-  assert(droot.is_absolute());
+  assert(option::droot.is_absolute());
 
-  cwd doc_root(droot);
+  cwd doc_root(option::droot);
 
   if (source.has_parent_path()) {
     doc::URI directory  = source.parent_path();
@@ -201,10 +218,10 @@ std::string Mdown::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Mdown::operator () (const fs::path &droot, const Index &index) {
-  assert(droot.is_absolute());
-  cwd pwd(droot);
+void Mdown::operator () (const Index &index) {
+  assert(option::droot.is_absolute());
 
+  cwd pwd(option::droot);
   ofstream out("toc.md");
   out << H("Table of Contents",1) << endl;
 

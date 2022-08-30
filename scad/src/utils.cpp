@@ -65,3 +65,27 @@ void print_exception(const exception& e, int level) {
     print_exception(nestedException, level+1);
   } catch(...) {}
 }
+
+bool is_sub_of(const fs::path &sub, const fs::path &root) {
+  try {
+    auto s = sub.is_relative()  ? fs::canonical(sub)  : sub;
+    auto r = root.is_relative() ? fs::canonical(root) : root;
+
+    auto r_first  = r.begin();
+    auto s_first  = s.begin();
+    auto r_last   = r.end();
+    auto s_last   = s.end();
+
+    auto r_it = r_first;
+    auto s_it = s_first;
+
+    while (r_it!=r_last && s_it!=s_last && *r_it==*s_it) {
+      ++r_it;
+      ++s_it;
+    }
+    
+    return r_it==r_last;
+  } catch(...) {
+    throw_with_nested(runtime_error("root '"+root.string()+"', sub '"+sub.string()+'\''));
+  }
+}

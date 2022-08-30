@@ -58,7 +58,7 @@ void Processor::operator () (const fs::path &source) {
   assert(source.has_filename());
   try {
     // change to source root
-    cwd source_root(_sroot);
+    cwd source_root(option::sroot);
 
     ifstream          is(source);
     ANTLRInputStream  in(is);
@@ -71,7 +71,7 @@ void Processor::operator () (const fs::path &source) {
     parser.addErrorListener(&handler);
 
     // source parse listener
-    Listener  listener(source.filename().stem().c_str());
+    Listener  listener(source);
     // parse tree depth-first traverse
     tree::ParseTreeWalker  walker;
     // parsing
@@ -81,7 +81,7 @@ void Processor::operator () (const fs::path &source) {
 
     // document writing
 
-    _writer->operator()(source,_droot,listener.document);
+    _writer->operator()(source,listener.document);
     _toc.add(listener.document);
 
   } catch(...) {

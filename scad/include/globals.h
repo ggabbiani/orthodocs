@@ -21,9 +21,20 @@
 
 #pragma once
 
+#include <filesystem>
 #include <string>
 
 namespace option {
+
+/**
+ * document root in canonical form
+ */
+extern std::filesystem::path droot;
+
+/**
+ * source root in canonical form
+ */
+extern std::filesystem::path sroot;
 
 /**
  * when true, adminitions emoji are enabled for the annotation.

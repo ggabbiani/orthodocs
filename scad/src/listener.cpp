@@ -12,17 +12,54 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const char *pkg_name) : _package(pkg_name) {
+Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
-  curr_item.push(make_unique<doc::Package>(_package));
+  curr_package = new doc::Package(_pkg_path);
+  curr_item.push(doc::ItemPtr(curr_package));
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
-  auto index    = "package "+_package;
-  document[index]  = move(curr_item.top());
+  auto &item  = curr_item.top();
+  document[doc::key(*item)] = move(item);
   curr_item.pop();
+  curr_package  = nullptr;
+}
+
+void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
+  // try {
+  // change into directory of the current package
+  cwd pwd(_pkg_path.parent_path());
+
+  string      inc_file = ctx->FILE()->getText();
+  fs::path    inc_path = inc_file.substr(1,inc_file.length()-2); // eliminates angular brackets
+  error_code  error;  // we manage fs error: no need for exception here...
+  auto        inc_canonical = fs::canonical(inc_path,error);
+
+  if (!static_cast<bool>(error) && is_sub_of(inc_canonical,option::sroot)) {
+    auto requisite = fs::relative(inc_canonical,option::sroot);
+    curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
+  }
+  // } catch(const fs::filesystem_error &error) {
+  //   cout << error.code().value() << ',' << error.code().category().name() << endl;
+  //   throw;
+  // }
+}
+
+void Listener::enterUse(SCADParser::UseContext *ctx) {
+  // change into directory of the current package
+  cwd pwd(_pkg_path.parent_path());
+
+  string      use_file = ctx->FILE()->getText();
+  fs::path    use_path = use_file.substr(1,use_file.length()-2); // eliminates angular brackets
+  error_code  error;  // we manage fs error: no need for exception here...
+  auto        use_canonical = fs::canonical(use_path,error);
+
+  if (!static_cast<bool>(error) && is_sub_of(use_canonical,option::sroot)) {
+    auto requisite = fs::relative(use_canonical,option::sroot);
+    curr_package->uses.emplace((requisite.parent_path()/requisite.stem()).string());
+  }
 }
 
 void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {

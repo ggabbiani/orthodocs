@@ -37,36 +37,34 @@ using namespace antlr4;
 
 namespace fs=std::filesystem;
 
+string cannonau(string &file) {
+  auto path = fs::path(file);
+  if (path.is_relative()) {
+    path  = fs::canonical(path);
+    file  = path.string();
+  }
+  return fs::is_directory(path) ? string() : string("Root directory does not exist : ")+path.string();
+}
+
 int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation for the OpenSCAD language.","adox-scad"};
   auto      result = EXIT_SUCCESS;
-  fs::path  sroot,droot;
   FileSet   sources;
 
-
   app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
-  app.add_option("-s,--src-root", sroot, "source root directory")
+  app.add_option("-s,--src-root", option::sroot, "source root directory")
     ->required()
-    ->check(CLI::ExistingDirectory);
-  app.add_option("-d,--doc-root",droot, "document root directory")
+    ->transform(CLI::Validator(&cannonau,"DIR(existing)"));
+  app.add_option("-d,--doc-root",option::droot, "document root directory")
     ->required()
-    ->transform(CLI::Validator(
-      [&sroot] (string &file) -> string {
-        auto path = fs::path(file);
-        if (path.is_relative()) {
-          path  = fs::absolute(path);
-          file  = path.string();
-        }
-        return fs::is_directory(path) ? string() : string("Document root directory does not exist : ")+path.string();
-      }
-      ,"DIR(existing)"));
+    ->transform(CLI::Validator(&cannonau,"DIR(existing)"));
   app.add_option("sources", sources, "directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
     ->required()
     ->transform(CLI::Validator(
-      [&sroot] (string &file) -> string {
+      [] (string &file) -> string {
         auto path = fs::path(file);
         if (path.is_relative()) {
-          path  = sroot / path;
+          path  = option::sroot/path;
           file  = path.string();
         }
         return fs::is_regular_file(path)||fs::is_directory(path) ? string() : string("Source path does not exist : ")+path.string();
@@ -78,8 +76,8 @@ int main(int argc, const char *argv[]) {
 
   try {
     app.parse(argc, argv);
-    assert(droot.is_absolute());
-    assert(sroot.is_relative());
+    assert(option::droot.is_absolute());
+    assert(option::sroot.is_absolute());
 
     FileSet src_files;
     lookup(sources,".scad",&src_files);
@@ -92,11 +90,11 @@ int main(int argc, const char *argv[]) {
     };
     cout << "Processing " << src_files.size() << " source files:\n";
     {
-      scad::Processor proc(sroot,droot,new doc::writer::Mdown);
+      scad::Processor proc(new doc::writer::Mdown);
       for(auto file: src_files) {
         // update postfix text with current file working on
         bar.set_option(indicators::option::PostfixText{file});
-        proc(fs::relative(file,sroot));
+        proc(fs::relative(file,option::sroot));
         bar.tick(); // update progress bar
       }
       bar.set_option(indicators::option::PostfixText{"done."});

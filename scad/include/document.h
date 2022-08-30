@@ -129,8 +129,10 @@ public:
 
 class Package : public Item {
 public:
-  Package(const Name &name) : Item(name,nullptr,false) {}
+  Package(const std::filesystem::path &path) : Item(path.stem(),nullptr,false), path(path) {}
   std::string type() const override {return "package";}
+
+  std::filesystem::path path;
   std::set<std::string> uses;
   std::set<std::string> includes;
 };
