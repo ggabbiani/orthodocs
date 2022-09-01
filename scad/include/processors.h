@@ -40,8 +40,11 @@ public:
   }
 
   void writeToC() {
-    if (option::toc)
-      _writer->operator()(_toc);
+    _writer->toc(_toc);
+  }
+
+  void writeGraph() {
+    _writer->graph(_toc);
   }
 
   /*!

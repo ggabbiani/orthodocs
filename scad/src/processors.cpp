@@ -80,8 +80,7 @@ void Processor::operator () (const fs::path &source) {
     walker.walk(&listener,tree);
 
     // document writing
-
-    _writer->operator()(source,listener.document);
+    _writer->document(source,listener.document);
     _toc.add(listener.document);
 
   } catch(...) {

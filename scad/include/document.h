@@ -69,6 +69,17 @@ public:
 
   virtual std::string type() const = 0;
 
+  /**
+   * builds key value usable by Document
+   */
+  virtual std::string documentKey() const;
+
+  /**
+   * builds key value usable by Index
+   */
+  virtual std::string indexKey() const;
+
+
   Name          name;
   Annotation    annotation;
   ParameterVec  parameters;
@@ -129,20 +140,25 @@ public:
 
 class Package : public Item {
 public:
-  Package(const std::filesystem::path &path) : Item(path.stem(),nullptr,false), path(path) {}
+  Package(const std::filesystem::path &path) : Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
   std::string type() const override {return "package";}
+
+  /**
+   * Packages provide different keys for Index. 
+   * Their key is constituted by the file part of their path without extension.
+   */
+  std::string indexKey() const override;
+  /**
+   * Builds a Package key for Index from a package path without the extension.
+   * This method is used for searching packages from the Package::include and 
+   * Package::use member values.
+   */
+  static std::string indexKey(const std::string &s);
 
   std::filesystem::path path;
   std::set<std::string> uses;
   std::set<std::string> includes;
 };
-
-/**
- * returns the key used by Document
- */
-inline std::string key(const Item &item) {
-  return item.type()+' '+item.name;
-}
 
 struct AbstractStyle {
   virtual bool check(const std::string &text) = 0;

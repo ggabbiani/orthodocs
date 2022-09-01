@@ -1,4 +1,5 @@
 #include "globals.h"
+#include "graph.h"
 #include "xref.h"
 #include "utils.h"
 #include "writers.h"
@@ -22,8 +23,18 @@ size_t size(const Document &items,const type_info &type) {
 
 namespace writer {
 
+namespace markdown {
+
+// transforms the passed string in a markdown id
+void headingId(string &s) {
+  replace( s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
+  s.erase(remove(s.begin(), s.end(), '/'), s.end());  // remove all '/'
+}
+
+}
+
 void Mdown::package(ostream &out, const doc::Package &pkg) {
-  out << H("package "+(pkg.path.parent_path()/pkg.path.stem()).string()) << endl
+  out << H("package "+pkg.name) << endl
       << endl;
   if (!pkg.includes.empty()) {
     out << BOLD("Includes:") << '\n'
@@ -130,7 +141,7 @@ void Mdown::module(ostream &out, const doc::Module &mod) {
   }
 }
 
-void Mdown::operator () (const fs::path &source, const Document &document) {
+void Mdown::document(const fs::path &source, const Document &document) {
   assert(source.is_relative());
   assert(option::droot.is_absolute());
 
@@ -218,7 +229,7 @@ std::string Mdown::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Mdown::operator () (const Index &index) {
+void Mdown::toc(const Index &index) {
   assert(option::droot.is_absolute());
 
   cwd pwd(option::droot);
@@ -229,16 +240,10 @@ void Mdown::operator () (const Index &index) {
   char                          current = 0;
   for(auto &item: index._map) {
     // see https://www.markdownguide.org/extended-syntax/#heading-ids
-    char  initial = std::toupper(Index::key(*item.second)[0]);
+    char  initial = std::toupper(item.second->indexKey()[0]);
     if (current!=initial) {  // new sub toc
       if (sub.size()) { // write previous sub toc
-        out << H(current,2) << '\n';
-        for(auto &i: sub) {
-          auto id     = i.second->type()+'-'+i.second->name;
-          auto link   = i.second->uri.string();
-          auto title  = Index::title(*i.second);
-          out << "- [" << title << "](" << link << "#" << id << ")\n";
-        }
+        subToc(sub,out,current);
         out << endl;
         sub.clear();
       }
@@ -248,14 +253,90 @@ void Mdown::operator () (const Index &index) {
   }
   // write last sub toc
   if (sub.size()) { 
-    out << H(current,2) << endl;
-    for(auto &i: sub) {
-      auto id     = i.second->type()+'-'+i.second->name;
-      auto link   = i.second->uri.string();
-      auto title  = Index::title(*i.second);
-      out << "- [" << title << "](" << link << "#" << id << ")" << endl;
+    subToc(sub,out,current);
+  }
+}
+
+void Mdown::subToc(SubToc &sub,ostream &out,char &current) const {
+  out << H(current,2) << endl;
+  for(auto &i: sub) {
+    auto id     = i.second->type()+'-'+i.second->name;
+    markdown::headingId(id);
+    auto link   = i.second->uri.string();
+    auto title  = Index::title(*i.second);
+    out << "- [" << title << "](" << link << "#" << id << ")" << endl;
+  }
+}
+
+void Mdown::graph(ostream &out, const doc::Package &pkg) {
+  IncLabel label("A");
+  map<string,graph::Node> nodes;
+
+  graph::Node src_node(&pkg,label);
+  if (pkg.includes.size() || pkg.uses.size()) {
+
+  }
+}
+
+void Mdown::graph(const Index &index) {
+  cwd pwd(option::droot);
+  ofstream out("deps.md");
+  // ostream &out = cout;
+  out << H("Dependencies",1) << '\n'
+      << "```mermaid\n"
+      << "graph TD" << endl;
+
+  IncLabel label("A");
+  map<string,graph::Node> nodes;
+
+  for(auto &item: index.toc()) {
+    doc::Package *src_package = dynamic_cast<doc::Package*>(item.second.get());
+    if (src_package) {
+      auto src_it = nodes.find(src_package->name);
+      graph::Node src_node = src_it!=nodes.end() ? src_it->second : graph::Node(src_package,label);
+
+      if (src_package->includes.size() || src_package->uses.size()) {
+        for(auto &dst_name: src_package->includes) {
+          auto dst_it = index._map.find(Package::indexKey(dst_name));
+          doc::Package *dst_package = 
+            dst_it!=index._map.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
+          if (dst_package) {
+            auto dst_it = nodes.find(dst_package->name);
+            graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);
+
+            graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
+            connection.write(out);
+            if (src_it==nodes.end())
+              nodes.emplace(src_package->name,src_node);
+            if (dst_it==nodes.end())
+              nodes.emplace(dst_package->name,dst_node);
+          }
+        }
+        for(auto &dst_name: src_package->uses) {
+          auto dst_it = index._map.find(Package::indexKey(dst_name));
+          doc::Package *dst_package = 
+            dst_it!=index._map.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
+          if (dst_package) {
+            auto dst_it = nodes.find(dst_package->name);
+            graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);
+            graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
+            connection.write(out);
+            if (src_it==nodes.end())
+              nodes.emplace(src_package->name,src_node);
+            if (dst_it==nodes.end())
+              nodes.emplace(dst_package->name,dst_node);
+          }
+        }
+      } else { // write an isolated node
+        out << "    ";
+        src_node.write(out);
+        if (src_it==nodes.end())
+          nodes.emplace(src_package->name,src_node);
+        out << endl;
+      }
     }
   }
+  out  << "```" << endl;
 }
 
 }

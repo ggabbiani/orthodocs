@@ -20,16 +20,13 @@ public:
       return  str1 < str2;
     }
   };
-
+  // multimap with case insensitive sort 
   using Map = std::multimap<doc::Name,doc::ItemPtr,NoCase>;
   
   // move Document items into index, contextually enriching with source uri
   void add(Document &document);
-  /**
-   * builds key value used by Index::_map
-   */
-  static std::string key(const doc::Item &item);
   static std::string title(const doc::Item &item);
+  const Map &toc() const {return _map;}
 private:
   void insert(Map::mapped_type &item);
   Map _map;

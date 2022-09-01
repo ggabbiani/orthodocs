@@ -90,3 +90,19 @@ inline bool compare(std::string str1,std::string str2) {
   ;
 }
 }
+
+// Factory for string labels with postfix operator
+class IncLabel {
+public:
+  IncLabel(const char *base,int start = 0) : number(start),base(base) {}
+  IncLabel operator++() {++number;return *this;}
+  IncLabel operator++(int) {number++;return *this;}
+  std::string string() const {return base+std::to_string(number);}
+private:
+  std::string base;
+  int number = 0;
+};
+
+inline std::ostream & operator << (std::ostream& os,const IncLabel& label) {
+  return os << label.string();
+}

@@ -41,9 +41,14 @@ extern std::filesystem::path sroot;
  */
 extern bool admonitions;
 /**
- * when true, toc generation on the document root is enabled
+ * when true, toc generation in document root is enabled
  */
 extern bool toc;
+
+/**
+ * when true, graph generation in document root is enabled
+ */
+extern bool graph;
 
 extern std::string prefix;
 

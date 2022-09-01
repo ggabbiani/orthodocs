@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include <filesystem>
+#include <map>
 #include <ostream>
 
 namespace doc {
@@ -15,8 +16,18 @@ extern size_t size(const Document &items,const std::type_info &type);
  */
 class Writer {
 public:
-  virtual void operator () (const std::filesystem::path &source, const Document &document) = 0;
-  virtual void operator () (const Index &index) = 0;
+  /**
+   * write a document in the concrete instance native format
+   */
+  virtual void document(const std::filesystem::path &source, const Document &document) = 0;
+  /**
+   * write a table of contents in the concrete instance native format
+   */
+  virtual void toc(const Index &index) = 0;
+  /**
+   * write a dependecy graph in the concrete instance native format
+   */
+  virtual void graph(const Index &index) = 0;
 };
 
 namespace writer {
@@ -26,11 +37,15 @@ namespace writer {
  */
 class Mdown : public Writer {
 public:
-  void operator () (const std::filesystem::path &source, const Document &document) override;
-private:
-  void operator () (const Index &index) override;
+  using SubToc = std::multimap<const std::string&,doc::Item*>;
+
+  void document(const std::filesystem::path &source, const Document &document) override;
+  void toc(const Index &index) override;
+  void graph(const Index &index) override;
 
 private:
+  void graph(std::ostream &out, const doc::Package &pkg);
+  void subToc(SubToc &sub, std::ostream &out, char &current) const;
   void package(std::ostream &out,const doc::Package &pkg);
   void parameter(std::ostream &out,const doc::Parameter &param);
   void function(std::ostream &out,const doc::Function &func);
@@ -43,6 +58,7 @@ private:
   std::string H(const std::string &text,int level=1) const;
   std::string H(char c,int level=1) const;
   std::string HRULE() const;
+
 };
 
 }

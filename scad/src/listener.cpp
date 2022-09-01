@@ -22,7 +22,7 @@ void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto &item  = curr_item.top();
-  document[doc::key(*item)] = move(item);
+  document[item->documentKey()] = move(item);
   curr_item.pop();
   curr_package  = nullptr;
 }

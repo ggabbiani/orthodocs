@@ -4,12 +4,38 @@
 
 #include <algorithm>
 #include <cassert>
+#include <filesystem>
 #include <string.h>
 #include <sstream> 
 
 using namespace std;
 
+namespace fs = std::filesystem;
+
 namespace doc {
+
+string Item::documentKey() const {
+  return type()+' '+name;
+}
+
+string Item::indexKey() const {
+  auto len  = option::prefix.length();
+  string s  = option::prefix.empty() || !nocase::compare(name.substr(0,len),option::prefix) ? name : name.substr(len);
+  auto res  = s+" ("+type()+')';
+  return res;
+}
+
+string Package::indexKey(const string &s) {
+  return fs::path(s).stem().string()+" (package)";
+}
+
+string Package::indexKey() const {
+  auto    len   = option::prefix.length();
+  auto    stem  = path.stem().string();
+  string  s     = option::prefix.empty() || !nocase::compare(stem.substr(0,len),option::prefix) ? stem : stem.substr(len);
+  auto    res   = s+" ("+type()+')';
+  return res;
+}
 
 Signature Item::signature() const {
   ostringstream ss;

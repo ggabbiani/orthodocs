@@ -71,7 +71,8 @@ int main(int argc, const char *argv[]) {
       }
       ,"PATH(existing)"
     ));
-  app.add_flag("-t,--toc",option::toc,"when true, toc generation on the document root is enabled.");
+  app.add_flag("-g,--graph",option::graph,"when true, graph generation in document root is enabled");
+  app.add_flag("-t,--toc",option::toc,"when true, toc generation in document root is enabled.");
   app.add_option("-i,--ignore-prefix",option::prefix,"prefix to be ignored during ToC sorting");
 
   try {
@@ -103,6 +104,8 @@ int main(int argc, const char *argv[]) {
       indicators::show_console_cursor(true);
       if (option::toc)
         proc.writeToC();
+      if (option::graph)
+        proc.writeGraph();
     }
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
