@@ -22,7 +22,6 @@
 #pragma once
 
 #include "writers.h"
-#include "xref.h"
 #include "antlr4-runtime.h"
 
 #include <filesystem>
@@ -47,7 +46,7 @@ public:
     _writer->graph(_toc);
   }
 
-  /*!
+  /**
    * Elaborate an OpenSCAD source and produce a Markdown document
    *
    * TODO: other kind of formatter (i.e not only Markdown)
@@ -58,7 +57,7 @@ public:
   );
 private:
   std::unique_ptr<doc::Writer> _writer;
-  Index _toc;
+  doc::ToC _toc;
 };
 
 }

@@ -1,6 +1,5 @@
 #include "globals.h"
 #include "graph.h"
-#include "xref.h"
 #include "utils.h"
 #include "writers.h"
 
@@ -36,22 +35,26 @@ void headingId(string &s) {
 void Mdown::package(ostream &out, const doc::Package &pkg) {
   out << H("package "+pkg.name) << endl
       << endl;
-  if (!pkg.includes.empty()) {
-    out << BOLD("Includes:") << '\n'
-        << endl;
-    for(auto p: pkg.includes) {
-      out << "    " << p << '\n';
-    }
-    out << endl;
-  }
-  if (!pkg.uses.empty()) {
-    out << BOLD("Uses:") << endl
-        << endl;
-    for(auto p: pkg.uses) {
-      out << "    " << p << endl
-          << endl;
-    }
-  }
+
+  giraffe(pkg,out);
+  out << endl;
+
+  // if (!pkg.includes.empty()) {
+  //   out << BOLD("Includes:") << '\n'
+  //       << endl;
+  //   for(auto p: pkg.includes) {
+  //     out << "    " << p << '\n';
+  //   }
+  //   out << endl;
+  // }
+  // if (!pkg.uses.empty()) {
+  //   out << BOLD("Uses:") << endl
+  //       << endl;
+  //   for(auto p: pkg.uses) {
+  //     out << "    " << p << endl
+  //         << endl;
+  //   }
+  // }
   if (!pkg.annotation.empty())
     out << pkg.annotation << endl
         << endl;
@@ -229,7 +232,7 @@ std::string Mdown::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Mdown::toc(const Index &index) {
+void Mdown::toc(const ToC &toc) {
   assert(option::droot.is_absolute());
 
   cwd pwd(option::droot);
@@ -238,7 +241,7 @@ void Mdown::toc(const Index &index) {
 
   multimap<const string&,Item*> sub;
   char                          current = 0;
-  for(auto &item: index._map) {
+  for(auto &item: toc) {
     // see https://www.markdownguide.org/extended-syntax/#heading-ids
     char  initial = std::toupper(item.second->indexKey()[0]);
     if (current!=initial) {  // new sub toc
@@ -263,22 +266,81 @@ void Mdown::subToc(SubToc &sub,ostream &out,char &current) const {
     auto id     = i.second->type()+'-'+i.second->name;
     markdown::headingId(id);
     auto link   = i.second->uri.string();
-    auto title  = Index::title(*i.second);
+    auto title  = toc::title(*i.second);
     out << "- [" << title << "](" << link << "#" << id << ")" << endl;
   }
 }
 
-void Mdown::graph(ostream &out, const doc::Package &pkg) {
+namespace giraffe {
+
+struct Node {
+  Node(const fs::path &abstract_path, IncLabel &label) : path(abstract_path), labeller(&label) {
+
+  }
+
+  std::ostream &write(std::ostream &os);
+  
+  bool        defined = false;
+  IncLabel    *labeller;
+  std::string label;
+  fs::path    path;
+  string name() {return path.parent_path()/path.stem();}
+};
+
+struct Connection {
+  enum Type {inc,use};
+
+  Connection(Node &source, Type type, Node &destination) : source(source),type(type),destination(destination) {}
+  std::ostream &write(std::ostream &os);
+
+  Node &source,&destination;
+  Type type;
+};
+
+ostream &Connection::write(ostream &os) {
+  os << "    ";
+  source.write(os);
+  os << " --o|" << (type==inc ? "include" : "use") << "| ";
+  destination.write(os);
+  os << endl;
+  return os;
+}
+
+ostream &Node::write(ostream &os) {
+  if (!defined) {
+    label = (++(*labeller)).string();
+    os << label << '[' << name() << "]";
+    defined = true;
+  } else
+    os << label;
+  return os;
+}
+
+
+}
+
+void Mdown::giraffe(const doc::Package &pkg, ostream &out) {
   IncLabel label("A");
-  map<string,graph::Node> nodes;
-
-  graph::Node src_node(&pkg,label);
+  giraffe::Node src_node(pkg.name,label);
   if (pkg.includes.size() || pkg.uses.size()) {
-
+    out << H("Dependencies",2) << '\n'
+        << "```mermaid\n"
+        << "graph LR" << endl;
+    for(auto &dst_name: pkg.includes) {
+      giraffe::Node dst_node(dst_name,label);
+      giraffe::Connection connection(src_node,giraffe::Connection::Type::inc,dst_node);
+      connection.write(out);
+    }
+    for(auto &dst_name: pkg.uses) {
+      giraffe::Node dst_node(dst_name,label);
+      giraffe::Connection connection(src_node,giraffe::Connection::Type::use,dst_node);
+      connection.write(out);
+    }
+  out  << "```" << endl;
   }
 }
 
-void Mdown::graph(const Index &index) {
+void Mdown::graph(const doc::ToC &toc) {
   cwd pwd(option::droot);
   ofstream out("deps.md");
   // ostream &out = cout;
@@ -289,7 +351,7 @@ void Mdown::graph(const Index &index) {
   IncLabel label("A");
   map<string,graph::Node> nodes;
 
-  for(auto &item: index.toc()) {
+  for(auto &item: toc) {
     doc::Package *src_package = dynamic_cast<doc::Package*>(item.second.get());
     if (src_package) {
       auto src_it = nodes.find(src_package->name);
@@ -297,9 +359,9 @@ void Mdown::graph(const Index &index) {
 
       if (src_package->includes.size() || src_package->uses.size()) {
         for(auto &dst_name: src_package->includes) {
-          auto dst_it = index._map.find(Package::indexKey(dst_name));
+          auto dst_it = toc.find(Package::indexKey(dst_name));
           doc::Package *dst_package = 
-            dst_it!=index._map.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
+            dst_it!=toc.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
           if (dst_package) {
             auto dst_it = nodes.find(dst_package->name);
             graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);
@@ -313,9 +375,9 @@ void Mdown::graph(const Index &index) {
           }
         }
         for(auto &dst_name: src_package->uses) {
-          auto dst_it = index._map.find(Package::indexKey(dst_name));
+          auto dst_it = toc.find(Package::indexKey(dst_name));
           doc::Package *dst_package = 
-            dst_it!=index._map.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
+            dst_it!=toc.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
           if (dst_package) {
             auto dst_it = nodes.find(dst_package->name);
             graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);

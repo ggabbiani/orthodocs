@@ -23,11 +23,11 @@ public:
   /**
    * write a table of contents in the concrete instance native format
    */
-  virtual void toc(const Index &index) = 0;
+  virtual void toc(const ToC &toc) = 0;
   /**
    * write a dependecy graph in the concrete instance native format
    */
-  virtual void graph(const Index &index) = 0;
+  virtual void graph(const ToC &toc) = 0;
 };
 
 namespace writer {
@@ -40,11 +40,11 @@ public:
   using SubToc = std::multimap<const std::string&,doc::Item*>;
 
   void document(const std::filesystem::path &source, const Document &document) override;
-  void toc(const Index &index) override;
-  void graph(const Index &index) override;
+  void toc(const ToC &toc) override;
+  void graph(const ToC &toc) override;
 
 private:
-  void graph(std::ostream &out, const doc::Package &pkg);
+  void giraffe(const doc::Package &pkg, std::ostream &out);
   void subToc(SubToc &sub, std::ostream &out, char &current) const;
   void package(std::ostream &out,const doc::Package &pkg);
   void parameter(std::ostream &out,const doc::Parameter &param);

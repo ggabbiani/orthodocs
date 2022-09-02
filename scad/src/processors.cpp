@@ -23,7 +23,6 @@
 #include "globals.h"
 #include "processors.h"
 #include "utils.h"
-#include "xref.h"
 #include "writers.h"
 
 #include "antlr4-runtime.h"
@@ -81,7 +80,7 @@ void Processor::operator () (const fs::path &source) {
 
     // document writing
     _writer->document(source,listener.document);
-    _toc.add(listener.document);
+    doc::toc::add(listener.document,_toc);
 
   } catch(...) {
     throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));

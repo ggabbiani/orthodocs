@@ -89,6 +89,17 @@ inline bool compare(std::string str1,std::string str2) {
   return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](char & c1, char & c2) {return (std::toupper(c1) == std::toupper(c2));})
   ;
 }
+
+struct Compare {
+  bool operator() (const std::string& s1, const std::string& s2) const {
+    std::string str1(s1.length(),' ');
+    std::string str2(s2.length(),' ');
+    std::transform(s1.begin(), s1.end(), str1.begin(), ::tolower);
+    std::transform(s2.begin(), s2.end(), str2.begin(), ::tolower);
+    return  str1 < str2;
+  }
+};
+
 }
 
 // Factory for string labels with postfix operator

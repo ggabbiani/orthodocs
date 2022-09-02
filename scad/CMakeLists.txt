@@ -38,7 +38,6 @@ add_executable(adox-scad
   src/processors.cpp 
   src/utils.cpp 
   src/writers.cpp 
-  src/xref.cpp 
   ${ANTLR_${LANGUAGE}_CXX_OUTPUTS}
 )
 target_include_directories(adox-scad PUBLIC include)

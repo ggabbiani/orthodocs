@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "utils.h"
+
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -75,7 +77,9 @@ public:
   virtual std::string documentKey() const;
 
   /**
-   * builds key value usable by Index
+   * builds an key value usable by Index.
+   * 
+   * «item name» («item type»)
    */
   virtual std::string indexKey() const;
 
@@ -140,21 +144,35 @@ public:
 
 class Package : public Item {
 public:
-  Package(const std::filesystem::path &path) : Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
-  std::string type() const override {return "package";}
-
   /**
-   * Packages provide different keys for Index. 
-   * Their key is constituted by the file part of their path without extension.
+   * Construct a new Package object
+   * 
+   * NOTE: Item::name is equal to the abstract package path
+   */
+  Package(const std::filesystem::path &path) : Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
+  /**
+   * always return "package"
+   */
+  std::string type() const override {return "package";}
+  /**
+   * Packages provide different keys for Index, building it from the package 
+   * abstract path.
+   * 
+   * «package name» (package)
    */
   std::string indexKey() const override;
   /**
-   * Builds a Package key for Index from a package path without the extension.
+   * Builds a Package key for Index from a package abstract path.
    * This method is used for searching packages from the Package::include and 
    * Package::use member values.
+   * 
+   * «package name» (package)
    */
   static std::string indexKey(const std::string &s);
 
+  /**
+   * full package path comprehensive of extension
+   */
   std::filesystem::path path;
   std::set<std::string> uses;
   std::set<std::string> includes;
@@ -207,6 +225,31 @@ class Fine : public AbstractStyle {
   int column;
   static const char *decoration[3];
 };
+
+}
+
+using ToC = std::multimap<Name,ItemPtr,nocase::Compare>;
+
+namespace toc {
+
+/**
+ * build an index title in the form
+ * 
+ * "«item name» («item type»)"
+ */
+inline std::string title(const Item &item) {
+  return item.name+" ("+item.type()+')';
+}
+
+inline void insert(ToC::mapped_type &item, ToC &map) {
+  map.emplace(item->indexKey(),std::move(item));
+}
+
+// move Document items into index
+inline void add(Document &document, ToC &map) {
+  for(auto &item: document) 
+    insert(item.second,map);
+}
 
 }
 
