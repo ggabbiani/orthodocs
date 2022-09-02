@@ -282,11 +282,10 @@ void Mdown::subToc(SubToc &sub,ostream &out,char &current) const {
 namespace giraffe {
 
 struct Node {
-  Node(const fs::path &abstract_path, IncLabel &label) : path(abstract_path), labeller(&label) {
+  using Map = map<string,Node>;
+  Node(const fs::path &abstract_path, IncLabel &label) : path(abstract_path), labeller(&label) {}
 
-  }
-
-  std::ostream &write(std::ostream &os);
+  std::ostream &write(std::ostream &os,Map &nodemap);
   
   bool        defined = false;
   IncLabel    *labeller;
@@ -298,27 +297,29 @@ struct Node {
 struct Connection {
   enum Type {inc,use};
 
+
   Connection(Node &source, Type type, Node &destination) : source(source),type(type),destination(destination) {}
-  std::ostream &write(std::ostream &os);
+  std::ostream &write(std::ostream &os,Node::Map &nodemap);
 
   Node &source,&destination;
   Type type;
 };
 
-ostream &Connection::write(ostream &os) {
+ostream &Connection::write(ostream &os,Node::Map &nodemap) {
   os << "    ";
-  source.write(os);
+  source.write(os,nodemap);
   os << " --o|" << (type==inc ? "include" : "use") << "| ";
-  destination.write(os);
+  destination.write(os,nodemap);
   os << endl;
   return os;
 }
 
-ostream &Node::write(ostream &os) {
+ostream &Node::write(ostream &os,Node::Map &nodemap) {
   if (!defined) {
     label = (++(*labeller)).string();
     os << label << '[' << name() << "]";
     defined = true;
+    nodemap.emplace(name(),*this);
   } else
     os << label;
   return os;
@@ -329,18 +330,19 @@ ostream &Node::write(ostream &os) {
 
 void Mdown::giraffe(const doc::Package &pkg, ostream &out) {
   IncLabel label("A");
+  giraffe::Node::Map nodemap;
   giraffe::Node src_node(pkg.name,label);
 
   for(auto &dst_name: pkg.includes) {
     giraffe::Node dst_node(dst_name,label);
     giraffe::Connection connection(src_node,giraffe::Connection::Type::inc,dst_node);
-    connection.write(out);
+    connection.write(out,nodemap);
   }
 
   for(auto &dst_name: pkg.uses) {
     giraffe::Node dst_node(dst_name,label);
     giraffe::Connection connection(src_node,giraffe::Connection::Type::use,dst_node);
-    connection.write(out);
+    connection.write(out,nodemap);
   }
 }
 
