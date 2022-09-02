@@ -52,7 +52,7 @@ static ErrorHandler handler;
 
 namespace scad {
 
-void Processor::operator () (const fs::path &source) {
+void Processor::document(const fs::path &source) {
   assert(source.is_relative());
   assert(source.has_filename());
   try {

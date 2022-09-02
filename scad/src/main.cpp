@@ -95,7 +95,7 @@ int main(int argc, const char *argv[]) {
       for(auto file: src_files) {
         // update postfix text with current file working on
         bar.set_option(indicators::option::PostfixText{file});
-        proc(fs::relative(file,option::sroot));
+        proc.document(fs::relative(file,option::sroot));
         bar.tick(); // update progress bar
       }
       bar.set_option(indicators::option::PostfixText{"done."});
@@ -113,5 +113,6 @@ int main(int argc, const char *argv[]) {
     print_exception(error);
     result  = EXIT_FAILURE;
   }
+  indicators::show_console_cursor(true);
   return result;
 }

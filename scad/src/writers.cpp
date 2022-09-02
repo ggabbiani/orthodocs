@@ -33,11 +33,17 @@ void headingId(string &s) {
 }
 
 void Mdown::package(ostream &out, const doc::Package &pkg) {
-  out << H("package "+pkg.name) << endl
+  out << H("package "+pkg.name)
       << endl;
 
-  giraffe(pkg,out);
-  out << endl;
+  if (pkg.includes.size() || pkg.uses.size()) {
+    out << H("Dependencies",2) << '\n'
+        << "```mermaid\n"
+        << "graph LR" << endl;
+    giraffe(pkg,out);
+    // out << endl;
+    out  << "```\n" << endl;
+  }
 
   // if (!pkg.includes.empty()) {
   //   out << BOLD("Includes:") << '\n'
@@ -87,7 +93,9 @@ void Mdown::function(ostream &out, const doc::Function &func) {
       << BOLD("Syntax:") << endl
       << endl
       // << CODE(signature(func)) << endl
-      << "    " << func.signature() << endl
+      << "```text\n"
+      << func.signature() << '\n'
+      << "```\n"
       << endl;
   if (!func.annotation.empty())
     out << func.annotation << endl
@@ -168,7 +176,7 @@ void Mdown::document(const fs::path &source, const Document &document) {
   }
 
   if (size(document,typeid(Variable))) {
-    out << H("Variables",2) << endl 
+    out << H("Variables",2)
         << endl;
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto var  = i->second.get();
@@ -180,7 +188,7 @@ void Mdown::document(const fs::path &source, const Document &document) {
   }
 
   if (size(document,typeid(Function))) {
-    out << H("Functions",2) << endl 
+    out << H("Functions",2)
         << endl;
     for (auto i=document.begin(); i!=document.end(); ++i) {
       auto func = i->second.get();
@@ -322,21 +330,17 @@ ostream &Node::write(ostream &os) {
 void Mdown::giraffe(const doc::Package &pkg, ostream &out) {
   IncLabel label("A");
   giraffe::Node src_node(pkg.name,label);
-  if (pkg.includes.size() || pkg.uses.size()) {
-    out << H("Dependencies",2) << '\n'
-        << "```mermaid\n"
-        << "graph LR" << endl;
-    for(auto &dst_name: pkg.includes) {
-      giraffe::Node dst_node(dst_name,label);
-      giraffe::Connection connection(src_node,giraffe::Connection::Type::inc,dst_node);
-      connection.write(out);
-    }
-    for(auto &dst_name: pkg.uses) {
-      giraffe::Node dst_node(dst_name,label);
-      giraffe::Connection connection(src_node,giraffe::Connection::Type::use,dst_node);
-      connection.write(out);
-    }
-  out  << "```" << endl;
+
+  for(auto &dst_name: pkg.includes) {
+    giraffe::Node dst_node(dst_name,label);
+    giraffe::Connection connection(src_node,giraffe::Connection::Type::inc,dst_node);
+    connection.write(out);
+  }
+
+  for(auto &dst_name: pkg.uses) {
+    giraffe::Node dst_node(dst_name,label);
+    giraffe::Connection connection(src_node,giraffe::Connection::Type::use,dst_node);
+    connection.write(out);
   }
 }
 
@@ -398,7 +402,7 @@ void Mdown::graph(const doc::ToC &toc) {
       }
     }
   }
-  out  << "```" << endl;
+  out  << "```\n" << endl;
 }
 
 }

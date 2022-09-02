@@ -51,7 +51,7 @@ public:
    *
    * TODO: other kind of formatter (i.e not only Markdown)
    */
-  void operator () (
+  void document(
     // OpenSCAD source file relative to source root or absolute
     const std::filesystem::path &source
   );
