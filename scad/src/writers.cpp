@@ -3,6 +3,8 @@
 #include "utils.h"
 #include "writers.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include <cassert>
 #include <fstream>
 
@@ -36,31 +38,31 @@ void Mdown::package(ostream &out, const doc::Package &pkg) {
   out << H("package "+pkg.name)
       << endl;
 
-  if (pkg.includes.size() || pkg.uses.size()) {
-    out << H("Dependencies",2) << '\n'
-        << "```mermaid\n"
-        << "graph LR" << endl;
-    giraffe(pkg,out);
-    // out << endl;
-    out  << "```\n" << endl;
-  }
+  if (pkg.includes.size() || pkg.uses.size()) 
+    if (boost::iequals(option::pkg_deps,"graph")) {
+      out << H("Dependencies",2) << '\n'
+          << "```mermaid\n"
+          << "graph LR" << endl;
+      graph(pkg,out);
+      // out << endl;
+      out  << "```\n" << endl;
+    } else {
+      if (!pkg.includes.empty()) {
+        out << BOLD("Includes:") << '\n'
+            << endl;
+        for(auto p: pkg.includes)
+          out << "    " << p << '\n';
+        out << endl;
+      }
+      if (!pkg.uses.empty()) {
+        out << BOLD("Uses:") << '\n'
+            << '\n';
+        for(auto p: pkg.uses) 
+          out << "    " << p << '\n';
+        out << endl;
+      }
+    }
 
-  // if (!pkg.includes.empty()) {
-  //   out << BOLD("Includes:") << '\n'
-  //       << endl;
-  //   for(auto p: pkg.includes) {
-  //     out << "    " << p << '\n';
-  //   }
-  //   out << endl;
-  // }
-  // if (!pkg.uses.empty()) {
-  //   out << BOLD("Uses:") << endl
-  //       << endl;
-  //   for(auto p: pkg.uses) {
-  //     out << "    " << p << endl
-  //         << endl;
-  //   }
-  // }
   if (!pkg.annotation.empty())
     out << pkg.annotation << endl
         << endl;
@@ -279,71 +281,38 @@ void Mdown::subToc(SubToc &sub,ostream &out,char &current) const {
   }
 }
 
-namespace giraffe {
-
-struct Node {
-  using Map = map<string,Node>;
-  Node(const fs::path &abstract_path, IncLabel &label) : path(abstract_path), labeller(&label) {}
-
-  std::ostream &write(std::ostream &os,Map &nodemap);
-  
-  bool        defined = false;
-  IncLabel    *labeller;
-  std::string label;
-  fs::path    path;
-  string name() {return path.parent_path()/path.stem();}
-};
-
-struct Connection {
-  enum Type {inc,use};
-
-
-  Connection(Node &source, Type type, Node &destination) : source(source),type(type),destination(destination) {}
-  std::ostream &write(std::ostream &os,Node::Map &nodemap);
-
-  Node &source,&destination;
-  Type type;
-};
-
-ostream &Connection::write(ostream &os,Node::Map &nodemap) {
-  os << "    ";
-  source.write(os,nodemap);
-  os << " --o|" << (type==inc ? "include" : "use") << "| ";
-  destination.write(os,nodemap);
-  os << endl;
-  return os;
+/**
+ * save to «out» the «src_package» dependencies in mermaid format.
+ * NOTE: must be preceeded and followed by proper mermaid open/close statements
+ */
+static void saveme(const doc::Package *src_package, graph::Node::Map &nodemap, IncLabel &label, ostream &out) {
+  auto src_it = nodemap.find(src_package->name);
+  graph::Node src_node = src_it!=nodemap.end() ? src_it->second : graph::Node(src_package->path,label);
+  if (src_package->includes.size() || src_package->uses.size()) {
+    for(auto &dst_name: src_package->includes) {
+      auto dst_it = nodemap.find(dst_name);
+      graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+      graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
+      connection.write(out,nodemap);
+    }
+    for(auto &dst_name: src_package->uses) {
+      auto dst_it = nodemap.find(dst_name);
+      graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+      graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
+      connection.write(out,nodemap);
+    }
+  } else { // write an isolated node
+    out << "    ";
+    src_node.write(out,nodemap);
+    out << endl;
+  }
 }
 
-ostream &Node::write(ostream &os,Node::Map &nodemap) {
-  if (!defined) {
-    label = (++(*labeller)).string();
-    os << label << '[' << name() << "]";
-    defined = true;
-    nodemap.emplace(name(),*this);
-  } else
-    os << label;
-  return os;
-}
-
-
-}
-
-void Mdown::giraffe(const doc::Package &pkg, ostream &out) {
+void Mdown::graph(const doc::Package &pkg, ostream &out) {
   IncLabel label("A");
-  giraffe::Node::Map nodemap;
-  giraffe::Node src_node(pkg.name,label);
-
-  for(auto &dst_name: pkg.includes) {
-    giraffe::Node dst_node(dst_name,label);
-    giraffe::Connection connection(src_node,giraffe::Connection::Type::inc,dst_node);
-    connection.write(out,nodemap);
-  }
-
-  for(auto &dst_name: pkg.uses) {
-    giraffe::Node dst_node(dst_name,label);
-    giraffe::Connection connection(src_node,giraffe::Connection::Type::use,dst_node);
-    connection.write(out,nodemap);
-  }
+  graph::Node::Map nodemap;
+  graph::Node src_node(pkg.name,label);
+  saveme(&pkg,nodemap,label,out);
 }
 
 void Mdown::graph(const doc::ToC &toc) {
@@ -355,54 +324,12 @@ void Mdown::graph(const doc::ToC &toc) {
       << "graph TD" << endl;
 
   IncLabel label("A");
-  map<string,graph::Node> nodes;
+  graph::Node::Map nodemap;
 
   for(auto &item: toc) {
     doc::Package *src_package = dynamic_cast<doc::Package*>(item.second.get());
-    if (src_package) {
-      auto src_it = nodes.find(src_package->name);
-      graph::Node src_node = src_it!=nodes.end() ? src_it->second : graph::Node(src_package,label);
-
-      if (src_package->includes.size() || src_package->uses.size()) {
-        for(auto &dst_name: src_package->includes) {
-          auto dst_it = toc.find(Package::indexKey(dst_name));
-          doc::Package *dst_package = 
-            dst_it!=toc.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
-          if (dst_package) {
-            auto dst_it = nodes.find(dst_package->name);
-            graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);
-
-            graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
-            connection.write(out);
-            if (src_it==nodes.end())
-              nodes.emplace(src_package->name,src_node);
-            if (dst_it==nodes.end())
-              nodes.emplace(dst_package->name,dst_node);
-          }
-        }
-        for(auto &dst_name: src_package->uses) {
-          auto dst_it = toc.find(Package::indexKey(dst_name));
-          doc::Package *dst_package = 
-            dst_it!=toc.end() ? dynamic_cast<doc::Package*>(dst_it->second.get()) : nullptr;
-          if (dst_package) {
-            auto dst_it = nodes.find(dst_package->name);
-            graph::Node dst_node = dst_it!=nodes.end() ? dst_it->second : graph::Node(dst_package,label);
-            graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
-            connection.write(out);
-            if (src_it==nodes.end())
-              nodes.emplace(src_package->name,src_node);
-            if (dst_it==nodes.end())
-              nodes.emplace(dst_package->name,dst_node);
-          }
-        }
-      } else { // write an isolated node
-        out << "    ";
-        src_node.write(out);
-        if (src_it==nodes.end())
-          nodes.emplace(src_package->name,src_node);
-        out << endl;
-      }
-    }
+    if (src_package) // item is a doc::Package
+      saveme(src_package,nodemap,label,out);
   }
   out  << "```\n" << endl;
 }

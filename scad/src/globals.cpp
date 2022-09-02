@@ -15,4 +15,5 @@ bool graph          = false;
 
 string prefix;
 
+string pkg_deps("text");
 }

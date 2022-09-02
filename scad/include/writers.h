@@ -41,10 +41,10 @@ public:
 
   void document(const std::filesystem::path &source, const Document &document) override;
   void toc(const ToC &toc) override;
-  void graph(const ToC &toc) override;
 
 private:
-  void giraffe(const doc::Package &pkg, std::ostream &out);
+  void graph(const ToC &toc) override;
+  void graph(const doc::Package &pkg, std::ostream &out);
   void subToc(SubToc &sub, std::ostream &out, char &current) const;
   void package(std::ostream &out,const doc::Package &pkg);
   void parameter(std::ostream &out,const doc::Parameter &param);

@@ -52,4 +52,9 @@ extern bool graph;
 
 extern std::string prefix;
 
+/**
+ * how package dependecies are documented (default "text")
+ */
+extern std::string pkg_deps;
+
 }

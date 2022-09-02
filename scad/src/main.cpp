@@ -74,6 +74,8 @@ int main(int argc, const char *argv[]) {
   app.add_flag("-g,--graph",option::graph,"when true, graph generation in document root is enabled");
   app.add_flag("-t,--toc",option::toc,"when true, toc generation in document root is enabled.");
   app.add_option("-i,--ignore-prefix",option::prefix,"prefix to be ignored during ToC sorting");
+  app.add_option("--pd,--pkg-deps",option::pkg_deps,"how package dependecies are documented (default TEXT)")
+    ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
 
   try {
     app.parse(argc, argv);
