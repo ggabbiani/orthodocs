@@ -46,6 +46,10 @@ public:
     _writer->graph(_toc);
   }
 
+  void writeSubGraphs(const FileSet &dirs) {
+    _writer->subGraphs(_toc,dirs);
+  }
+
   /**
    * Elaborate an OpenSCAD source and produce a Markdown document
    *

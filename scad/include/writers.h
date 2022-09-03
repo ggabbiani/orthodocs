@@ -25,9 +25,13 @@ public:
    */
   virtual void toc(const ToC &toc) = 0;
   /**
-   * write a dependecy graph in the concrete instance native format
+   * write the document root graph
    */
   virtual void graph(const ToC &toc) = 0;
+  /**
+   * write sub-root graphs
+   */
+  virtual void subGraphs(const ToC &toc, const FileSet &dirs) = 0;
 };
 
 namespace writer {
@@ -41,9 +45,10 @@ public:
 
   void document(const std::filesystem::path &source, const Document &document) override;
   void toc(const ToC &toc) override;
+  void graph(const ToC &toc) override;
+  void subGraphs(const ToC &toc,const FileSet &dirs) override;
 
 private:
-  void graph(const ToC &toc) override;
   void graph(const doc::Package &pkg, std::ostream &out);
   void subToc(SubToc &sub, std::ostream &out, char &current) const;
   void package(std::ostream &out,const doc::Package &pkg);

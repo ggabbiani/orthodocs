@@ -46,10 +46,26 @@ string cannonau(string &file) {
   return fs::is_directory(path) ? string() : string("Root directory does not exist : ")+path.string();
 }
 
+/**
+ * check if the passed directory is a sub-directory of the source root.
+ */
+string sroot_relative_dir(string &file) {
+  auto path = fs::path(file);
+  if (path.is_relative()) {
+    path  = option::sroot/path;
+    file  = path.string();
+  }
+  std::error_code error;
+  auto result = fs::relative(path,option::sroot,error);
+  if (error)
+    return error.message();
+  file = result.string();
+  return fs::is_directory(path) ? string() : string("not existing path: ")+path.string();
+}
+
 int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation for the OpenSCAD language.","adox-scad"};
   auto      result = EXIT_SUCCESS;
-  FileSet   sources;
 
   app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
   app.add_option("-s,--src-root", option::sroot, "source root directory")
@@ -58,7 +74,7 @@ int main(int argc, const char *argv[]) {
   app.add_option("-d,--doc-root",option::droot, "document root directory")
     ->required()
     ->transform(CLI::Validator(&cannonau,"DIR(existing)"));
-  app.add_option("sources", sources, "directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
+  app.add_option("sources", option::sources, "directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
     ->required()
     ->transform(CLI::Validator(
       [] (string &file) -> string {
@@ -76,6 +92,8 @@ int main(int argc, const char *argv[]) {
   app.add_option("-i,--ignore-prefix",option::prefix,"prefix to be ignored during ToC sorting");
   app.add_option("--pd,--pkg-deps",option::pkg_deps,"how package dependecies are documented (default TEXT)")
     ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
+  app.add_option("--sg,--sub_graphs",option::sub_graphs,"set of source root sub-directories for additional graphs: paths can be passed either as relative to «Source root» or absolute")
+    ->transform(CLI::Validator(sroot_relative_dir,"PATH(existing)"));
 
   try {
     app.parse(argc, argv);
@@ -83,7 +101,7 @@ int main(int argc, const char *argv[]) {
     assert(option::sroot.is_absolute());
 
     FileSet src_files;
-    lookup(sources,".scad",&src_files);
+    lookup(option::sources,".scad",&src_files);
 
     // Hide cursor
     indicators::show_console_cursor(false);
@@ -108,6 +126,8 @@ int main(int argc, const char *argv[]) {
         proc.writeToC();
       if (option::graph)
         proc.writeGraph();
+      if (option::sub_graphs.size()) 
+        proc.writeSubGraphs(option::sub_graphs);
     }
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);

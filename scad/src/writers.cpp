@@ -311,7 +311,6 @@ static void saveme(const doc::Package *src_package, graph::Node::Map &nodemap, I
 void Mdown::graph(const doc::Package &pkg, ostream &out) {
   IncLabel label("A");
   graph::Node::Map nodemap;
-  graph::Node src_node(pkg.name,label);
   saveme(&pkg,nodemap,label,out);
 }
 
@@ -332,6 +331,43 @@ void Mdown::graph(const doc::ToC &toc) {
       saveme(src_package,nodemap,label,out);
   }
   out  << "```\n" << endl;
+}
+
+void Mdown::subGraphs(const doc::ToC &toc, const FileSet &dirs) {
+  // change working directory to «document root»
+  cwd pwd(option::droot);
+  for(auto &dir: dirs) {
+    assert(dir.is_relative());
+    // get a selection of doc::Packages located inside dir
+    auto packages = doc::toc::filter(dir,toc,[&dir] (const std::filesystem::path &path,const Item *item) -> bool {
+      auto package = dynamic_cast<const doc::Package*>(item);
+      if (package) {
+        error_code error;
+        auto unused = fs::relative(package->path,dir,error);
+        return !error;
+      } else 
+        return false;
+    });
+    // change the working directory to «dir»
+    cwd pwd(dir);
+    // create the sub graph file
+    ofstream out("deps.md");
+
+    graph::Node::Map nodemap;
+    IncLabel label("A");
+
+    // define a top-down mermaid graph
+    out << H("Dependencies",1) << '\n'
+        << "```mermaid\n"
+        << "graph TD" << endl;
+    // build a dependecy graph containing all and only the filtered packages 
+    for(auto element: packages) {
+      const doc::Package *package = dynamic_cast<const doc::Package*>(element.second);
+      assert(package);
+      saveme(package,nodemap,label,out);
+    }
+    out  << "```\n" << endl;
+  }
 }
 
 }

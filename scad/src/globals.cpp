@@ -16,4 +16,9 @@ bool graph          = false;
 string prefix;
 
 string pkg_deps("text");
+
+FileSet sub_graphs;
+
+FileSet   sources;
+
 }

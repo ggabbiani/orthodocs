@@ -199,4 +199,18 @@ AbstractStyle *Factory::operator()(const string &text) {
 
 }
 
+namespace toc {
+
+SubToC filter(const std::filesystem::path &path,const ToC &toc, std::function<bool(const std::filesystem::path&,const Item*)> func) {
+  SubToC result;
+  for(auto &element: toc) {
+    auto item = element.second.get();
+    if (func(path,item))
+      result.emplace(element.first,item);
+  }
+  return result;
+}
+
+}
+
 }

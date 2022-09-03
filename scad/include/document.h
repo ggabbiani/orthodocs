@@ -23,6 +23,7 @@
 
 #include "utils.h"
 
+#include <functional>
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -228,7 +229,18 @@ class Fine : public AbstractStyle {
 
 }
 
+/**
+ * Table of Contents has the ownership of the contained items
+ * FIXME: a std::map couldn't be enough for this?
+ */
 using ToC = std::multimap<Name,ItemPtr,nocase::Compare>;
+
+/**
+ * SubToC is a filtered selection of ToC elements, as such its items are 
+ * simple pointers, because a SubToC has no ownerships over them.
+ * It is critical that SubToC never survive its ToC.
+ */
+using SubToC = std::multimap<Name,doc::Item*,nocase::Compare>;
 
 namespace toc {
 
@@ -250,6 +262,11 @@ inline void add(Document &document, ToC &map) {
   for(auto &item: document) 
     insert(item.second,map);
 }
+
+/**
+ * returns a «func()» filtered SubToC
+ */
+extern SubToC filter(const std::filesystem::path &path,const ToC &toc, std::function<bool(const std::filesystem::path&,const Item*)> func);
 
 }
 

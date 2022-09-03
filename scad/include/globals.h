@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "utils.h"
+
 #include <filesystem>
 #include <string>
 
@@ -56,5 +58,14 @@ extern std::string prefix;
  * how package dependecies are documented (default "text")
  */
 extern std::string pkg_deps;
+/**
+ * set of directory for partial dependencies graphs
+ */
+extern FileSet sub_graphs;
+
+/**
+ * directories or files in any combination: paths can be passed either as relative to «Source root» or absolute.
+ */
+extern FileSet   sources;
 
 }
