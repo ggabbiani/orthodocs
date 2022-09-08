@@ -11,14 +11,13 @@ fs::path sroot;
 
 bool admonitions    = false;
 bool toc            = false;
-bool graph          = false;
 
 string prefix;
 
 string pkg_deps("text");
 
-FileSet sub_graphs;
+FileSet graphs;
 
-FileSet   sources;
+FileSet sources;
 
 }

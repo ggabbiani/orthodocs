@@ -57,11 +57,12 @@ bool is(B &b) {
 }
 
 /**
- * check if sub is a subdirectory of root.
+ * check if «sub» is a subdirectory of «base».
  * 
- * **NOTE:** both the arguments must be in **CANONICAL** form.
+ * **NOTE:** for the function to work, both «sub» and «base» must be in the 
+ * same format i.e both relative or both canonical.
  */
-extern bool is_sub_of(const std::filesystem::path &sub, const std::filesystem::path &root);
+extern bool is_sub_of(const std::filesystem::path &sub, const std::filesystem::path &base);
 
 namespace nocase {
 

@@ -42,12 +42,8 @@ public:
     _writer->toc(_toc);
   }
 
-  void writeGraph() {
-    _writer->graph(_toc);
-  }
-
-  void writeSubGraphs(const FileSet &dirs) {
-    _writer->subGraphs(_toc,dirs);
+  void writeGraphs(const FileSet &dirs) {
+    _writer->graphs(_toc,dirs);
   }
 
   /**

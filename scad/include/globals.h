@@ -47,11 +47,6 @@ extern bool admonitions;
  */
 extern bool toc;
 
-/**
- * when true, graph generation in document root is enabled
- */
-extern bool graph;
-
 extern std::string prefix;
 
 /**
@@ -61,7 +56,7 @@ extern std::string pkg_deps;
 /**
  * set of directory for partial dependencies graphs
  */
-extern FileSet sub_graphs;
+extern FileSet graphs;
 
 /**
  * directories or files in any combination: paths can be passed either as relative to «Source root» or absolute.

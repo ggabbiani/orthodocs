@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 namespace fs  = std::filesystem;
@@ -285,23 +286,34 @@ void Mdown::subToc(SubToc &sub,ostream &out,char &current) const {
  * save to «out» the «src_package» dependencies in mermaid format.
  * NOTE: must be preceeded and followed by proper mermaid open/close statements
  */
-static void saveme(const doc::Package *src_package, graph::Node::Map &nodemap, IncLabel &label, ostream &out) {
+static void saveme(const doc::Package *src_package, 
+  graph::Node::Map &nodemap, 
+  IncLabel &label, 
+  ostream &out,
+  std::function<bool(const graph::Connection &)> filter= [](const graph::Connection &conn) -> bool {return true;}
+) {
   auto src_it = nodemap.find(src_package->name);
   graph::Node src_node = src_it!=nodemap.end() ? src_it->second : graph::Node(src_package->path,label);
-  if (src_package->includes.size() || src_package->uses.size()) {
-    for(auto &dst_name: src_package->includes) {
-      auto dst_it = nodemap.find(dst_name);
-      graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
-      graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
+  auto written = 0;
+  for(auto &dst_name: src_package->includes) {
+    auto dst_it = nodemap.find(dst_name);
+    graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+    graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
+    if (filter(connection)) {
       connection.write(out,nodemap);
+      ++written;
     }
-    for(auto &dst_name: src_package->uses) {
-      auto dst_it = nodemap.find(dst_name);
-      graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
-      graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
+  }
+  for(auto &dst_name: src_package->uses) {
+    auto dst_it = nodemap.find(dst_name);
+    graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+    graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
+    if (filter(connection)) {
       connection.write(out,nodemap);
+      ++written;
     }
-  } else { // write an isolated node
+  }
+  if (!written) { // write an isolated node
     out << "    ";
     src_node.write(out,nodemap);
     out << endl;
@@ -314,57 +326,46 @@ void Mdown::graph(const doc::Package &pkg, ostream &out) {
   saveme(&pkg,nodemap,label,out);
 }
 
-void Mdown::graph(const doc::ToC &toc) {
-  cwd pwd(option::droot);
-  ofstream out("deps.md");
-  // ostream &out = cout;
-  out << H("Dependencies",1) << '\n'
-      << "```mermaid\n"
-      << "graph TD" << endl;
-
-  IncLabel label("A");
-  graph::Node::Map nodemap;
-
-  for(auto &item: toc) {
-    doc::Package *src_package = dynamic_cast<doc::Package*>(item.second.get());
-    if (src_package) // item is a doc::Package
-      saveme(src_package,nodemap,label,out);
-  }
-  out  << "```\n" << endl;
-}
-
-void Mdown::subGraphs(const doc::ToC &toc, const FileSet &dirs) {
+void Mdown::graphs(const doc::ToC &toc, const FileSet &dirs) {
   // change working directory to «document root»
   cwd pwd(option::droot);
+  // from here we move on each directory passed in the FileSet
   for(auto &dir: dirs) {
+    cout << "dir: " << dir << endl;
     assert(dir.is_relative());
-    // get a selection of doc::Packages located inside dir
-    auto packages = doc::toc::filter(dir,toc,[&dir] (const std::filesystem::path &path,const Item *item) -> bool {
+    // select only doc::Package items
+    auto packages = doc::toc::filter(dir,toc,[dir] (const fs::path &path,const Item *item) -> bool {
+      bool result;
       auto package = dynamic_cast<const doc::Package*>(item);
       if (package) {
-        error_code error;
-        auto unused = fs::relative(package->path,dir,error);
-        return !error;
-      } else 
-        return false;
+        result = dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
+      } else
+        result = false;
+      return (result);
     });
     // change the working directory to «dir»
     cwd pwd(dir);
     // create the sub graph file
     ofstream out("deps.md");
-
+    // allocate graph resources on stack
     graph::Node::Map nodemap;
     IncLabel label("A");
-
     // define a top-down mermaid graph
     out << H("Dependencies",1) << '\n'
         << "```mermaid\n"
         << "graph TD" << endl;
-    // build a dependecy graph containing all and only the filtered packages 
+    // build a dependency graph limited on packages located inside «current_dir»
     for(auto element: packages) {
       const doc::Package *package = dynamic_cast<const doc::Package*>(element.second);
       assert(package);
-      saveme(package,nodemap,label,out);
+      // FIXME: unclear behaviour of path when using "." (current directory)
+      if (dir!=".") {
+        if (is_sub_of(package->path.parent_path(),dir))
+          saveme(package,nodemap,label,out, [dir] (const graph::Connection &conn) -> bool {
+            return (is_sub_of(conn.destination.path.parent_path(),dir));
+        });
+      } else 
+        saveme(package,nodemap,label,out);
     }
     out  << "```\n" << endl;
   }

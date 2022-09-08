@@ -37,30 +37,22 @@ using namespace antlr4;
 
 namespace fs=std::filesystem;
 
-string cannonau(string &file) {
-  auto path = fs::path(file);
-  if (path.is_relative()) {
-    path  = fs::canonical(path);
-    file  = path.string();
-  }
-  return fs::is_directory(path) ? string() : string("Root directory does not exist : ")+path.string();
+/*
+ * transforms an absolute or current working directory relative path in 
+ * canonical form
+ */
+string cwd2canonical(string &dir) {
+  // cwd pwd(dir);
+  dir = fs::canonical(dir).string();
+  return string();
 }
 
 /**
- * check if the passed directory is a sub-directory of the source root.
+ * transforms to source root relative.
  */
-string sroot_relative_dir(string &file) {
-  auto path = fs::path(file);
-  if (path.is_relative()) {
-    path  = option::sroot/path;
-    file  = path.string();
-  }
-  std::error_code error;
-  auto result = fs::relative(path,option::sroot,error);
-  if (error)
-    return error.message();
-  file = result.string();
-  return fs::is_directory(path) ? string() : string("not existing path: ")+path.string();
+string sroot_relative(string &sub) {
+  sub = fs::relative(sub,option::sroot).string();
+  return string();
 }
 
 int main(int argc, const char *argv[]) {
@@ -68,32 +60,21 @@ int main(int argc, const char *argv[]) {
   auto      result = EXIT_SUCCESS;
 
   app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
-  app.add_option("-s,--src-root", option::sroot, "source root directory")
+  app.add_option("-s,--src-root", option::sroot, "source root directory: either as absolute or current directory relative path")
     ->required()
-    ->transform(CLI::Validator(&cannonau,"DIR(existing)"));
-  app.add_option("-d,--doc-root",option::droot, "document root directory")
+    ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
+  app.add_option("-d,--doc-root",option::droot, "document root directory - either as absolute or current directory relative path")
     ->required()
-    ->transform(CLI::Validator(&cannonau,"DIR(existing)"));
-  app.add_option("sources", option::sources, "directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
+    ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
+  app.add_option("sources", option::sources, "source directories and files: either as absolute or «Source root» relative path")
     ->required()
-    ->transform(CLI::Validator(
-      [] (string &file) -> string {
-        auto path = fs::path(file);
-        if (path.is_relative()) {
-          path  = option::sroot/path;
-          file  = path.string();
-        }
-        return fs::is_regular_file(path)||fs::is_directory(path) ? string() : string("Source path does not exist : ")+path.string();
-      }
-      ,"PATH(existing)"
-    ));
-  app.add_flag("-g,--graph",option::graph,"when true, graph generation in document root is enabled");
+    ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
   app.add_flag("-t,--toc",option::toc,"when true, toc generation in document root is enabled.");
   app.add_option("-i,--ignore-prefix",option::prefix,"prefix to be ignored during ToC sorting");
   app.add_option("--pd,--pkg-deps",option::pkg_deps,"how package dependecies are documented (default TEXT)")
     ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
-  app.add_option("--sg,--sub_graphs",option::sub_graphs,"set of source root sub-directories for additional graphs: paths can be passed either as relative to «Source root» or absolute")
-    ->transform(CLI::Validator(sroot_relative_dir,"PATH(existing)"));
+  app.add_option("-g,--graphs",option::graphs,"set of root relative directories for graphs")
+    ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
 
   try {
     app.parse(argc, argv);
@@ -112,10 +93,10 @@ int main(int argc, const char *argv[]) {
     cout << "Processing " << src_files.size() << " source files:\n";
     {
       scad::Processor proc(new doc::writer::Mdown);
-      for(auto file: src_files) {
+      for(const auto &file: src_files) {
         // update postfix text with current file working on
         bar.set_option(indicators::option::PostfixText{file});
-        proc.document(fs::relative(file,option::sroot));
+        proc.document(file);
         bar.tick(); // update progress bar
       }
       bar.set_option(indicators::option::PostfixText{"done."});
@@ -124,10 +105,8 @@ int main(int argc, const char *argv[]) {
       indicators::show_console_cursor(true);
       if (option::toc)
         proc.writeToC();
-      if (option::graph)
-        proc.writeGraph();
-      if (option::sub_graphs.size()) 
-        proc.writeSubGraphs(option::sub_graphs);
+      if (option::graphs.size()) 
+        proc.writeGraphs(option::graphs);
     }
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);

@@ -19,6 +19,7 @@
  * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "globals.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -39,6 +40,7 @@ void lookup(
   //! list of source files matching «extension»
   FileSet *result
 ) {
+  cwd pwd(option::sroot);
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)
@@ -53,8 +55,10 @@ void lookup(
           lookup(FileSet{path},extension,result);
         }
       }
-    }
+    } else 
+      throw runtime_error("what is this '"+path.string()+"'?");
   }
+  // cout << "got " << result->size() << " elements" << endl;
 }
 
 void print_exception(const exception& e, int level) {
@@ -66,26 +70,11 @@ void print_exception(const exception& e, int level) {
   } catch(...) {}
 }
 
-bool is_sub_of(const fs::path &sub, const fs::path &root) {
-  try {
-    auto s = sub.is_relative()  ? fs::canonical(sub)  : sub;
-    auto r = root.is_relative() ? fs::canonical(root) : root;
-
-    auto r_first  = r.begin();
-    auto s_first  = s.begin();
-    auto r_last   = r.end();
-    auto s_last   = s.end();
-
-    auto r_it = r_first;
-    auto s_it = s_first;
-
-    while (r_it!=r_last && s_it!=s_last && *r_it==*s_it) {
-      ++r_it;
-      ++s_it;
+bool is_sub_of(const fs::path &sub, const fs::path &base) {
+  for (auto b = base.begin(), s = sub.begin(); b != base.end(); ++b, ++s) {
+    if (s==sub.end() || *s!=*b) {
+      return false;
     }
-    
-    return r_it==r_last;
-  } catch(...) {
-    throw_with_nested(runtime_error("root '"+root.string()+"', sub '"+sub.string()+'\''));
   }
+  return true;
 }

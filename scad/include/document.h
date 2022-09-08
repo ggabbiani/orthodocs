@@ -143,12 +143,17 @@ public:
   std::string type() const override {return "module";}
 };
 
+/**
+ * manages OpenSCAD packages
+ * 
+ * NOTE: Item::name is set to the abstract package path, i.e. the relative 
+ * path of the package from the source or document root without extension.
+ */
 class Package : public Item {
 public:
   /**
    * Construct a new Package object
    * 
-   * NOTE: Item::name is equal to the abstract package path
    */
   Package(const std::filesystem::path &path) : Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
   /**
@@ -156,18 +161,17 @@ public:
    */
   std::string type() const override {return "package";}
   /**
-   * Packages provide different keys for Index, building it from the package 
-   * abstract path.
+   * return the Packages Index key from its path.
    * 
-   * «package name» (package)
+   * «package stem» (package)
    */
   std::string indexKey() const override;
   /**
-   * Builds a Package key for Index from a package abstract path.
+   * return the Package Index key from a path.
    * This method is used for searching packages from the Package::include and 
    * Package::use member values.
    * 
-   * «package name» (package)
+   * «package stem» (package)
    */
   static std::string indexKey(const std::string &s);
 
