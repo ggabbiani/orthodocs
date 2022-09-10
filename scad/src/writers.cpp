@@ -331,7 +331,7 @@ void Mdown::graphs(const doc::ToC &toc, const FileSet &dirs) {
   cwd pwd(option::droot);
   // from here we move on each directory passed in the FileSet
   for(auto &dir: dirs) {
-    cout << "dir: " << dir << endl;
+    // cout << "dir: " << dir << endl;
     assert(dir.is_relative());
     // select only doc::Package items
     auto packages = doc::toc::filter(dir,toc,[dir] (const fs::path &path,const Item *item) -> bool {
