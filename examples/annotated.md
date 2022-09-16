@@ -8,6 +8,9 @@ graph LR
     A1 --o|include| A3[foundation/bbox]
     A1 --o|include| A4[foundation/type_trait]
 ```
+
+3d primitives replacing native OpenSCAD ones.
+
 ## Variables
 
 ---
