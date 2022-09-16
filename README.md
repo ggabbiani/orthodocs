@@ -1,96 +1,150 @@
 # OrthoDocs
 
-OrthoDocs (ODOX) is a project aimed to provide a documentation generator and a static analysis tool for the OpenSCAD scripting language. Due to the 'flat' nature of the language, only a graphical representation of the inter-package relations will be provided. Among the features also a cross-reference between API items is planned. For the list of the feature planned and their status see [Project status](#project-status).
+OrthoDocs is a API documentation generator and a static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
 
 ## Design
 
-ODOX tries to:
+OrthoDocs comes with a complete OpenSCAD language parser, able to recognize all the public functions, modules and variables found in the source tree, complete with parameters and their default values. Sources to be documented can be passed as files, directories or both. Each source file will produce a corresponding API document, we call these API groups as **packages**.
+Even in a completely uncommented source tree, OrthoDocs will create a number of API documents each of them with the following items:
 
-* minimize changes to already commented code (actually only one);
-* not introduce any specific documentation tag;
-* focus the produced output to Markdown only.
+* package name;
+* package dependency tree (in textual or graphical mode);
+* global (top level) variables (name and its default value);
+* functions signatures (function name, parameters and their default values);
+* public (not nested) modules signature (name, parameters and their default values).
 
-Rather then imposing a comment style, ODOX's adopted strategy is:
+The following uncommented code
 
-1. analyse the surce code;
-2. create a syntax signature for every global variable, function or module;
-3. discover every annotation;
-4. bind annotations to the proper syntactical entities;
-5. generate documentation by integrating syntactical entities found with the correct annotations.
+```text
+include <2d.scad>
+include <bbox.scad>
+include <type_trait.scad>
 
-## Example code
+function fl_3d_AxisList(axes) = ... ;
 
-Suppose to have the following code:
+function fl_3d_axisIsSet(axis,list) = ... ;
 
-    // Calculates the bounding box of an origin-centered sphere
-    function sphereBoundingBox(d,r=1) = 
-        let(d = d ? d : 2*r) [[-r,-r,-r],[+r,+r,+r]];
+module fl_cube(verbs = FL_ADD, size = [1,1,1], octant,direction) {
+...
+}
 
-ODOX will produce the following documentation:
+e = 2.71828;
 
----
+module fl_cylinder(verbs  = FL_ADD,h,r,r1,r2,d,d1,d2,octant,direction) {
+...
+}
+```
 
-### function sphereBoundingBlock
+Once analyzed by OrthoDocs will produce the following [formatted document](examples/uncommented.md):
 
-__Syntax:__
+### Annotations
 
-`sphereBoundingBlock(d,r=1)`
+Annotations are single line or block comments in which the comment start is immediately followed by the `!` character. All the other comments will be ignored.
 
----
+The previous code with comments and annotations:
 
-If you modify the existing comment in the following way
+```text
+/*!
+ * 3d primitives replacing native OpenSCAD ones.
+ */
 
-    //! Calculates the bounding box of an origin-centered sphere
-    function sphereBoundingBox(d,r=1) = 
-        let(d = d ? d : 2*r) [[-r,-r,-r],[+r,+r,+r]];
+include <2d.scad>
+include <bbox.scad>
+include <type_trait.scad>
 
-ODOX will interpret the comment starting with '!' as an annotation related to the function with the following result:
+/*!
+ * Build a floating semi-axis list from literal semi-axis list.
+ *
+ * example:
+ *
+ *     list = fl_3d_AxisList(axes=["-x","±Z"]);
+ *
+ * is equivalent to:
+ *
+ *     list =
+ *     [
+ *      [-1, 0,  0],
+ *      [ 0, 0, -1],
+ *      [ 0, 0, +1],
+ *     ];
+ */
+function fl_3d_AxisList(
+  //! semi-axis list (es.["-x","±Z"])
+  axes
+) = ... ;
 
----
+//! wether «axis» is present in floating semi-axis list
+function fl_3d_axisIsSet(axis,list) = ... ;
 
-### function sphereBoundingBlock
+/*!
+ * cube replacement
+ */
+module fl_cube(
+  //! FL_ADD,FL_AXES,FL_BBOX
+  verbs     = FL_ADD,
+  size      = [1,1,1],
+  //! when undef native positioning is used
+  octant,
+  //! desired direction [director,rotation] or native direction if undef
+  direction
+) {
+...
+}
 
-__Syntax:__
+/*!
+ * The number e, also known as Euler's number, is a mathematical
+ * constant approximately equal to 2.71828 which can be characterized
+ * in many ways.
+ */
+e = 2.71828;
 
-`sphereBoundingBlock(d,r=1)`
+/*!
+ * cylinder replacement
+ */
+module fl_cylinder(
+  //! FL_ADD,FL_AXES,FL_BBOX
+  verbs  = FL_ADD,
+  //! height of the cylinder or cone
+  h,
+  //! radius of cylinder. r1 = r2 = r.
+  r,
+  //! radius, bottom of cone.
+  r1,
+  //! radius, top of cone.
+  r2,
+  //! diameter of cylinder. r1 = r2 = d / 2.
+  d,
+  //! diameter, bottom of cone. r1 = d1 / 2.
+  d1,
+  //! diameter, top of cone. r2 = d2 / 2.
+  d2,
+  //! when undef native positioning is used
+  octant,
+  //! desired direction [director,rotation], native direction when undef ([+X+Y+Z])
+  direction
+) {
+...
+}
+```
+will detect and add only the annotations (normal comments are ignored) and produced an [annotated document](examples/annotated.md)
 
-Calculates the bounding box of an origin-centered sphere
+### Other features
 
----
+Given a source tree, it is possible to:
+* generate a global Table of Contents referencing all the documented APIs;
+* generate one or more [dependency graphs](examples/dependecies.md) located at different position of the source tree in order to have clear understanding of the packages correlations.
 
-If you think that parameter d needs an explanation, just comment it out:
-
-    //! Calculates the bounding box of an origin-centered sphere
-    function sphereBoundingBox(/*! this is the diameter */ d,r=1) = 
-        let(d = d ? d : 2*r) [[-r,-r,-r],[+r,+r,+r]];
-
-The result now will be:
-
----
-
-### function sphereBoundingBox
-
-__Syntax:__
-
-`sphereBoundingBox(d,r=1)`
-
-Calculates the bounding box of an origin-centered sphere
-
-__Parameters:__
-
-__d__  
-this is the diameter
-
----
 
 ## The command line
 
-
-
 ## Project status
 
-| Syntax      | Description |
+| Feature      | Status |
 | ----------- | ----------- |
-| Header      | Title       |
-| Paragraph   | Text        |
+| global values      | ✔       |
+| comment patterns   | ✔        |
+| dependency graphs | ✔        |
+| table of contents |  ✔        |
+| cross-reference | ❌
+| [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
 
