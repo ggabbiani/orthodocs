@@ -131,6 +131,3 @@ when undef native positioning is used
 
 __direction__
 desired direction [director,rotation], native direction when undef ([+X+Y+Z])
-
-
-

@@ -9,7 +9,7 @@ Even in a completely uncommented source tree, OrthoDocs will create a number of 
 
 * package name;
 * package dependency tree (in textual or graphical mode);
-* global (top level) variables (name and its default value);
+* global (top level) variables (name and default value);
 * functions signatures (function name, parameters and their default values);
 * public (not nested) modules signature (name, parameters and their default values).
 
@@ -35,7 +35,7 @@ module fl_cylinder(verbs  = FL_ADD,h,r,r1,r2,d,d1,d2,octant,direction) {
 }
 ```
 
-Once analyzed by OrthoDocs will produce the following [formatted document](examples/uncommented.md):
+once analyzed by OrthoDocs will produce the following [formatted document](examples/uncommented.md):
 
 ### Annotations
 
@@ -126,7 +126,7 @@ module fl_cylinder(
 ...
 }
 ```
-will detect and add only the annotations (normal comments are ignored) and produced an [annotated document](examples/annotated.md)
+will produce an [annotated document](examples/annotated.md)
 
 ### Other features
 
