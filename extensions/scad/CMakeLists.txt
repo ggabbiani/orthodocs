@@ -21,39 +21,41 @@ antlr_target(${LANGUAGE} ${LANGUAGE}.g4 LEXER PARSER LISTENER PACKAGE scad)
 # include_directories(${ANTLR_${LEXER}_OUTPUT_DIR})
 # include_directories(${ANTLR_${PARSER}_OUTPUT_DIR})
 
-include_directories(${ANTLR_${LANGUAGE}_OUTPUT_DIR})
+# include_directories(${ANTLR_${LANGUAGE}_OUTPUT_DIR})
+message("ANTLR_${LANGUAGE}_OUTPUT_DIR: ${ANTLR_${LANGUAGE}_OUTPUT_DIR}")
 
 ###############################################################################
 # 2) C++ application using the parser at 1)
 # add_executable(scad main.cpp ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 # target_link_libraries(scad antlr4_static ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-
-add_executable(adox-scad 
-  src/main.cpp 
-  src/annotations.cpp 
-  src/document.cpp 
-  src/graph.cpp 
-  src/listener.cpp
-  src/globals.cpp 
-  src/processors.cpp 
-  src/utils.cpp 
-  src/writers.cpp 
+set(LIB_NAME scad)
+add_library(${LIB_NAME} STATIC
+  src/scad/annotations.cpp 
+  src/scad/extension.cpp
+  src/scad/document.cpp 
+  src/scad/listener.cpp
   ${ANTLR_${LANGUAGE}_CXX_OUTPUTS}
 )
-target_include_directories(adox-scad PUBLIC include)
-target_link_libraries(adox-scad antlr4_static)
+target_include_directories(${LIB_NAME}
+  PUBLIC
+    ${PROJECT_SOURCE_DIR}/include 
+    include
+    ${ANTLR_${LANGUAGE}_OUTPUT_DIR}
+)
+# target_compile_options(${LIB_NAME} PUBLIC "-Wl,-u,scad_loader")
+target_link_libraries(${LIB_NAME} antlr4_static)
 
 ###############################################################################
 # 3) C++ application for annotation style testing
 
-add_executable(style-tester
-  src/style-tester.cpp 
-  src/globals.cpp 
-  src/utils.cpp 
-  src/document.cpp
-)
-target_include_directories(style-tester PUBLIC include)
-target_link_libraries(style-tester)
+# add_executable(style-tester
+#   src/style-tester.cpp 
+#   src/globals.cpp 
+#   src/utils.cpp 
+#   src/document.cpp
+# )
+# target_include_directories(style-tester PUBLIC include)
+# target_link_libraries(style-tester)
 
 ###############################################################################
 # 4) Java parser for testing grammars via grun

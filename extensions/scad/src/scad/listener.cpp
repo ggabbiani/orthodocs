@@ -1,8 +1,28 @@
+/*
+ * OpenSCAD listener
+ *
+ * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
+ * This file is part of the 'OrthoDocs' (ODOX) project.
+ *
+ * ODOX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ODOX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
+ */
 
-#include "annotations.h"
-#include "listener.h"
-#include "globals.h"
-#include "utils.h"
+#include "scad/annotations.h"
+#include "scad/listener.h"
+#include "orthodocs/globals.h"
+#include "orthodocs/utils.h"
 
 #include <regex>
 
@@ -12,17 +32,17 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source) {
+Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source),document(new orthodocs::Document) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
-  curr_item.push(doc::ItemPtr(curr_package));
+  curr_item.push(orthodocs::doc::ItemPtr(curr_package));
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto &item  = curr_item.top();
-  document[item->documentKey()] = move(item);
+  document->emplace(item->documentKey(),move(item));
   curr_item.pop();
   curr_package  = nullptr;
 }
@@ -72,7 +92,7 @@ void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto name   = curr_item.top()->name;
   auto index  = string("function ")+name;
   if (!priv(name))
-    document[index] = move(curr_item.top());
+    document->emplace(index,move(curr_item.top()));
   curr_item.pop();
 }
 
@@ -86,7 +106,7 @@ void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto name   = curr_item.top()->name;
   auto index  = "module "+name;
   if (!curr_item.top()->nested && !priv(name))
-    document[index] = move(curr_item.top());
+    document->emplace(index,move(curr_item.top()));
   curr_item.pop();
 }
 
@@ -115,7 +135,7 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
 }
 
 void Listener::enterParameter(scad::SCADParser::ParameterContext *ctx) {
-  curr_parameter  = make_unique<doc::Parameter>();
+  curr_parameter  = make_unique<orthodocs::doc::Parameter>();
 }
 
 void Listener::exitParameter(scad::SCADParser::ParameterContext *ctx) {
@@ -138,7 +158,7 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
     auto nested             = is<doc::Module>(*curr_item.top());
     doc::Variable *variable = new doc::Variable(id,defaults,nested);
-    curr_variable.push(doc::ItemPtr(variable));
+    curr_variable.push(orthodocs::doc::ItemPtr(variable));
   } else if (curr_parameter) {
     curr_parameter->_name      = id;
     curr_parameter->defaults  = defaults;
@@ -151,7 +171,7 @@ void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
       auto id     = curr_variable.top()->name;
       auto index  = "variable "+id;
       if (!curr_variable.top()->nested && !priv(id))
-        document[index] = move(curr_variable.top());
+        document->emplace(index, move(curr_variable.top()));
       curr_variable.pop();
     }
   }

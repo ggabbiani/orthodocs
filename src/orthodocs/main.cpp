@@ -1,41 +1,38 @@
 /*
- * ADOX scad processor
+ * orthodocs: API documentation and static analysis tool
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * This file is part of the 'AutoDox' (ADOX) project.
+ * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ADOX is free software: you can redistribute it and/or modify
+ * ODOX is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ADOX is distributed in the hope that it will be useful,
+ * ODOX is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
+ * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-// #define NDEBUG 
+#include "orthodocs/analizer.h"
+#include "orthodocs/globals.h"
+#include "orthodocs/utils.h"
 
-#include "globals.h"
-#include "processors.h"
-#include "utils.h"
-#include "antlr4-runtime.h"
-
-#include "indicators/block_progress_bar.hpp"
-#include "indicators/cursor_control.hpp"
 #include "CLI11.hpp"
 
 #include <algorithm>
 
 using namespace std;
-using namespace antlr4;
+using namespace orthodocs;
 
 namespace fs=std::filesystem;
+
+namespace {
 
 /*
  * transforms an absolute or current working directory relative path in 
@@ -51,12 +48,15 @@ string cwd2canonical(string &dir) {
  * transforms to source root relative.
  */
 string sroot_relative(string &sub) {
+  cwd sroot(option::sroot);
   sub = fs::relative(sub,option::sroot).string();
   return string();
 }
 
+}
+
 int main(int argc, const char *argv[]) {
-  CLI::App  app{"Automatic documentation generation for the OpenSCAD language.","adox-scad"};
+  CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
   auto      result = EXIT_SUCCESS;
 
   app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
@@ -84,36 +84,20 @@ int main(int argc, const char *argv[]) {
     FileSet src_files;
     lookup(option::sources,".scad",&src_files);
 
-    // Hide cursor
-    indicators::show_console_cursor(false);
-    indicators::BlockProgressBar bar{
-      indicators::option::BarWidth{50},
-      indicators::option::MaxProgress{src_files.size()}
-    };
-    cout << "Processing " << src_files.size() << " source files:\n";
-    {
-      scad::Processor proc(new doc::writer::Mdown);
-      for(const auto &file: src_files) {
-        // update postfix text with current file working on
-        bar.set_option(indicators::option::PostfixText{file});
-        proc.document(file);
-        bar.tick(); // update progress bar
-      }
-      bar.set_option(indicators::option::PostfixText{"done."});
-      bar.mark_as_completed();
-      // Show cursor
-      indicators::show_console_cursor(true);
-      if (option::toc)
-        proc.writeToC();
-      if (option::graphs.size()) 
-        proc.writeGraphs(option::graphs);
-    }
+    Analizer analizer;
+    analizer.process(src_files);
+
+    if (option::toc)
+      analizer.writeToC();
+
+    if (option::graphs.size()) 
+      analizer.writeGraphs(option::graphs);
+      
   } catch (const CLI::ParseError &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
     print_exception(error);
     result  = EXIT_FAILURE;
   }
-  indicators::show_console_cursor(true);
   return result;
 }

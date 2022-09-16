@@ -1,6 +1,27 @@
-#include "document.h"
-#include "globals.h"
-#include "utils.h"
+/*
+ * Abstract document definition
+ *
+ * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
+ * This file is part of the 'OrthoDocs' (ODOX) project.
+ *
+ * ODOX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ODOX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
+ */
+
+#include "scad/document.h"
+#include "orthodocs/globals.h"
+#include "orthodocs/utils.h"
 
 #include <algorithm>
 #include <cassert>
@@ -12,18 +33,9 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
+namespace scad {
+  
 namespace doc {
-
-string Item::documentKey() const {
-  return type()+' '+name;
-}
-
-string Item::indexKey() const {
-  auto len  = option::prefix.length();
-  string s  = option::prefix.empty() || !nocase::compare(name.substr(0,len),option::prefix) ? name : name.substr(len);
-  auto res  = s+" ("+type()+')';
-  return res;
-}
 
 string Package::indexKey(const string &s) {
   return fs::path(s).stem().string()+" (package)";
@@ -35,21 +47,6 @@ string Package::indexKey() const {
   string  s     = option::prefix.empty() || !nocase::compare(stem.substr(0,len),option::prefix) ? stem : stem.substr(len);
   auto    res   = s+" ("+type()+')';
   return res;
-}
-
-Signature Item::signature() const {
-  ostringstream ss;
-  ss << name << "(";
-  for(auto i=parameters.begin();i!=parameters.end();i++) {
-    if (i!=parameters.begin())
-      ss << ",";
-    auto parameter = i->get();
-    ss << parameter->name();
-    if (!parameter->defaults.empty())
-      ss << "=" << parameter->defaults;
-  }
-  ss << ")";
-  return ss.str();
 }
 
 namespace style {
@@ -199,18 +196,6 @@ AbstractStyle *Factory::operator()(const string &text) {
 
 }
 
-namespace toc {
+} // namespace doc
 
-SubToC filter(const std::filesystem::path &path,const ToC &toc, std::function<bool(const std::filesystem::path&,const Item*)> func) {
-  SubToC result;
-  for(auto &element: toc) {
-    auto item = element.second.get();
-    if (func(path,item))
-      result.emplace(element.first,item);
-  }
-  return result;
-}
-
-}
-
-}
+} // namespace scad

@@ -1,16 +1,16 @@
-# AutoDox
+# OrthoDocs
 
-AutoDox (ADOX) is a project aimed to provide a documentation generator and a static analysis tool for the OpenSCAD scripting language. Due to the 'flat' nature of the language, only a graphical representation of the inter-package relations will be provided. Among the features also a cross-reference between API items is planned. For the list of the feature planned and their status see [Project status](#project-status).
+OrthoDocs (ODOX) is a project aimed to provide a documentation generator and a static analysis tool for the OpenSCAD scripting language. Due to the 'flat' nature of the language, only a graphical representation of the inter-package relations will be provided. Among the features also a cross-reference between API items is planned. For the list of the feature planned and their status see [Project status](#project-status).
 
 ## Design
 
-ADOX tries to be as less invasive as possible:
+ODOX tries to:
 
 * minimize changes to already commented code (actually only one);
-* do not introduce any specific documentation tag;
+* not introduce any specific documentation tag;
 * focus the produced output to Markdown only.
 
-Rather then imposing a comment style, ADOX's adopted strategy is:
+Rather then imposing a comment style, ODOX's adopted strategy is:
 
 1. analyse the surce code;
 2. create a syntax signature for every global variable, function or module;
@@ -26,7 +26,7 @@ Suppose to have the following code:
     function sphereBoundingBox(d,r=1) = 
         let(d = d ? d : 2*r) [[-r,-r,-r],[+r,+r,+r]];
 
-ADOX will produce the following documentation:
+ODOX will produce the following documentation:
 
 ---
 
@@ -44,7 +44,7 @@ If you modify the existing comment in the following way
     function sphereBoundingBox(d,r=1) = 
         let(d = d ? d : 2*r) [[-r,-r,-r],[+r,+r,+r]];
 
-ADOX will interpret the comment as an annotation for the function with the following result:
+ODOX will interpret the comment starting with '!' as an annotation related to the function with the following result:
 
 ---
 
@@ -82,6 +82,10 @@ __d__
 this is the diameter
 
 ---
+
+## The command line
+
+
 
 ## Project status
 

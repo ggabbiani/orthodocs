@@ -4,7 +4,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(AutoDox)
 
-option(BUILD_TESTING "generate tests" ON)
+option(BUILD_TESTING    "Generate tests"              ON)
+option(LANGUAGE_SCAD    "OpenSCAD language extension" ON)
+option(WRITER_MARKDOWN  "Markdown writer extension"   ON)
 
 include(CTest)
 
@@ -29,6 +31,7 @@ set(ANTLR4_ZIP_REPOSITORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
 include_directories(${ANTLR4_INCLUDE_DIRS})
+message("ANTLR4_INCLUDE_DIRS: ${ANTLR4_INCLUDE_DIRS}")
 
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
@@ -37,6 +40,33 @@ set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/third-part)
+configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
+set(ORTHODOCS_INCS include third-part)
+set(ORTHODOCS_LIBS antlr4_static)
 
-add_subdirectory(scad)
+if (LANGUAGE_SCAD)
+  add_subdirectory(extensions/scad)
+  # list(APPEND ORTHODOCS_INCS extensions/scad/include)
+  list(APPEND ORTHODOCS_LIBS scad)
+endif()
+
+if (WRITER_MARKDOWN)
+  add_subdirectory(extensions/markdown)
+  list(APPEND ORTHODOCS_LIBS markdown)
+endif()
+message("ORTHODOCS_INCS: ${ORTHODOCS_INCS}")
+message("ORTHODOCS_LIBS: ${ORTHODOCS_LIBS}")
+
+add_executable(orthodocs
+  src/orthodocs/analizer.cpp
+  src/orthodocs/document.cpp
+  src/orthodocs/extensions.cpp
+  src/orthodocs/globals.cpp
+  src/orthodocs/main.cpp
+  src/orthodocs/utils.cpp
+)
+# target_compile_options(orthodocs PUBLIC "-u _ZN8markdown9Extension6loaderE")
+target_link_options(orthodocs PUBLIC "-Wl,--undefined,_ZN8markdown9Extension6loaderE" "-Wl,--undefined,_ZN4scad9Extension6loaderE")
+target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
+target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
+
