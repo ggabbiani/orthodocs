@@ -51,6 +51,7 @@ is equivalent to:
 __Parameters:__
 
 __axes__
+
 semi-axis list (es.["-x","±Z"])
 
 ---
@@ -81,12 +82,15 @@ cube replacement
 __Parameters:__
 
 __verbs__
+
 FL_ADD,FL_AXES,FL_BBOX
 
 __octant__
+
 when undef native positioning is used
 
 __direction__
+
 desired direction [director,rotation] or native direction if undef
 
 ---
@@ -103,31 +107,41 @@ cylinder replacement
 __Parameters:__
 
 __verbs__
+
 FL_ADD,FL_AXES,FL_BBOX
 
 __h__
+
 height of the cylinder or cone
 
 __r__
+
 radius of cylinder. r1 = r2 = r.
 
 __r1__
+
 radius, bottom of cone.
 
 __r2__
+
 radius, top of cone.
 
 __d__
+
 diameter of cylinder. r1 = r2 = d / 2.
 
 __d1__
+
 diameter, bottom of cone. r1 = d1 / 2.
 
 __d2__
+
 diameter, top of cone. r2 = d2 / 2.
 
 __octant__
+
 when undef native positioning is used
 
 __direction__
+
 desired direction [director,rotation], native direction when undef ([+X+Y+Z])
