@@ -39,6 +39,9 @@ namespace {
  * canonical form
  */
 string cwd2canonical(string &dir) {
+  #ifndef NDEBUG
+  cout << __PRETTY_FUNCTION__ << endl;
+  #endif
   // cwd pwd(dir);
   dir = fs::canonical(dir).string();
   return string();
@@ -48,10 +51,42 @@ string cwd2canonical(string &dir) {
  * transforms to source root relative.
  */
 string sroot_relative(string &sub) {
-  cwd sroot(option::sroot);
-  sub = fs::relative(sub,option::sroot).string();
-  return string();
+  #ifndef NDEBUG
+  cout << __PRETTY_FUNCTION__ << endl;
+  #endif
+  string error;
+  if (!option::sroot.empty()) {
+    cwd sroot(option::sroot);
+    sub = fs::relative(sub,option::sroot).string();
+  } else 
+    error = "«source tree root» is missing";
+  return error;
 }
+
+enum {
+  ADMONITIONS,
+  SRC_ROOT,
+  DOC_ROOT,
+  SOURCES,
+  TOC,
+  INGNORE,
+  DEPS,
+  GRAPHS
+};
+
+struct {
+  const char *name;
+  const char *desc;
+} opt[] = {
+  {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
+  {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
+  {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"             },
+  {"sources",             "source sub-trees and/or files - either as absolute or «source tree root» relative path"      },
+  {"-t,--toc",            "generate a Table of Content in the document tree root"                                       },
+  {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
+  {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
+  {"-g,--graphs",         "list of root relative directories where placing graphs"                                      },
+};
 
 }
 
@@ -59,22 +94,25 @@ int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
   auto      result = EXIT_SUCCESS;
 
-  app.add_flag("-a,--admonitions",option::admonitions,"when enabled any admonition found in annotations will be enriched with a corresponding emoji");
-  app.add_option("-s,--src-root", option::sroot, "source root directory: either as absolute or current directory relative path")
+  app.add_flag(   opt[ADMONITIONS].name ,option::admonitions  ,opt[ADMONITIONS].desc);
+  auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,option::sroot        ,opt[SRC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  app.add_option("-d,--doc-root",option::droot, "document root directory - either as absolute or current directory relative path")
+  auto droot_opt = app.add_option(opt[DOC_ROOT].name,option::droot, opt[DOC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  app.add_option("sources", option::sources, "source directories and files: either as absolute or «Source root» relative path")
+  auto sources_opt = app.add_option(opt[SOURCES].name, option::sources, opt[SOURCES].desc)
     ->required()
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-  app.add_flag("-t,--toc",option::toc,"when true, toc generation in document root is enabled.");
-  app.add_option("-i,--ignore-prefix",option::prefix,"prefix to be ignored during ToC sorting");
-  app.add_option("--pd,--pkg-deps",option::pkg_deps,"how package dependecies are documented (default TEXT)")
+  app.add_flag(opt[TOC].name,option::toc,opt[TOC].desc);
+  app.add_option(opt[INGNORE].name,option::prefix,opt[INGNORE].desc);
+  app.add_option(opt[DEPS].name,option::pkg_deps,opt[DEPS].desc)
     ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
-  app.add_option("-g,--graphs",option::graphs,"set of root relative directories for graphs")
+  auto graph_opt = app.add_option(opt[GRAPHS].name,option::graphs,opt[GRAPHS].desc)
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
+
+  sources_opt->needs(sroot_opt);
+  graph_opt->needs(sroot_opt);
 
   try {
     app.parse(argc, argv);
@@ -93,7 +131,7 @@ int main(int argc, const char *argv[]) {
     if (option::graphs.size()) 
       analizer.writeGraphs(option::graphs);
       
-  } catch (const CLI::ParseError &e) {
+  } catch (const CLI::Error &e) {
     result  = app.exit(e);
   } catch(const exception &error) {
     print_exception(error);
