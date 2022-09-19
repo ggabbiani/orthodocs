@@ -44,7 +44,7 @@ string Package::indexKey(const string &s) {
 string Package::indexKey() const {
   auto    len   = option::prefix.length();
   auto    stem  = path.stem().string();
-  string  s     = option::prefix.empty() || !nocase::compare(stem.substr(0,len),option::prefix) ? stem : stem.substr(len);
+  string  s     = len==0 || !nocase::compare(stem.substr(0,len),option::prefix) ? stem : stem.substr(len);
   auto    res   = s+" ("+type()+')';
   return res;
 }
