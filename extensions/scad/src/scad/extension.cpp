@@ -31,6 +31,8 @@ using namespace std;
 using namespace antlr4;
 namespace fs=std::filesystem;
 
+ExtensionLoader<scad::Extension> scad_extension_loader;
+
 namespace {
 
 class ErrorHandler : public BaseErrorListener {
@@ -51,8 +53,6 @@ ErrorHandler handler;
 }
 
 namespace scad {
-
-ExtensionLoader<Extension> Extension::loader;
 
 orthodocs::Document *Extension::parse(const fs::path &source) const {
   // change to source root

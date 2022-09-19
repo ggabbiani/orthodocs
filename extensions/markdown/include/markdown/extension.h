@@ -47,8 +47,9 @@ private:
   std::string H(const std::string &text,int level=1) const;
   std::string H(char c,int level=1) const;
   std::string HRULE() const;
+  std::string ITALIC(const std::string &text) const;
 
-  static ExtensionLoader<Extension> loader;
+  // static ExtensionLoader<Extension> loader;
 };
 
 } // namespace markdown

@@ -2,11 +2,12 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-project(AutoDox)
+project(OrthoDocs)
 
 option(BUILD_TESTING    "Generate tests"              ON)
 option(LANGUAGE_SCAD    "OpenSCAD language extension" ON)
 option(WRITER_MARKDOWN  "Markdown writer extension"   ON)
+option(EXPERIMENTAL     "Experimental tests"         OFF)
 
 include(CTest)
 
@@ -65,8 +66,11 @@ add_executable(orthodocs
   src/orthodocs/main.cpp
   src/orthodocs/utils.cpp
 )
-# target_compile_options(orthodocs PUBLIC "-u _ZN8markdown9Extension6loaderE")
-target_link_options(orthodocs PUBLIC "-Wl,--undefined,_ZN8markdown9Extension6loaderE" "-Wl,--undefined,_ZN4scad9Extension6loaderE")
+# target_link_options(odox PUBLIC "-Wl,--undefined,_ZN8markdown9Extension6loaderE" "-Wl,--undefined,_ZN4scad9Extension6loaderE")
+target_link_options(orthodocs PUBLIC "-Wl,--undefined,markdown_extension_loader" "-Wl,--undefined,scad_extension_loader")
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
 
+if (EXPERIMENTAL)
+  add_subdirectory(experimental)
+endif()

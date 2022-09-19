@@ -139,12 +139,18 @@ Given a source tree, it is possible to:
 
 ## Project status
 
-| Feature      | Status |
-| ----------- | ----------- |
-| global values      | ✔       |
-| comment patterns   | ✔        |
-| dependency graphs | ✔        |
-| table of contents |  ✔        |
-| cross-reference | ❌
+| Feature      | Status
+| -----------  | ------
 | [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
+| comment styles    | ✔ 
+| cross-reference   | 🚧  
+| dependency graphs | ✔
+| global values     | ✔
+| table of contents | ✔
 
+Legenda:
+
+| Symbol | Description  |
+|--------|--------------|
+|✔       | done         |
+|🚧      | on going     |

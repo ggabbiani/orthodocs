@@ -17,6 +17,5 @@ add_library(${WRITER} STATIC
   src/markdown/graph.cpp 
   src/markdown/extension.cpp
 )
-# target_link_options(${WRITER} PUBLIC "-Wl,--undefined,markdown_loader_dimmerda")
 target_include_directories(${WRITER} PUBLIC ${WRITER_INCS})
 target_link_libraries(${WRITER} ${WRITER_LIBS})

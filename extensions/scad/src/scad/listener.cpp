@@ -130,7 +130,12 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   } else if (is<scad::SCADParser::AssignmentContext>(*ctx->parent->parent)) {   // variable's annotation
     curr_variable.top()->annotation = value;
   } else if (is<scad::SCADParser::PkgContext>(*ctx->parent->parent))        {   // package's annotation
-    curr_item.top()->annotation = value;
+    auto package = dynamic_cast<scad::doc::Package *>(curr_item.top().get());
+    // search and subsitute any - known - license note
+    auto lic = doc::License::remove(value);
+    if (lic) 
+      package->license = &lic->name;
+    package->annotation = value;
   }
 }
 

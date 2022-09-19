@@ -20,6 +20,7 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "scad/doc/license.h"
 #include "orthodocs/document.h"
 #include "orthodocs/utils.h"
 
@@ -96,8 +97,15 @@ public:
   std::filesystem::path path;
   std::set<std::string> uses;
   std::set<std::string> includes;
+  // eventual license 
+  const std::string *license;
 };
 
+/**
+ * base for comment styles.
+ * FIXME: comment style management work on parsed text, as such it should be 
+ * outside source specific coding.
+ */
 struct AbstractStyle {
   virtual bool check(const std::string &text) = 0;
   virtual std::string manage(const std::string &text) = 0;

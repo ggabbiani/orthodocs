@@ -32,6 +32,7 @@ set(LIB_NAME scad)
 add_library(${LIB_NAME} STATIC
   src/scad/annotations.cpp 
   src/scad/extension.cpp
+  src/scad/doc/license.cpp
   src/scad/document.cpp 
   src/scad/listener.cpp
   ${ANTLR_${LANGUAGE}_CXX_OUTPUTS}

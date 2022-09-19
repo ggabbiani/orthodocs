@@ -31,6 +31,8 @@
 using namespace std;
 namespace fs=std::filesystem;
 
+ExtensionLoader<markdown::Extension> markdown_extension_loader;
+
 namespace {
 
 // transforms the passed string in a markdown id
@@ -80,8 +82,6 @@ static void saveme(const scad::doc::Package *src_package,
 }
 
 namespace markdown {
-
-ExtensionLoader<Extension> Extension::loader;
 
 void Extension::document(const fs::path &source, const orthodocs::Document *document) {
   assert(source.is_relative());
@@ -200,7 +200,6 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
           << "```mermaid\n"
           << "graph LR" << endl;
       graph(pkg,out);
-      // out << endl;
       out  << "```\n" << endl;
     } else {
       if (!pkg.includes.empty()) {
@@ -218,10 +217,12 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
         out << endl;
       }
     }
-
-  if (!pkg.annotation.empty())
-    out << pkg.annotation << endl
-        << endl;
+  // write annotation contents
+  if (!pkg.annotation.empty()) {
+    out << pkg.annotation << endl;
+    if (pkg.license) 
+      out << "*Published under " << "__" << *pkg.license << "__*" << '\n' << endl;
+  }
 }
 
 void Extension::parameter(ostream &out, const orthodocs::doc::Parameter &p) {
@@ -312,6 +313,10 @@ void Extension::module(ostream &out, const scad::doc::Module &mod) {
 
 std::string Extension::BOLD(const std::string &text) const {
   return "__"+text+"__";
+}
+
+std::string Extension::ITALIC(const std::string &text) const {
+  return "*"+text+"*";
 }
 
 std::string Extension::BR() const {

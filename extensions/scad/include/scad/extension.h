@@ -30,7 +30,7 @@ public:
   Extension() : language::Extension(ID) {}
   orthodocs::Document *parse(const std::filesystem::path &source) const override;
 private:
-  static ExtensionLoader<Extension> loader;
+  // static ExtensionLoader<Extension> loader;
 };
 
 } // namespace scad

@@ -157,7 +157,7 @@ inline void add(Document *document, ToC &map) {
  */
 extern SubToC filter(const std::filesystem::path &path,const ToC &toc, std::function<bool(const std::filesystem::path&,const Item*)> func);
 
-}
+} // namespace toc
 
 } // namespace doc
 
