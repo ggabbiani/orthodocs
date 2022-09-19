@@ -67,6 +67,7 @@ public:
  */
 class Package : public orthodocs::doc::Item {
 public:
+  static constexpr const char *ID = "package";
   /**
    * Construct a new Package object
    * 
@@ -75,7 +76,7 @@ public:
   /**
    * always return "package"
    */
-  std::string type() const override {return "package";}
+  std::string type() const override {return ID;}
   /**
    * return the Packages Index key from its path.
    * 

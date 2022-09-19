@@ -38,7 +38,7 @@ namespace scad {
 namespace doc {
 
 string Package::indexKey(const string &s) {
-  return fs::path(s).stem().string()+" (package)";
+  return fs::path(s).stem().string()+" ("+ID+")";
 }
 
 string Package::indexKey() const {
