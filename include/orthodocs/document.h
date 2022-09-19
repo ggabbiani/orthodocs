@@ -69,7 +69,7 @@ public:
   virtual std::string documentKey() const;
 
   /**
-   * builds an key value usable by Index.
+   * builds a key value usable by Index.
    * 
    * «item name» («item type»)
    */
