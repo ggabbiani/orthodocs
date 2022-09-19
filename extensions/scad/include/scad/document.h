@@ -93,7 +93,7 @@ public:
   static std::string indexKey(const std::string &s);
 
   /**
-   * full package path comprehensive of extension
+   * contains the full abstract package path: root relative path comprehensive of extension
    */
   std::filesystem::path path;
   std::set<std::string> uses;
