@@ -65,6 +65,7 @@ add_executable(orthodocs
   src/orthodocs/globals.cpp
   src/orthodocs/main.cpp
   src/orthodocs/utils.cpp
+  src/orthodocs/xref.cpp
 )
 # target_link_options(odox PUBLIC "-Wl,--undefined,_ZN8markdown9Extension6loaderE" "-Wl,--undefined,_ZN4scad9Extension6loaderE")
 target_link_options(orthodocs PUBLIC "-Wl,--undefined,markdown_extension_loader" "-Wl,--undefined,scad_extension_loader")
