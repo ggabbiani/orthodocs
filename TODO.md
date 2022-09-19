@@ -12,6 +12,6 @@
 - [ ] implement cross-reference
 - [x] implement [Admonitions](https://www.markdownguide.org/hacks/#admonitions)
 - [x] fix packages with proper path (a package can be nested)
-- [ ] implement a regex based license identification;
-- [ ] fix bug on repeated cli argument --pkg-deps (and likely also to others)
+- [x] implement a regex based license identification;
+- [x] fix bug on repeated cli argument --pkg-deps (and likely also to others)
 - [x] implement license recognition on packages
