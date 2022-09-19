@@ -44,7 +44,7 @@ string Item::documentKey() const {
 
 string Item::indexKey() const {
   auto len  = option::prefix.length();
-  string s  = option::prefix.empty() || !nocase::compare(name.substr(0,len),option::prefix) ? name : name.substr(len);
+  string s  = len==0 || !nocase::compare(name.substr(0,len),option::prefix) ? name : name.substr(len);
   auto res  = s+" ("+type()+')';
   return res;
 }
