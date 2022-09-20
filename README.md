@@ -142,11 +142,12 @@ Given a source tree, it is possible to:
 | Feature      | Status
 | -----------  | ------
 | [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
-| comment styles    | ✔ 
-| cross-reference   | 🚧  
-| dependency graphs | ✔
-| global values     | ✔
-| table of contents | ✔
+| comment styles            | ✔ 
+| cross-reference           | 🚧  
+| dependency graphs         | ✔
+| global values             | ✔
+| source license detection  | ✔
+| table of contents         | ✔
 
 Legenda:
 
