@@ -44,7 +44,6 @@ using URI         = std::filesystem::path;
 using Value       = std::string;
 
 class Parameter {
-  friend class Builder;
 public:
   const Name &name() const {return _name;}
   const Annotation &annotation() const {return _annotation;}
@@ -65,6 +64,8 @@ public:
 
   /**
    * builds key value usable by Document
+   * 
+   * «item type» «item name»
    */
   virtual std::string documentKey() const;
 
@@ -80,6 +81,10 @@ public:
   ParameterVec  parameters;
   const Value   defaults;
   const bool    nested;
+  /**
+   * the semantic of this field is language dependant
+   */
+  Item          *parent = nullptr;
   // filled by writers
   URI           uri;
 

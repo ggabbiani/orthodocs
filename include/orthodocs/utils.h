@@ -33,6 +33,7 @@ inline std::string trim(std::string str) {
   return str;
 }
 
+// TODO: implement as an Item's function member
 inline bool priv(const std::string &s) {
   return s.find("__")==0 ? true : false;
 }

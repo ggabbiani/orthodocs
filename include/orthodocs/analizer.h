@@ -46,10 +46,17 @@ public:
   void writeGraphs(const FileSet &dirs);
 
   /**
-   * Elaborate a source returning an abstract document
+   *
+   * 
+   * 1) reset the currently held document (deleting the eventually already present one)
+   * 2) Produce the synthetic document of the source code passed as argument
+   * 3) invoke the writer to write it on the doc root
+   * 4) move the document items in the ToC
+   * 
+   * At the end of the process the document is empty.
    */
   void document(
-    // source file relative to source root or absolute
+    // source file relative to source root
     const std::filesystem::path &source
   );
   std::unique_ptr<Document> doc;

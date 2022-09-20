@@ -48,7 +48,6 @@ void Analizer::document(const fs::path &source) {
 void Analizer::process(const FileSet &sources) {
   try {
     Bar bar(sources,"Documents");
-    // cout << "Processing " << sources.size() << " source files:\n";
     for(const auto &file: sources) {
       bar.status(file.string());
       document(file);
