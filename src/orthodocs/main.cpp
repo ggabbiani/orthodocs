@@ -124,8 +124,8 @@ int main(int argc, const char *argv[]) {
     if (option::graphs.size()) 
       analizer.writeGraphs(option::graphs);
       
-  } catch (const CLI::Error &e) {
-    result  = app.exit(e);
+  } catch (const CLI::Error &error) {
+    result  = app.exit(error);
   } catch(const exception &error) {
     print_exception(error);
     result  = EXIT_FAILURE;
