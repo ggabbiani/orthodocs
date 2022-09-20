@@ -48,7 +48,7 @@ public:
   virtual ~Extension() = default;
   virtual orthodocs::Document *parse(const std::filesystem::path &source) const = 0;
   /**
-   * return the extesion corresponding to the option::writer
+   * return the extension corresponding to the option::writer
    */
   static Extension *factory();
 };
@@ -64,7 +64,7 @@ public:
   const char * const id;
   virtual ~Extension() = default;
   /**
-   * return the extesion corresponding to the option::writer
+   * return the extension corresponding to the option::writer
    */
   static Extension *factory();
   /**
