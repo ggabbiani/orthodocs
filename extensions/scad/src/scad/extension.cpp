@@ -66,10 +66,8 @@ orthodocs::Document *Extension::parse(const fs::path &source) const {
   // error management - FIXME: set once before this call
   parser.removeErrorListeners();
   parser.addErrorListener(&handler);
-
   // source parse listener
   Listener  listener(source);
-
   // parse tree depth-first traverse
   tree::ParseTreeWalker  walker;
   // parsing
@@ -77,6 +75,10 @@ orthodocs::Document *Extension::parse(const fs::path &source) const {
   // creation of the document
   walker.walk(&listener,tree);
   return listener.document;
+}
+
+const char *Extension::sourcePostfix() const {
+  return ".scad";
 }
 
 } // namespace scad

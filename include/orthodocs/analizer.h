@@ -36,9 +36,11 @@ namespace orthodocs {
  */
 class Analizer {
 public:
-  explicit Analizer() : _writer(writer::Extension::factory()),_parser(language::Extension::factory()) {
+  using DocumentList = std::vector<std::unique_ptr<Document>>;
+  explicit Analizer(language::Extension *language) : _writer(writer::Extension::factory()),_parser(language) {
   }
 
+  // analize a set of files / directories
   void process(const FileSet &sources);
   
   void writeToC();
@@ -46,8 +48,6 @@ public:
   void writeGraphs(const FileSet &dirs);
 
   /**
-   *
-   * 
    * 1) reset the currently held document (deleting the eventually already present one)
    * 2) Produce the synthetic document of the source code passed as argument
    * 3) invoke the writer to write it on the doc root
@@ -59,8 +59,18 @@ public:
     // source file relative to source root
     const std::filesystem::path &source
   );
-  std::unique_ptr<Document> doc;
+  // std::unique_ptr<Document> doc;
 private:
+  // return a FileSet made of files matching «extension»
+  void lookup(
+    // list of source directories/files
+    const FileSet &sources,
+    // extension to filter out
+    const char *extension, 
+    // resulting list of source files matching «extension»
+    FileSet &result
+  );
+  DocumentList         _docs;
   doc::ToC             _toc;
   writer::Extension   *_writer;
   language::Extension *_parser;

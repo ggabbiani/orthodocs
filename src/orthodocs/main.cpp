@@ -112,11 +112,15 @@ int main(int argc, const char *argv[]) {
     assert(option::droot.is_absolute());
     assert(option::sroot.is_absolute());
 
-    FileSet src_files;
-    lookup(option::sources,".scad",&src_files);
+    // language extension for source analysis
+    auto language = language::Extension::factory();
+    // source tree analysis
+    Analizer analizer(language);
+    analizer.process(option::sources);
 
-    Analizer analizer;
-    analizer.process(src_files);
+    // // language extension for document writing
+    // auto writer = writer::Extension::factory();
+    // writer->documents();
 
     if (option::toc)
       analizer.writeToC();

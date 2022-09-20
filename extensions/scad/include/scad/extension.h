@@ -29,6 +29,7 @@ public:
   static constexpr const char *ID = "scad";
   Extension() : language::Extension(ID) {}
   orthodocs::Document *parse(const std::filesystem::path &source) const override;
+  const char *sourcePostfix() const override;
 private:
   // static ExtensionLoader<Extension> loader;
 };

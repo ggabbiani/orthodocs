@@ -31,36 +31,6 @@ using namespace std;
 
 namespace fs=std::filesystem;
 
-//! return a vector containing all the file paths with «extension»
-void lookup(
-  //! list of source directories/files
-  const FileSet &sources,
-  //! extension to filter out
-  const char *extension, 
-  //! list of source files matching «extension»
-  FileSet *result
-) {
-  cwd pwd(option::sroot);
-  for(auto &path: sources) {
-    if (fs::is_regular_file(path)) {
-      if (!extension || path.extension()==extension)
-        result->insert(path);
-    } else if (fs::is_directory(path)) {
-      for (auto &entry: fs::directory_iterator{path}) {
-        auto path = entry.path();
-        if (fs::is_regular_file(path)) {
-          if (!extension || path.extension()==extension)
-            result->insert(path);
-        } else if (fs::is_directory(path)) {
-          lookup(FileSet{path},extension,result);
-        }
-      }
-    } else 
-      throw runtime_error("what is this '"+path.string()+"'?");
-  }
-  // cout << "got " << result->size() << " elements" << endl;
-}
-
 void print_exception(const exception& e, int level) {
   cerr << string(level, ' ') << "exception: " << e.what() << '\n';
   try {

@@ -35,11 +35,12 @@ void Analizer::document(const fs::path &source) {
   assert(source.is_relative());
   assert(source.has_filename());
   try {
-    doc.reset(_parser->parse(source));
+    auto document = _parser->parse(source);
+    _docs.emplace(_docs.end(),document);
     // document writing
-    _writer->document(source,doc.get());
-    // merge document contents to the Table of Contents
-    doc::toc::add(doc.get(),_toc);
+    _writer->document(source,document);
+    // move document contents to the Table of Contents
+    doc::toc::add(document,_toc);
   } catch(...) {
     throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));
   }
@@ -47,8 +48,11 @@ void Analizer::document(const fs::path &source) {
 
 void Analizer::process(const FileSet &sources) {
   try {
-    Bar bar(sources,"Documents");
-    for(const auto &file: sources) {
+    FileSet files;
+    lookup(sources,_parser->sourcePostfix(),files);
+
+    Bar bar(files,"Documents");
+    for(const auto &file: files) {
       bar.status(file.string());
       document(file);
       bar++;
@@ -65,6 +69,27 @@ void Analizer::writeGraphs(const FileSet &dirs) {
 
 void Analizer::writeToC() {
   _writer->toc(_toc);
+}
+
+void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
+  cwd pwd(option::sroot);
+  for(auto &path: sources) {
+    if (fs::is_regular_file(path)) {
+      if (!extension || path.extension()==extension)
+        result.insert(path);
+    } else if (fs::is_directory(path)) {
+      for (auto &entry: fs::directory_iterator{path}) {
+        auto path = entry.path();
+        if (fs::is_regular_file(path)) {
+          if (!extension || path.extension()==extension)
+            result.insert(path);
+        } else if (fs::is_directory(path)) {
+          lookup(FileSet{path},extension,result);
+        }
+      }
+    } else 
+      throw runtime_error("what is this '"+path.string()+"'?");
+  }
 }
 
 }

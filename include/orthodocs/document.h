@@ -147,14 +147,10 @@ inline std::string title(const Item &item) {
   return item.name+" ("+item.type()+')';
 }
 
-inline void insert(ToC::mapped_type &item, ToC &map) {
-  map.emplace(item->indexKey(),std::move(item));
-}
-
 // move Document items into index
 inline void add(Document *document, ToC &map) {
   for(auto &item: *document) 
-    insert(item.second,map);
+    map.emplace(item.second->indexKey(),std::move(item.second));
 }
 
 /**

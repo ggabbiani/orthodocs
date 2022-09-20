@@ -40,16 +40,6 @@ inline bool priv(const std::string &s) {
 
 using FileSet = std::set<std::filesystem::path>;
 
-//! return a FileSet matching «extension»
-extern void lookup(
-  //! list of source directories/files
-  const FileSet &sources,
-  //! extension to filter out
-  const char *extension, 
-  //! list of source files matching «extension»
-  FileSet *result
-);
-
 /*!
  * prints the explanatory string of an exception. If the exception is nested,
  * recurses to print the explanatory of the exception it holds
