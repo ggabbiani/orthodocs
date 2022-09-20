@@ -48,13 +48,7 @@ extern void print_exception(const std::exception& e, int level =  0);
 
 class cwd {
 public:
-  cwd(const std::filesystem::path &path) : _old(std::filesystem::current_path()) {
-    try {
-      std::filesystem::current_path(path);
-    } catch(...) {
-      std::throw_with_nested(std::runtime_error("error while setting current path: '"+path.string()+'\''));
-    }
-  }
+  cwd(const std::filesystem::path &path);
   ~cwd() {
     std::filesystem::current_path(_old);
   }

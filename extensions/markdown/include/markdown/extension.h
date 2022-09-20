@@ -29,8 +29,8 @@ class Extension : public writer::Extension {
 public:
   static constexpr const char *ID = "markdown";
   Extension() : writer::Extension(ID) {}
-  void document(const std::filesystem::path &source, const orthodocs::Document *document) override;
-  void toc(const orthodocs::doc::ToC &toc) override;
+  void save(const orthodocs::Document &document) override;
+  void save(const orthodocs::doc::ToC &toc) override;
   void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) override;
 private:
   void graph(const scad::doc::Package &pkg, std::ostream &out);

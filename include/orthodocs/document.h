@@ -99,10 +99,11 @@ using ConstItemPtr  = std::unique_ptr<const Item>;
 using ItemPtrStack  = std::stack<ItemPtr>;
 
 /**
- * Table of Contents has the ownership of the contained items
+ * Table of Contents
+ * NOTE: no ownership of the contained items
  * FIXME: a std::map couldn't be enough for this?
  */
-using ToC = std::multimap<Name,ItemPtr,nocase::Compare>;
+using ToC = std::multimap<Name,Item*,nocase::Compare>;
 
 /**
  * SubToC is a filtered selection of ToC elements, as such its items are 
@@ -113,28 +114,48 @@ using SubToC = std::multimap<Name,doc::Item*,nocase::Compare>;
 
 } // namespace doc
 
-/**
- * Document format:
- * Key    ==> "function|module|variable <item name>"
- * Value  ==> unique_ptr<doc::Item>
- * 
- * valid key examples:
- * 
- * "variable $FL_ADD"
- * "function fl_description"
- * "module fl_manage"
- * "package defs"
- * 
- * NOTE: see doc::Key()
- */
-using Document = std::map<std::string,doc::ItemPtr>;
+class Document {
+public:
+  explicit Document(const std::filesystem::path &source) : source(source) {}
+  /**
+   * Document::Index format:
+   * Key    ==> "function|module|variable <item name>"
+   * Value  ==> unique_ptr<doc::Item>
+   * 
+   * valid key examples:
+   * 
+   * "variable $FL_ADD"
+   * "function fl_description"
+   * "module fl_manage"
+   * "package defs"
+   * 
+   * NOTE: see doc::Key()
+   */
+  using Index = std::map<std::string,doc::ItemPtr>;
+  /**
+   * return the number of item of type «type»
+   */
+  template <class T>
+  size_t size() const {
+    size_t size  = 0;
+    for(auto i=index.begin(); i!=index.end(); ++i) {
+      auto item = i->second.get();
+      size += (typeid(*item)==typeid(T));
+    }
+    return size;
+  }
+
+  Index::iterator begin() {return index.begin();}
+  Index::const_iterator begin() const {return index.begin();}
+  Index::iterator end() {return index.end();}
+  Index::const_iterator end() const {return index.end();}
+
+// private:
+  Index index;
+  std::filesystem::path source;
+};
 
 namespace doc {
-
-/**
- * return the number of item of type «type»
- */
-extern size_t size(const Document *items,const std::type_info &type);
 
 namespace toc {
 
@@ -147,10 +168,10 @@ inline std::string title(const Item &item) {
   return item.name+" ("+item.type()+')';
 }
 
-// move Document items into index
-inline void add(Document *document, ToC &map) {
+// copy Document items into the Table of Contents
+inline void add(Document *document, ToC &toc) {
   for(auto &item: *document) 
-    map.emplace(item.second->indexKey(),std::move(item.second));
+    toc.emplace(item.second->indexKey(),item.second.get());
 }
 
 /**

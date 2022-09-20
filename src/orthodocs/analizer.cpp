@@ -19,8 +19,10 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "error_info.h"
 #include "orthodocs/analizer.h"
 #include "orthodocs/bar.h"
+#include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
@@ -37,12 +39,14 @@ void Analizer::document(const fs::path &source) {
   try {
     auto document = _parser->parse(source);
     _docs.emplace(_docs.end(),document);
-    // document writing
-    _writer->document(source,document);
-    // move document contents to the Table of Contents
+
+    // // document writing
+    // _writer->document(source,document);
+
+    // copy document contents to the Table of Contents
     doc::toc::add(document,_toc);
   } catch(...) {
-    throw_with_nested(runtime_error("error while processing '"+source.string()+'\''));
+    throw_with_nested(runtime_error(ERR_CALL(source)));
   }
 }
 
@@ -51,7 +55,7 @@ void Analizer::process(const FileSet &sources) {
     FileSet files;
     lookup(sources,_parser->sourcePostfix(),files);
 
-    Bar bar(files,"Documents");
+    Bar bar(files,"analized sources");
     for(const auto &file: files) {
       bar.status(file.string());
       document(file);
@@ -61,14 +65,6 @@ void Analizer::process(const FileSet &sources) {
     indicators::show_console_cursor(true);
     throw;
   }
-}
-
-void Analizer::writeGraphs(const FileSet &dirs) {
-  _writer->graphs(_toc,dirs);
-}
-
-void Analizer::writeToC() {
-  _writer->toc(_toc);
 }
 
 void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {

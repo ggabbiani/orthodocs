@@ -83,7 +83,8 @@ static void saveme(const scad::doc::Package *src_package,
 
 namespace markdown {
 
-void Extension::document(const fs::path &source, const orthodocs::Document *document) {
+void Extension::save(const orthodocs::Document &document) {
+  auto &source = document.source;
   assert(source.is_relative());
   assert(option::droot.is_absolute());
 
@@ -98,7 +99,7 @@ void Extension::document(const fs::path &source, const orthodocs::Document *docu
   auto md = source.parent_path() / source.stem().replace_extension(".md");
   ofstream out(md);
 
-  for (auto i=document->begin(); i!=document->end(); ++i) {
+  for (auto i=document.begin(); i!=document.end(); ++i) {
     auto pkg = i->second.get();
     if (is<scad::doc::Package>(*pkg)) {
       pkg->uri = md;
@@ -106,10 +107,10 @@ void Extension::document(const fs::path &source, const orthodocs::Document *docu
     }
   }
 
-  if (size(document,typeid(scad::doc::Variable))) {
+  if (document.size<scad::doc::Variable>()) {
     out << H("Variables",2)
         << endl;
-    for (auto i=document->begin(); i!=document->end(); ++i) {
+    for (auto i=document.begin(); i!=document.end(); ++i) {
       auto var  = i->second.get();
       if (is<scad::doc::Variable>(*var)) {
         var->uri = md;
@@ -118,10 +119,10 @@ void Extension::document(const fs::path &source, const orthodocs::Document *docu
     }
   }
 
-  if (size(document,typeid(scad::doc::Function))) {
+  if (document.size<scad::doc::Function>()) {
     out << H("Functions",2)
         << endl;
-    for (auto i=document->begin(); i!=document->end(); ++i) {
+    for (auto i=document.begin(); i!=document.end(); ++i) {
       auto func = i->second.get();
       if (is<scad::doc::Function>(*func)) {
         func->uri = md;
@@ -130,10 +131,10 @@ void Extension::document(const fs::path &source, const orthodocs::Document *docu
     }
   }
 
-  if (size(document,typeid(scad::doc::Module))) {
+  if (document.size<scad::doc::Module>()) {
     out << H("Modules",2) << endl 
         << endl;
-    for (auto i=document->begin(); i!=document->end(); ++i) {
+    for (auto i=document.begin(); i!=document.end(); ++i) {
       auto mod = i->second.get();
       if (is<scad::doc::Module>(*mod)) {
         mod->uri = md;
@@ -143,7 +144,7 @@ void Extension::document(const fs::path &source, const orthodocs::Document *docu
   }
 }
 
-void Extension::toc(const orthodocs::doc::ToC &toc) {
+void Extension::save(const orthodocs::doc::ToC &toc) {
   assert(option::droot.is_absolute());
 
   try {
@@ -165,7 +166,7 @@ void Extension::toc(const orthodocs::doc::ToC &toc) {
         }
         current = initial;
       }
-      sub.emplace(item.first,item.second.get());
+      sub.emplace(item.first,item.second);
       bar++;
     }
     // write last sub toc
@@ -351,7 +352,7 @@ void Extension::graph(const scad::doc::Package &pkg, ostream &out) {
 
 void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
   try {
-    orthodocs::Bar bar(dirs,"Graphs");
+    orthodocs::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
     cwd pwd(option::droot);
     // from here we move on each directory passed in the FileSet

@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "error_info.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
@@ -26,6 +27,7 @@
 #include <cassert>
 #include <iostream>
 #include <set>
+#include <sstream>
 
 using namespace std;
 
@@ -47,4 +49,12 @@ bool is_sub_of(const fs::path &sub, const fs::path &base) {
     }
   }
   return true;
+}
+
+cwd::cwd(const fs::path &path) : _old(fs::current_path()) {
+  try {
+    fs::current_path(path);
+  } catch(...) {
+    throw_with_nested(runtime_error(ERR_CALL(path)));
+  }
 }

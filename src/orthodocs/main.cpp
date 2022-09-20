@@ -20,6 +20,7 @@
  */
 
 #include "orthodocs/analizer.h"
+#include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
@@ -112,21 +113,25 @@ int main(int argc, const char *argv[]) {
     assert(option::droot.is_absolute());
     assert(option::sroot.is_absolute());
 
-    // language extension for source analysis
+    // get desired language extension for source analysis
     auto language = language::Extension::factory();
-    // source tree analysis
-    Analizer analizer(language);
-    analizer.process(option::sources);
+    // build proper analyst
+    Analizer analyst(language);
+    // in memory analysis of the source tree
+    analyst.process(option::sources);
 
-    // // language extension for document writing
-    // auto writer = writer::Extension::factory();
-    // writer->documents();
+    // get desired writer extension
+    auto writer = writer::Extension::factory();
+    // save documents
+    writer->save(analyst.documents());
 
+    // save table of contents
     if (option::toc)
-      analizer.writeToC();
+      writer->save(analyst.toc());
 
+    // save graphs
     if (option::graphs.size()) 
-      analizer.writeGraphs(option::graphs);
+      writer->graphs(analyst.toc(),option::graphs);
       
   } catch (const CLI::Error &error) {
     result  = app.exit(error);

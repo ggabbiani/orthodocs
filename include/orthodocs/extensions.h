@@ -20,6 +20,7 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "orthodocs/analizer.h"
 #include "orthodocs/document.h"
 #include "orthodocs/globals.h"
 #include "singleton.h"
@@ -72,13 +73,17 @@ public:
    */
   static Extension *factory();
   /**
+   * write a set of documents
+   */
+  void save(const orthodocs::Analizer::DocumentList &docs);
+  /**
    * write a document in the concrete instance native format
    */
-  virtual void document(const std::filesystem::path &source, const orthodocs::Document *document) = 0;
+  virtual void save(const orthodocs::Document &document) = 0;
   /**
    * write a table of contents in the concrete instance native format
    */
-  virtual void toc(const orthodocs::doc::ToC &toc) = 0;
+  virtual void save(const orthodocs::doc::ToC &toc) = 0;
   /**
    * write sub-root graphs
    */

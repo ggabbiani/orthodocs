@@ -20,7 +20,6 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/extensions.h"
 #include "orthodocs/document.h"
 
 #include "antlr4-runtime.h"
@@ -29,24 +28,32 @@
 #include <iostream>
 #include <memory>
 
+namespace language {
+
+class Extension;
+
+} // namespace language
+
+namespace writer {
+
+class Extension;
+
+} // namespace writer
+
 namespace orthodocs {
 
 /**
- * Analize sources producing the Document via a scad parser listener
+ * Analize sources producing the Document through a language parser listener
  */
 class Analizer {
 public:
   using DocumentList = std::vector<std::unique_ptr<Document>>;
-  explicit Analizer(language::Extension *language) : _writer(writer::Extension::factory()),_parser(language) {
-  }
+
+  explicit Analizer(language::Extension *language): _parser(language) {}
 
   // analize a set of files / directories
   void process(const FileSet &sources);
   
-  void writeToC();
-
-  void writeGraphs(const FileSet &dirs);
-
   /**
    * 1) reset the currently held document (deleting the eventually already present one)
    * 2) Produce the synthetic document of the source code passed as argument
@@ -59,7 +66,13 @@ public:
     // source file relative to source root
     const std::filesystem::path &source
   );
-  // std::unique_ptr<Document> doc;
+
+  // documents getter
+  const DocumentList &documents() const {return _docs;}
+
+  // ToC getter
+  const doc::ToC &toc() const {return _toc;}
+
 private:
   // return a FileSet made of files matching «extension»
   void lookup(
@@ -72,7 +85,6 @@ private:
   );
   DocumentList         _docs;
   doc::ToC             _toc;
-  writer::Extension   *_writer;
   language::Extension *_parser;
 };
 

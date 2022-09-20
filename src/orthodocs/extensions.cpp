@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http: //www.gnu.org/licenses/>.
  */
 
+#include "orthodocs/bar.h"
 #include "orthodocs/config.h"
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
@@ -48,6 +49,20 @@ Extension *Extension::factory() {
     return i->second;
   else
     throw runtime_error("No language extension found for id '"+option::writer+'\'');
+}
+
+void Extension::save(const orthodocs::Analizer::DocumentList &docs) {
+  try {
+    orthodocs::Bar bar(docs,"saved documents");
+    for(const auto &doc: docs) {
+      bar.status(doc->source);
+      save(*doc);
+      bar++;
+    }
+  } catch(...) {
+    indicators::show_console_cursor(true);
+    throw;
+  }
 }
 
 } // namespace writer

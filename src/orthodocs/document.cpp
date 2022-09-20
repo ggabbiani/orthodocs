@@ -29,15 +29,6 @@ namespace orthodocs {
 
 namespace doc {
 
-size_t size(const Document *items,const type_info &type) {
-  auto size  = 0;
-  for(auto i=items->begin(); i!=items->end(); ++i) {
-    auto var  = i->second.get();
-    size += (typeid(*var)==type);
-  }
-  return size;
-}
-
 string Item::documentKey() const {
   return type()+' '+name;
 }
@@ -69,7 +60,7 @@ namespace toc {
 SubToC filter(const fs::path &path,const ToC &toc, function<bool(const fs::path&,const Item*)> func) {
   SubToC result;
   for(auto &element: toc) {
-    auto item = element.second.get();
+    auto item = element.second;
     if (func(path,item))
       result.emplace(element.first,item);
   }

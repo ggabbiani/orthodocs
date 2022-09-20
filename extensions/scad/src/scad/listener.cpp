@@ -32,7 +32,7 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source),document(new orthodocs::Document) {
+Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source),document(new orthodocs::Document(pkg_source)) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
@@ -42,7 +42,7 @@ void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto &item  = curr_item.top();
-  document->emplace(item->documentKey(),move(item));
+  document->index.emplace(item->documentKey(),move(item));
   curr_item.pop();
   curr_package  = nullptr;
 }
@@ -91,7 +91,7 @@ void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
   auto key  = func->documentKey();
   if (!priv(func->name))
-    document->emplace(key,move(func));
+    document->index.emplace(key,move(func));
   curr_item.pop();
 }
 
@@ -110,7 +110,7 @@ void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto &module  = curr_item.top();
   auto key      = module->documentKey();
   if (!module->nested && !priv(module->name))
-    document->emplace(key,move(module));
+    document->index.emplace(key,move(module));
   curr_item.pop();
 }
 
@@ -179,11 +179,10 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
 void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
     if (curr_variable.size()) {
-      // curr_variable.pop();
       auto &var   = curr_variable.top();
       auto key    = var->documentKey();
       if (!var->nested && !priv(var->name))
-        document->emplace(key, move(var));
+        document->index.emplace(key, move(var));
       curr_variable.pop();
     }
   }
