@@ -9,6 +9,7 @@ template<typename ...Args>
 std::string arguments(Args&&... values) {
   std::ostringstream out;
   std::string delim = "";
+  // [fold expression(since C++17)](https://en.cppreference.com/w/cpp/language/fold)
   (..., (out << delim << values, delim = ", "));
   return out.str();
 }
