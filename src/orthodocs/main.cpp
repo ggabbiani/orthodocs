@@ -39,10 +39,6 @@ namespace {
  * canonical form
  */
 string cwd2canonical(string &dir) {
-  #ifndef NDEBUG
-  cout << __PRETTY_FUNCTION__ << endl;
-  #endif
-  // cwd pwd(dir);
   dir = fs::canonical(dir).string();
   return string();
 }
@@ -51,9 +47,6 @@ string cwd2canonical(string &dir) {
  * transforms to source root relative.
  */
 string sroot_relative(string &sub) {
-  #ifndef NDEBUG
-  cout << __PRETTY_FUNCTION__ << endl;
-  #endif
   string error;
   if (!option::sroot.empty()) {
     cwd sroot(option::sroot);

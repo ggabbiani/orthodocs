@@ -48,7 +48,6 @@ void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
 }
 
 void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
-  // try {
   // change into directory of the current package
   cwd pwd(_pkg_path.parent_path());
 
@@ -61,10 +60,6 @@ void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
     auto requisite = fs::relative(inc_canonical,option::sroot);
     curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
   }
-  // } catch(const fs::filesystem_error &error) {
-  //   cout << error.code().value() << ',' << error.code().category().name() << endl;
-  //   throw;
-  // }
 }
 
 void Listener::enterUse(SCADParser::UseContext *ctx) {
@@ -85,28 +80,37 @@ void Listener::enterUse(SCADParser::UseContext *ctx) {
 void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
   auto identifier = ctx->ID()->getText();
   auto nested     = is<doc::Module>(*curr_item.top());
-  curr_item.push(make_unique<doc::Function>(identifier,nested));
+  auto item       = new doc::Function(identifier,nested);
+  item->parent    = curr_package;
+  assert(curr_package);
+  // curr_item.push(make_unique<doc::Function>(identifier,nested));
+  curr_item.emplace(item);
 }
 
 void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
-  auto name   = curr_item.top()->name;
-  auto index  = string("function ")+name;
-  if (!priv(name))
-    document->emplace(index,move(curr_item.top()));
+  auto &func = curr_item.top();
+  auto key  = func->documentKey();
+  if (!priv(func->name))
+    document->emplace(key,move(func));
   curr_item.pop();
 }
 
 void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto identifier = ctx->ID()->getText();
   auto nested     = is<doc::Module>(*curr_item.top());
-  curr_item.push(make_unique<doc::Module>(identifier,nested));
+  auto item       = new doc::Module(identifier,nested);
+  item->parent    = curr_package;
+  assert(curr_package);
+  curr_item.emplace(item);
+  // curr_item.push(make_unique<doc::Module>(identifier,nested));
 }
 
 void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
-  auto name   = curr_item.top()->name;
-  auto index  = "module "+name;
-  if (!curr_item.top()->nested && !priv(name))
-    document->emplace(index,move(curr_item.top()));
+  // TODO: implement the whole piece of code as a Document function
+  auto &module  = curr_item.top();
+  auto key      = module->documentKey();
+  if (!module->nested && !priv(module->name))
+    document->emplace(key,move(module));
   curr_item.pop();
 }
 
@@ -163,6 +167,8 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
     auto nested             = is<doc::Module>(*curr_item.top());
     doc::Variable *variable = new doc::Variable(id,defaults,nested);
+    assert(curr_package);
+    variable->parent        = curr_package;
     curr_variable.push(orthodocs::doc::ItemPtr(variable));
   } else if (curr_parameter) {
     curr_parameter->_name      = id;
@@ -173,10 +179,11 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
 void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
     if (curr_variable.size()) {
-      auto id     = curr_variable.top()->name;
-      auto index  = "variable "+id;
-      if (!curr_variable.top()->nested && !priv(id))
-        document->emplace(index, move(curr_variable.top()));
+      // curr_variable.pop();
+      auto &var   = curr_variable.top();
+      auto key    = var->documentKey();
+      if (!var->nested && !priv(var->name))
+        document->emplace(key, move(var));
       curr_variable.pop();
     }
   }
