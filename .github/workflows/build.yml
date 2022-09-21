@@ -44,7 +44,7 @@ jobs:
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Install boost libraries
-        run: apt-get install -y libboost-all-dev
+        run: sudo apt-get install -y libboost-all-dev
       - name: Run build-wrapper
         run: |
           mkdir build
