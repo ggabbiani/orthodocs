@@ -15,3 +15,4 @@
 - [x] implement a regex based license identification;
 - [x] fix bug on repeated cli argument --pkg-deps (and likely also to others)
 - [x] implement license recognition on packages
+- [ ] connect to sonarcloud
