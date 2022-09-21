@@ -20,7 +20,7 @@ const License *License::remove(std::string &s) {
   for(auto lic = std::begin(licenses);lic!=std::end(licenses);++lic) {
     // search pattern regexp in the annotation string 
     smatch match = lic->match(s);
-    if (match.ready()) {
+    if (!match.empty()) {
       // save the license text
       string license=match[0];
       // change the annotation 

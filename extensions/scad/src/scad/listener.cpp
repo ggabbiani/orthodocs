@@ -136,9 +136,8 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   } else if (is<scad::SCADParser::PkgContext>(*ctx->parent->parent))        {   // package's annotation
     auto package = dynamic_cast<scad::doc::Package *>(curr_item.top().get());
     // search and subsitute any - known - license note
-    auto lic = doc::License::remove(value);
-    if (lic) 
-      package->license = &lic->name;
+    if (auto lic = doc::License::remove(value))
+      package->license = lic->name;
     package->annotation = value;
   }
 }

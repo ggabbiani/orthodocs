@@ -10,7 +10,7 @@ namespace doc {
 class License {
 public:
   License(const char *name,const char *regex) : name(name),_regex(regex) {}
-  const std::string name;
+  const char * const name;
   const std::regex &regex() const {return _regex;}
   /**
    * Verify the presence of a known license inside «s».

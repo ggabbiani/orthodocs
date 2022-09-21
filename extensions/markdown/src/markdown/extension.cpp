@@ -222,7 +222,7 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
   if (!pkg.annotation.empty()) {
     out << pkg.annotation << endl;
     if (pkg.license) 
-      out << "*Published under " << "__" << *pkg.license << "__*" << '\n' << endl;
+      out << "*Published under " << "__" << pkg.license << "__*" << '\n' << endl;
   }
 }
 

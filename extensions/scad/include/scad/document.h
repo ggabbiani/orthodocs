@@ -99,7 +99,7 @@ public:
   std::set<std::string> uses;
   std::set<std::string> includes;
   // eventual license 
-  const std::string *license;
+  const char *license = nullptr;
 };
 
 /**
