@@ -13,6 +13,8 @@ include(CTest)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
+# disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)

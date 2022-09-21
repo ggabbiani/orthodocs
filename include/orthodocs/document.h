@@ -169,9 +169,9 @@ inline std::string title(const Item &item) {
 }
 
 // copy Document items into the Table of Contents
-inline void add(Document *document, ToC &toc) {
-  for(auto &item: *document) 
-    toc.emplace(item.second->indexKey(),item.second.get());
+inline void add(const Document *document, ToC &toc) {
+  for(auto &[key, value]: *document) 
+    toc.emplace(value->indexKey(),value.get());
 }
 
 /**

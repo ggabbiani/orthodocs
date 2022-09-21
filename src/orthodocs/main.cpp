@@ -71,7 +71,7 @@ enum {
 struct {
   const char *name;
   const char *desc;
-} opt[] = {
+} const opt[] = {
   {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
   {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"             },
@@ -92,7 +92,7 @@ int main(int argc, const char *argv[]) {
   auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,option::sroot        ,opt[SRC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  auto droot_opt = app.add_option(opt[DOC_ROOT].name,option::droot, opt[DOC_ROOT].desc)
+  app.add_option(opt[DOC_ROOT].name,option::droot, opt[DOC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
   auto sources_opt = app.add_option(opt[SOURCES].name, option::sources, opt[SOURCES].desc)
@@ -117,18 +117,15 @@ int main(int argc, const char *argv[]) {
     auto language = language::Extension::factory();
     // build proper analyst
     Analizer analyst(language);
-    // in memory analysis of the source tree
+    // in-memory source tree analysis
     analyst.process(option::sources);
-
     // get desired writer extension
     auto writer = writer::Extension::factory();
     // save documents
     writer->save(analyst.documents());
-
     // save table of contents
     if (option::toc)
       writer->save(analyst.toc());
-
     // save graphs
     if (option::graphs.size()) 
       writer->graphs(analyst.toc(),option::graphs);

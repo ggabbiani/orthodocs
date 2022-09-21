@@ -43,7 +43,7 @@ namespace language {
 
 class Extension {
 public:
-  Extension(const char *id) : id(id) {}
+  explicit Extension(const char *id) : id(id) {}
   using Map = std::map<std::string,Extension*>;
   const char * const id;
   virtual ~Extension() = default;
@@ -64,7 +64,7 @@ namespace writer {
 
 class Extension {
 public:
-  Extension(const char *id) : id(id) {}
+  explicit Extension(const char *id) : id(id) {}
   using Map = std::map<std::string,Extension*>;
   const char * const id;
   virtual ~Extension() = default;

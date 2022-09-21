@@ -59,10 +59,9 @@ namespace toc {
 
 SubToC filter(const fs::path &path,const ToC &toc, function<bool(const fs::path&,const Item*)> func) {
   SubToC result;
-  for(auto &element: toc) {
-    auto item = element.second;
-    if (func(path,item))
-      result.emplace(element.first,item);
+  for(auto& [key, value]: toc) {
+    if (func(path,value))
+      result.emplace(key,value);
   }
   return result;
 }

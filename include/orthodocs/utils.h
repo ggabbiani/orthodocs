@@ -97,11 +97,12 @@ inline bool compare(std::string str1,std::string str2) {
 }
 
 struct Compare {
-  bool operator() (const std::string& s1, const std::string& s2) const {
-    std::string str1(s1.length(),' ');
-    std::string str2(s2.length(),' ');
-    std::transform(s1.begin(), s1.end(), str1.begin(), ::tolower);
-    std::transform(s2.begin(), s2.end(), str2.begin(), ::tolower);
+  using is_transparent = void; // enables heterogeneous lookup
+  bool operator() (std::string_view lhs, std::string_view rhs) const {
+    std::string str1(lhs.length(),' ');
+    std::string str2(rhs.length(),' ');
+    std::transform(lhs.begin(), lhs.end(), str1.begin(), ::tolower);
+    std::transform(rhs.begin(), rhs.end(), str2.begin(), ::tolower);
     return  str1 < str2;
   }
 };

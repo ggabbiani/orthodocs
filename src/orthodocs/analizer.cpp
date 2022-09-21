@@ -39,10 +39,6 @@ void Analizer::document(const fs::path &source) {
   try {
     auto document = _parser->parse(source);
     _docs.emplace(_docs.end(),document);
-
-    // // document writing
-    // _writer->document(source,document);
-
     // copy document contents to the Table of Contents
     doc::toc::add(document,_toc);
   } catch(...) {
@@ -75,12 +71,12 @@ void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &re
         result.insert(path);
     } else if (fs::is_directory(path)) {
       for (auto &entry: fs::directory_iterator{path}) {
-        auto path = entry.path();
-        if (fs::is_regular_file(path)) {
-          if (!extension || path.extension()==extension)
-            result.insert(path);
-        } else if (fs::is_directory(path)) {
-          lookup(FileSet{path},extension,result);
+        const auto &entry_path = entry.path();
+        if (fs::is_regular_file(entry_path)) {
+          if (!extension || entry_path.extension()==extension)
+            result.insert(entry_path);
+        } else if (fs::is_directory(entry_path)) {
+          lookup(FileSet{entry_path},extension,result);
         }
       }
     } else 

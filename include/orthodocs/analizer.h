@@ -55,12 +55,8 @@ public:
   void process(const FileSet &sources);
   
   /**
-   * 1) reset the currently held document (deleting the eventually already present one)
-   * 2) Produce the synthetic document of the source code passed as argument
-   * 3) invoke the writer to write it on the doc root
-   * 4) move the document items in the ToC
-   * 
-   * At the end of the process the document is empty.
+   * 1) produce an in-memory document of the source code passed
+   * 2) add document contents to the Table of Contents
    */
   void document(
     // source file relative to source root
