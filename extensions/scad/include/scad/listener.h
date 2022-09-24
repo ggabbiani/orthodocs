@@ -22,11 +22,11 @@
 
 #include "scad/document.h"
 
-#include "SCADBaseListener.h"
+#include "SCADParserBaseListener.h"
 
 namespace scad {
 
-class Listener : public scad::SCADBaseListener {
+class Listener : public scad::SCADParserBaseListener {
 public:
   using Parser = scad::SCADParser;
 
