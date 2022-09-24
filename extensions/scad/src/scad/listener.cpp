@@ -56,8 +56,8 @@ void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
   error_code  error;  // we manage fs error: no need for exception here...
   auto        inc_canonical = fs::canonical(inc_path,error);
 
-  if (!static_cast<bool>(error) && is_sub_of(inc_canonical,option::sroot)) {
-    auto requisite = fs::relative(inc_canonical,option::sroot);
+  if (!static_cast<bool>(error) && is_sub_of(inc_canonical,Option::sroot())) {
+    auto requisite = fs::relative(inc_canonical,Option::sroot());
     curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
   }
 }
@@ -71,8 +71,8 @@ void Listener::enterUse(SCADParser::UseContext *ctx) {
   error_code  error;  // we manage fs error: no need for exception here...
   auto        use_canonical = fs::canonical(use_path,error);
 
-  if (!static_cast<bool>(error) && is_sub_of(use_canonical,option::sroot)) {
-    auto requisite = fs::relative(use_canonical,option::sroot);
+  if (!static_cast<bool>(error) && is_sub_of(use_canonical,Option::sroot())) {
+    auto requisite = fs::relative(use_canonical,Option::sroot());
     curr_package->uses.emplace((requisite.parent_path()/requisite.stem()).string());
   }
 }
@@ -121,7 +121,7 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   auto style  = factory(anno);
   auto value  = style->manage(anno);
 
-  if (option::admonitions)
+  if (Option::admonitions)
     mk_admonitions(value);
 
   // FIXME: a sigle if with multiple OR sould be ok

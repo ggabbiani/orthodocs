@@ -31,11 +31,11 @@ namespace language {
 
 Extension *Extension::factory() {
   auto &registry  = Singleton<Map>::instance();
-  auto i          = registry.find(option::language);
+  auto i          = registry.find(Option::language());
   if (i!=registry.end())
     return i->second;
   else
-    throw runtime_error("No language extension found for id '"+option::language+'\'');
+    throw runtime_error("No language extension found for id '"+Option::language()+'\'');
 }
 
 } // namespace language
@@ -44,11 +44,11 @@ namespace writer {
 
 Extension *Extension::factory() {
   auto &registry  = Singleton<Map>::instance();
-  auto i          = registry.find(option::writer);
+  auto i          = registry.find(Option::writer());
   if (i!=registry.end())
     return i->second;
   else
-    throw runtime_error("No language extension found for id '"+option::writer+'\'');
+    throw runtime_error("No language extension found for id '"+Option::writer()+'\'');
 }
 
 void Extension::save(const orthodocs::Analizer::DocumentList &docs) {

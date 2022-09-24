@@ -53,7 +53,7 @@ public:
    */
   virtual const char *sourcePostfix() const = 0;
   /**
-   * return the extension corresponding to the option::writer
+   * return the extension corresponding to the Option::writer()
    */
   static Extension *factory();
 };
@@ -69,7 +69,7 @@ public:
   const char * const id;
   virtual ~Extension() = default;
   /**
-   * return the extension corresponding to the option::writer
+   * return the extension corresponding to the Option::writer()
    */
   static Extension *factory();
   /**

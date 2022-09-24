@@ -42,9 +42,9 @@ string Package::indexKey(const string &s) {
 }
 
 string Package::indexKey() const {
-  auto    len   = option::prefix.length();
+  auto    len   = Option::prefix().length();
   auto    stem  = path.stem().string();
-  string  s     = len==0 || !nocase::compare(stem.substr(0,len),option::prefix) ? stem : stem.substr(len);
+  string  s     = len==0 || !nocase::compare(stem.substr(0,len),Option::prefix()) ? stem : stem.substr(len);
   auto    res   = s+" ("+type()+')';
   return res;
 }

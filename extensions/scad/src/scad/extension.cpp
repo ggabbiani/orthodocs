@@ -56,7 +56,7 @@ namespace scad {
 
 orthodocs::Document *Extension::parse(const fs::path &source) const {
   // change to source root
-  cwd source_root(option::sroot);
+  cwd source_root(Option::sroot());
   ifstream          is(source);
   ANTLRInputStream  in(is);
   SCADLexer         lexer(&in);

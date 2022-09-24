@@ -64,7 +64,7 @@ void Analizer::process(const FileSet &sources) {
 }
 
 void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
-  cwd pwd(option::sroot);
+  cwd pwd(Option::sroot());
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)

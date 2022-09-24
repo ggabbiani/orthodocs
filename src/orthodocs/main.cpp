@@ -49,9 +49,9 @@ string cwd2canonical(string &dir) {
  */
 string sroot_relative(string &sub) {
   string error;
-  if (!option::sroot.empty()) {
-    cwd sroot(option::sroot);
-    sub = fs::relative(sub,option::sroot).string();
+  if (!Option::sroot().empty()) {
+    cwd sroot(Option::sroot());
+    sub = fs::relative(sub,Option::sroot()).string();
   } else 
     error = "«source tree root» is missing";
   return error;
@@ -88,21 +88,21 @@ int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
   auto      result = EXIT_SUCCESS;
 
-  app.add_flag(   opt[ADMONITIONS].name ,option::admonitions  ,opt[ADMONITIONS].desc);
-  auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,option::sroot        ,opt[SRC_ROOT].desc)
+  app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
+  auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  app.add_option(opt[DOC_ROOT].name,option::droot, opt[DOC_ROOT].desc)
+  app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
     ->required()
     ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  auto sources_opt = app.add_option(opt[SOURCES].name, option::sources, opt[SOURCES].desc)
+  auto sources_opt = app.add_option(opt[SOURCES].name, Option::_sources, opt[SOURCES].desc)
     ->required()
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-  app.add_flag(opt[TOC].name,option::toc,opt[TOC].desc);
-  app.add_option(opt[INGNORE].name,option::prefix,opt[INGNORE].desc);
-  app.add_option(opt[DEPS].name,option::pkg_deps,opt[DEPS].desc)
+  app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
+  app.add_option(opt[INGNORE].name,Option::_prefix,opt[INGNORE].desc);
+  app.add_option(opt[DEPS].name,Option::_pkg_deps,opt[DEPS].desc)
     ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
-  auto graph_opt = app.add_option(opt[GRAPHS].name,option::graphs,opt[GRAPHS].desc)
+  auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
 
   sources_opt->needs(sroot_opt);
@@ -110,25 +110,25 @@ int main(int argc, const char *argv[]) {
 
   try {
     app.parse(argc, argv);
-    assert(option::droot.is_absolute());
-    assert(option::sroot.is_absolute());
+    assert(Option::_droot.is_absolute());
+    assert(Option::_sroot.is_absolute());
 
     // get desired language extension for source analysis
     auto language = language::Extension::factory();
     // build proper analyst
     Analizer analyst(language);
     // in-memory source tree analysis
-    analyst.process(option::sources);
+    analyst.process(Option::sources());
     // get desired writer extension
     auto writer = writer::Extension::factory();
     // save documents
     writer->save(analyst.documents());
     // save table of contents
-    if (option::toc)
+    if (Option::_toc)
       writer->save(analyst.toc());
     // save graphs
-    if (option::graphs.size()) 
-      writer->graphs(analyst.toc(),option::graphs);
+    if (Option::_graphs.size()) 
+      writer->graphs(analyst.toc(),Option::_graphs);
       
   } catch (const CLI::Error &error) {
     result  = app.exit(error);

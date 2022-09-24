@@ -22,27 +22,22 @@
 #include "orthodocs/globals.h"
 
 using namespace std;
-
 namespace fs=std::filesystem;
 
-namespace option {
+fs::path Option::_droot;
+fs::path Option::_sroot;
 
-fs::path droot;
-fs::path sroot;
+bool Option::_admonitions    = false;
+bool Option::_toc            = false;
 
-bool admonitions    = false;
-bool toc            = false;
+string Option::_prefix;
 
-string prefix;
+string Option::_pkg_deps("text");
 
-string pkg_deps("text");
+FileSet Option::_graphs;
 
-FileSet graphs;
+FileSet Option::_sources;
 
-FileSet sources;
+string Option::_language("scad");
 
-string language("scad");
-
-string writer("markdown");
-
-}
+string Option::_writer("markdown");

@@ -86,9 +86,9 @@ namespace markdown {
 void Extension::save(const orthodocs::Document &document) {
   auto &source = document.source;
   assert(source.is_relative());
-  assert(option::droot.is_absolute());
+  assert(Option::droot().is_absolute());
 
-  cwd doc_root(option::droot);
+  cwd doc_root(Option::droot());
 
   if (source.has_parent_path()) {
     orthodocs::doc::URI directory  = source.parent_path();
@@ -145,11 +145,11 @@ void Extension::save(const orthodocs::Document &document) {
 }
 
 void Extension::save(const orthodocs::doc::ToC &toc) {
-  assert(option::droot.is_absolute());
+  assert(Option::droot().is_absolute());
 
   try {
     orthodocs::Bar bar(toc,"ToC items");
-    cwd pwd(option::droot);
+    cwd pwd(Option::droot());
     ofstream out("toc.md");
     out << H("Table of Contents",1) << endl;
     orthodocs::doc::SubToC sub;
@@ -196,7 +196,7 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
       << endl;
 
   if (pkg.includes.size() || pkg.uses.size()) 
-    if (boost::iequals(option::pkg_deps,"graph")) {
+    if (boost::iequals(Option::pkg_deps(),"graph")) {
       out << H("Dependencies",2) << '\n'
           << "```mermaid\n"
           << "graph LR" << endl;
@@ -354,7 +354,7 @@ void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
   try {
     orthodocs::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
-    cwd pwd(option::droot);
+    cwd pwd(Option::droot());
     // from here we move on each directory passed in the FileSet
     for(auto &dir: dirs) {
       bar.status(dir.string());
