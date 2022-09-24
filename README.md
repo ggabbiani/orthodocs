@@ -1,5 +1,7 @@
 # OrthoDocs
 
+[![SonarCloud](https://github.com/ggabbiani/orthodocs/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/ggabbiani/orthodocs/actions/workflows/sonarcloud.yml)
+
 OrthoDocs is a API documentation generator and a static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
 
 ## Design
