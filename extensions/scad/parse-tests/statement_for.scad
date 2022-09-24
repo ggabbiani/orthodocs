@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
+ * along with ADOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 for (a =[3:5])echo(a);     // 3 4 5

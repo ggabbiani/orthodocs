@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ADOX.  If not, see <http: //www.gnu.org/licenses/>.
+ * along with ADOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 steps = 50;
