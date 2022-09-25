@@ -1,6 +1,6 @@
 # OrthoDocs
 
-![Package output example](docs/package2.png "Package output example")
+![Package output example](docs/package3.png "Package output example")
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ggabbiani_orthodocs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ggabbiani_orthodocs)
 
