@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Empty file description
+ * console wrapper facilities
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -28,13 +28,17 @@ namespace orthodocs {
 template <class T>
 class Bar {
 public:
-  Bar(const T &container,const char *type,size_t width=50) {
+  Bar(const T &container,const char *type,size_t width=50) : _end{"✔ "+std::to_string(std::size(container))+" "+type} {
     indicators::show_console_cursor(false);
     _bar.set_option(indicators::option::BarWidth{width});
     _bar.set_option(indicators::option::MaxProgress{container.size()});
     _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
-    _end = "✔ "+std::to_string(container.size())+" "+type;
+    
   }
+  Bar(const Bar&) = delete;
+  Bar(const Bar&&) = delete;
+  Bar & operator = (const Bar &) = delete;
+  Bar & operator = (Bar &&) = delete;
   // set text as postfix
   void status(const std::string &text) {
     _bar.set_option(indicators::option::PostfixText{text});
@@ -44,8 +48,12 @@ public:
     _bar.tick();
   }
   ~Bar() {
-    status(_end);
-    _bar.mark_as_completed();
+    try {
+      status(_end);
+      _bar.mark_as_completed();
+    } catch(...) {
+      indicators::show_console_cursor(true);
+    }
     indicators::show_console_cursor(true);
   }
 private:
