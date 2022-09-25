@@ -20,63 +20,79 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "singleton.h"
 #include "utils.h"
 
 #include <filesystem>
 #include <string>
 
+/**
+ * Convenient namespace for command line passed program options. 
+ * 
+ * Actually defines the capability for main() function only to modify these 
+ * values during argument parsing while providing read-only access to the rest 
+ * of the world.
+ */
 class Option {
   friend int main(int argc,const char *argv[]);
 public:
-  /**
-   * document root in canonical form
-   */
-  static const std::filesystem::path &droot() {return _droot;}
-  /**
-   * source root in canonical form
-   */
-  static const std::filesystem::path &sroot() {return _sroot;}
   /**
    * when true, adminitions emoji are enabled for the annotation.
    */
   static bool admonitions() {return _admonitions;}
   /**
-   * when true, toc generation in document root is enabled
+   * document root in canonical form
    */
-  static bool toc() {return _toc;}
-  static const std::string &prefix() {return _prefix;}
-  /**
-   * how package dependecies are documented (default "text")
-   */
-  static const std::string &pkg_deps() {return _pkg_deps;}
+  static const std::filesystem::path &droot() {return _droot;}
   /**
    * set of directory for partial dependencies graphs
    */
   static const FileSet &graphs() {return _graphs;}
-  /**
-   * directories or files in any combination: paths can be passed either as relative to «Source root» or absolute.
-   */
-  static const FileSet &sources() {return _sources;}
   /**
    * defines the language processor to be used. 
    * For now only "scad" is supported.
    */
   static const std::string &language() {return _language;}
   /**
+   * how package dependecies are documented (default "text")
+   */
+  static const std::string &pkg_deps() {return _pkg_deps;}
+  /**
+   * ignore this package prefix in the Table of Contents sort
+   */
+  static const std::string &ignore_prefix() {return _ignore_prefix;}
+  /**
+   * prefix used for private (i.e. not to be documented) IDs (variable, 
+   * function, module or whatever ...)
+   */
+  static const std::string &private_prefix() {return _private_prefix;}
+  /**
+   * directories or files in any combination: paths can be passed either as 
+   * relative to «Source root» or absolute.
+   */
+  static const FileSet &sources() {return _sources;}
+  /**
+   * source root in canonical form
+   */
+  static const std::filesystem::path &sroot() {return _sroot;}
+  /**
+   * when true, toc generation in document root is enabled
+   */
+  static bool toc() {return _toc;}
+  /**
    * defines the language processor to be used. 
    * For now only "markdown" is supported.
    */
   static const std::string &writer() {return _writer;}
 private:
-  static std::filesystem::path _droot;
-  static std::filesystem::path _sroot;
   static bool                  _admonitions;
-  static bool                  _toc;
-  static std::string           _prefix;
+  static std::filesystem::path _droot;
   static std::string           _pkg_deps;
   static FileSet               _graphs;
-  static FileSet               _sources;
   static std::string           _language;
+  static std::string           _ignore_prefix;
+  static std::string           _private_prefix;
+  static FileSet               _sources;
+  static std::filesystem::path _sroot;
+  static bool                  _toc;
   static std::string           _writer;
 };

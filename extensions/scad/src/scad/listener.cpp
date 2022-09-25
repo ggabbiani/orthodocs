@@ -90,7 +90,7 @@ void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
 void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
   auto key  = func->documentKey();
-  if (!priv(func->name))
+  if (!func->privateId())
     document->index.emplace(key,move(func));
   curr_item.pop();
 }
@@ -109,7 +109,7 @@ void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   // TODO: implement the whole piece of code as a Document function
   auto &module  = curr_item.top();
   auto key      = module->documentKey();
-  if (!module->nested && !priv(module->name))
+  if (!module->nested && !module->privateId())
     document->index.emplace(key,move(module));
   curr_item.pop();
 }
@@ -180,7 +180,7 @@ void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
     if (curr_variable.size()) {
       auto &var   = curr_variable.top();
       auto key    = var->documentKey();
-      if (!var->nested && !priv(var->name))
+      if (!var->nested && !var->privateId())
         document->index.emplace(key, move(var));
       curr_variable.pop();
     }

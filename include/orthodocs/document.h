@@ -63,6 +63,11 @@ public:
   virtual std::string type() const = 0;
 
   /**
+   * return true if the item identifier is private, false otherwise.
+   * NOTE: it uses the global option private_prefix.
+   */
+  virtual bool privateId() const;
+  /**
    * builds key value usable by Document
    * 
    * «item type» «item name»

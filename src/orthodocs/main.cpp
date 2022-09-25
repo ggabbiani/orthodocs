@@ -59,13 +59,14 @@ string sroot_relative(string &sub) {
 
 enum {
   ADMONITIONS,
-  SRC_ROOT,
-  DOC_ROOT,
-  SOURCES,
-  TOC,
-  INGNORE,
   DEPS,
-  GRAPHS
+  DOC_ROOT,
+  GRAPHS,
+  IGNORE,
+  PRIVATE,
+  SOURCES,
+  SRC_ROOT,
+  TOC,
 };
 
 struct {
@@ -73,13 +74,14 @@ struct {
   const char *desc;
 } const opt[] = {
   {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
-  {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"             },
-  {"sources",             "source sub-trees and/or files - either as absolute or «source tree root» relative path"      },
-  {"-t,--toc",            "generate a Table of Content in the document tree root"                                       },
-  {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
   {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
+  {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",         "list of root relative directories where placing graphs"                                      },
+  {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
+  {"-p,--private",        "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
+  {"sources",             "source sub-trees and/or files - either as absolute or «source tree root» relative path"      },
+  {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
+  {"-t,--toc",            "generate a Table of Content in the document tree root"                                       },
 };
 
 }
@@ -99,11 +101,12 @@ int main(int argc, const char *argv[]) {
     ->required()
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
   app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
-  app.add_option(opt[INGNORE].name,Option::_prefix,opt[INGNORE].desc);
+  app.add_option(opt[IGNORE].name,Option::_ignore_prefix,opt[IGNORE].desc);
   app.add_option(opt[DEPS].name,Option::_pkg_deps,opt[DEPS].desc)
     ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
   auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
     ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
+  app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
 
   sources_opt->needs(sroot_opt);
   graph_opt->needs(sroot_opt);

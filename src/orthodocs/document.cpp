@@ -33,9 +33,13 @@ string Item::documentKey() const {
   return type()+' '+name;
 }
 
+bool Item::privateId() const {
+  return !Option::private_prefix().empty() && name.substr(0,Option::private_prefix().length())==Option::private_prefix();
+}
+
 string Item::indexKey() const {
-  auto len  = Option::prefix().length();
-  string s  = len==0 || !nocase::compare(name.substr(0,len),Option::prefix()) ? name : name.substr(len);
+  auto len  = Option::ignore_prefix().length();
+  string s  = len==0 || !nocase::compare(name.substr(0,len),Option::ignore_prefix()) ? name : name.substr(len);
   auto res  = s+" ("+type()+')';
   return res;
 }
