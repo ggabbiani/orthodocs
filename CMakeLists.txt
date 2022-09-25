@@ -69,8 +69,12 @@ add_executable(orthodocs
   src/orthodocs/utils.cpp
   src/orthodocs/xref.cpp
 )
-# target_link_options(odox PUBLIC "-Wl,--undefined,_ZN8markdown9Extension6loaderE" "-Wl,--undefined,_ZN4scad9Extension6loaderE")
-target_link_options(orthodocs PUBLIC "-Wl,--undefined,markdown_extension_loader" "-Wl,--undefined,scad_extension_loader")
+if (WRITER_MARKDOWN)
+  target_link_options(orthodocs PUBLIC "-Wl,--undefined,markdown_extension_loader")
+endif()
+if (LANGUAGE_SCAD)
+  target_link_options(orthodocs PUBLIC "-Wl,--undefined,scad_extension_loader")
+endif()
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
 
