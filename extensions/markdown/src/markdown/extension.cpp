@@ -148,7 +148,7 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
   assert(Option::droot().is_absolute());
 
   try {
-    orthodocs::Bar bar(toc,"ToC items");
+    orthodocs::Bar bar(toc,"items in ToC");
     cwd pwd(Option::droot());
     ofstream out("toc.md");
     out << H("Table of Contents",1) << endl;
