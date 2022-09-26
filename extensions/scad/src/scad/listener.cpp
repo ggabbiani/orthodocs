@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "error_info.h"
 #include "scad/annotations.h"
 #include "scad/listener.h"
 #include "orthodocs/globals.h"
@@ -48,17 +49,21 @@ void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
 }
 
 void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
-  // change into directory of the current package
-  cwd pwd(_pkg_path.parent_path());
+  try {
+    // change into directory of the current package
+    cwd pwd(_pkg_path.parent_path());
 
-  string      inc_file = ctx->FILE()->getText();
-  fs::path    inc_path = inc_file.substr(1,inc_file.length()-2); // eliminates angular brackets
-  error_code  error;  // we manage fs error: no need for exception here...
-  auto        inc_canonical = fs::canonical(inc_path,error);
+    string      inc_file = ctx->FILE()->getText();
+    fs::path    inc_path = inc_file.substr(1,inc_file.length()-2); // eliminates angular brackets
+    error_code  error;  // we manage fs error: no need for exception here...
+    auto        inc_canonical = fs::canonical(inc_path,error);
 
-  if (!static_cast<bool>(error) && is_sub_of(inc_canonical,Option::sroot())) {
-    auto requisite = fs::relative(inc_canonical,Option::sroot());
-    curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
+    if (!static_cast<bool>(error) && is_sub_of(inc_canonical,Option::sroot())) {
+      auto requisite = fs::relative(inc_canonical,Option::sroot());
+      curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
+    }
+  } catch(...) {
+    throw_with_nested(runtime_error(ERR_CALL(ctx)));
   }
 }
 
