@@ -34,12 +34,12 @@ public:
   void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) override;
 private:
   void graph(const scad::doc::Package &pkg, std::ostream &out);
-  void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char &current) const;
+  void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char current) const;
   void package(std::ostream &out,const scad::doc::Package &pkg);
-  void parameter(std::ostream &out,const orthodocs::doc::Parameter &param);
+  void parameter(std::ostream &out,const orthodocs::doc::Parameter &param) const;
   void function(std::ostream &out,const scad::doc::Function &func);
   void module(std::ostream &out,const scad::doc::Module &mod);
-  void variable(std::ostream &out,const scad::doc::Variable &var);
+  void variable(std::ostream &out,const scad::doc::Variable &var) const;
 
   std::string BOLD(const std::string &text) const;
   std::string BR() const;
@@ -48,8 +48,6 @@ private:
   std::string H(char c,int level=1) const;
   std::string HRULE() const;
   std::string ITALIC(const std::string &text) const;
-
-  // static ExtensionLoader<Extension> loader;
 };
 
 } // namespace markdown

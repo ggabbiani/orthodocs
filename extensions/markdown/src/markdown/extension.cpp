@@ -179,7 +179,7 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
 
 }
 
-void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char &current) const {
+void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char current) const {
   out << H(current,2) << endl;
   for(auto &[key, item]: sub) {
     auto id     = item->type()+'-'+item->name;
@@ -194,7 +194,7 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
   out << H("package "+pkg.name)
       << endl;
 
-  if (pkg.includes.size() || pkg.uses.size()) 
+  if (pkg.includes.size() || pkg.uses.size()) {
     if (boost::iequals(Option::pkg_deps(),"graph")) {
       out << H("Dependencies",2) << '\n'
           << "```mermaid\n"
@@ -205,18 +205,19 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
       if (!pkg.includes.empty()) {
         out << BOLD("Includes:") << '\n'
             << endl;
-        for(auto p: pkg.includes)
+        for(const auto &p: pkg.includes)
           out << "    " << p << '\n';
         out << endl;
       }
       if (!pkg.uses.empty()) {
         out << BOLD("Uses:") << '\n'
             << '\n';
-        for(auto p: pkg.uses) 
+        for(const auto &p: pkg.uses) 
           out << "    " << p << '\n';
         out << endl;
       }
     }
+  }
   // write annotation contents
   if (!pkg.annotation.empty()) {
     out << pkg.annotation << endl;
@@ -225,13 +226,13 @@ void Extension::package(ostream &out, const scad::doc::Package &pkg) {
   }
 }
 
-void Extension::parameter(ostream &out, const orthodocs::doc::Parameter &p) {
+void Extension::parameter(ostream &out, const orthodocs::doc::Parameter &p) const {
   out << BOLD(p.name()) << BR()
       << p.annotation() << endl
       << endl;
 }
 
-void Extension::variable(ostream &out, const scad::doc::Variable &var) {
+void Extension::variable(ostream &out, const scad::doc::Variable &var) const {
   out << HRULE()
       << H("variable "+var.name,3)
       << endl;
@@ -294,18 +295,20 @@ void Extension::module(ostream &out, const scad::doc::Module &mod) {
 
   if (mod.parameters.size()) {
     // how many annotated parameters do we have in place?
-    auto annotations  = 0;
-    for(auto i=mod.parameters.begin();i!=mod.parameters.end();++i) {
-      annotations +=(!(*i)->annotation().empty());
-    }
+    auto annotations = count_if(mod.parameters.begin(),mod.parameters.end(),
+      [] (const orthodocs::doc::ParameterPtr &p) {
+        return !p->annotation().empty();
+      }
+    );
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
-      for(auto i=mod.parameters.begin();i!=mod.parameters.end();i++) {
-        auto p = **i;
-        if (!p.annotation().empty())
-          parameter(out,**i);
-      }
+      for_each(mod.parameters.begin(),mod.parameters.end(),
+        [this,&out] (const orthodocs::doc::ParameterPtr &p) {
+          if (!p->annotation().empty())
+            parameter(out,*p);
+        }
+      );
       out << endl;
     }
   }
