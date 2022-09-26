@@ -24,20 +24,22 @@
 
 #include "SCADParserBaseListener.h"
 
+#include <memory>
+
 namespace scad {
 
 class Listener : public scad::SCADParserBaseListener {
 public:
   using Parser = scad::SCADParser;
 
-  orthodocs::Document           *document;
+  std::unique_ptr<orthodocs::Document> document;
   
   doc::Package      *curr_package;  // only one package during the parsing of a source
   orthodocs::doc::ItemPtrStack  curr_item;
   orthodocs::doc::ItemPtrStack  curr_variable;
   orthodocs::doc::ParameterPtr  curr_parameter;
 
-  Listener(const std::filesystem::path &pkg_source);
+  explicit Listener(const std::filesystem::path &pkg_source);
 
   void enterAnnotation(Parser::AnnotationContext *ctx)      override;
   void enterAssignment(Parser::AssignmentContext *ctx)      override;
@@ -55,7 +57,7 @@ public:
   void exitParameter(Parser::ParameterContext *ctx)         override;
   void exitPkg(Parser::PkgContext *ctx)                     override;
 
-protected:
+private:
   std::filesystem::path _pkg_path;
 };
 

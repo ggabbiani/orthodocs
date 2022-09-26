@@ -54,7 +54,7 @@ ErrorHandler handler;
 
 namespace scad {
 
-orthodocs::Document *Extension::parse(const fs::path &source) const {
+unique_ptr<orthodocs::Document> Extension::parse(const fs::path &source) const {
   // change to source root
   cwd source_root(Option::sroot());
   ifstream          is(source);
@@ -74,7 +74,7 @@ orthodocs::Document *Extension::parse(const fs::path &source) const {
   tree::ParseTree       *tree = parser.pkg();
   // creation of the document
   walker.walk(&listener,tree);
-  return listener.document;
+  return std::move(listener.document);
 }
 
 const char *Extension::sourcePostfix() const {

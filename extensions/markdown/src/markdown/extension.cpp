@@ -45,11 +45,11 @@ void headingId(string &s) {
  * save to «out» the «src_package» dependencies in mermaid format.
  * NOTE: must be preceeded and followed by proper mermaid open/close statements
  */
-static void saveme(const scad::doc::Package *src_package, 
+void saveme(const scad::doc::Package *src_package, 
   graph::Node::Map &nodemap, 
   IncLabel &label, 
   ostream &out,
-  std::function<bool(const graph::Connection &)> filter= [](const graph::Connection &conn) -> bool {return true;}
+  std::function<bool(const graph::Connection &)> filter= [](const graph::Connection &) {return true;}
 ) {
   auto src_it = nodemap.find(src_package->name);
   graph::Node src_node = src_it!=nodemap.end() ? src_it->second : graph::Node(src_package->path,label);
@@ -154,10 +154,10 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
     out << H("Table of Contents",1) << endl;
     orthodocs::doc::SubToC sub;
     char current = 0;
-    for(auto &item: toc) {
-      bar.status(item.first);
+    for(auto &[key, item]: toc) {
+      bar.status(key);
       // see https://www.markdownguide.org/extended-syntax/#heading-ids
-      char  initial = std::toupper(item.second->indexKey()[0]);
+      char  initial = std::toupper(item->indexKey()[0]);
       if (current!=initial) {  // new sub toc
         if (sub.size()) { // write previous sub toc
           subToc(sub,out,current);
@@ -166,7 +166,7 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
         }
         current = initial;
       }
-      sub.emplace(item.first,item.second);
+      sub.emplace(key,item);
       bar++;
     }
     // write last sub toc

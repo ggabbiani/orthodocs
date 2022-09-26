@@ -32,7 +32,7 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const std::filesystem::path &pkg_source) : _pkg_path(pkg_source),document(new orthodocs::Document(pkg_source)) {
+Listener::Listener(const fs::path &pkg_source) : document(new orthodocs::Document(pkg_source)),_pkg_path(pkg_source) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {

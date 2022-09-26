@@ -38,9 +38,10 @@ void Analizer::document(const fs::path &source) {
   assert(source.has_filename());
   try {
     auto document = _parser->parse(source);
-    _docs.emplace(_docs.end(),document);
     // copy document contents to the Table of Contents
-    doc::toc::add(document,_toc);
+    doc::toc::add(document.get(),_toc);
+    // move document in the documents list
+    _docs.emplace(_docs.end(),std::move(document));
   } catch(...) {
     throw_with_nested(runtime_error(ERR_CALL(source)));
   }

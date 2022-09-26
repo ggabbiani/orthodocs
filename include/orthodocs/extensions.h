@@ -47,7 +47,7 @@ public:
   using Map = std::map<std::string,Extension*>;
   const char * const id;
   virtual ~Extension() = default;
-  virtual orthodocs::Document *parse(const std::filesystem::path &source) const = 0;
+  virtual std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const = 0;
   /**
    * return the source postfix
    */

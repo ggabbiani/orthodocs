@@ -72,7 +72,7 @@ public:
    * Construct a new Package object
    * 
    */
-  Package(const std::filesystem::path &path) : orthodocs::doc::Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
+  explicit Package(const std::filesystem::path &path) : orthodocs::doc::Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
   /**
    * always return "package"
    */
