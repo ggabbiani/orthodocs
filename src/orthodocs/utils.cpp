@@ -51,9 +51,9 @@ bool is_sub_of(const fs::path &sub, const fs::path &base) {
   return true;
 }
 
-cwd::cwd(const fs::path &path) : _old(fs::current_path()) {
+cwd::cwd(const fs::path &path) {
   try {
-    fs::current_path(path);
+    fs::current_path(path.empty() ? fs::current_path() : path);
   } catch(...) {
     throw_with_nested(runtime_error(ERR_CALL(path)));
   }

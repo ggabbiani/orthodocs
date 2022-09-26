@@ -43,12 +43,12 @@ extern void print_exception(const std::exception& e, int level =  0);
 
 class cwd {
 public:
-  cwd(const std::filesystem::path &path);
+  explicit cwd(const std::filesystem::path &path);
   ~cwd() {
     std::filesystem::current_path(_old);
   }
 private:
-  std::filesystem::path _old;
+  std::filesystem::path _old = std::filesystem::current_path();
 };
 
 template <class A,class B>
