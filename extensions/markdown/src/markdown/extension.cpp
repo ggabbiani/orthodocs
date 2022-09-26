@@ -179,13 +179,13 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
 
 }
 
-void Extension::subToc(orthodocs::doc::SubToC &sub,ostream &out,char &current) const {
+void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char &current) const {
   out << H(current,2) << endl;
-  for(auto &i: sub) {
-    auto id     = i.second->type()+'-'+i.second->name;
+  for(auto &[key, item]: sub) {
+    auto id     = item->type()+'-'+item->name;
     headingId(id);
-    auto link   = i.second->uri.string();
-    auto title  = orthodocs::doc::toc::title(*i.second);
+    auto link   = item->uri.string();
+    auto title  = orthodocs::doc::toc::title(*item);
     out << "- [" << title << "](" << link << "#" << id << ")" << endl;
   }
 }

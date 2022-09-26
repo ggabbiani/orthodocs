@@ -34,7 +34,7 @@ public:
   void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) override;
 private:
   void graph(const scad::doc::Package &pkg, std::ostream &out);
-  void subToc(orthodocs::doc::SubToC &sub, std::ostream &out, char &current) const;
+  void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char &current) const;
   void package(std::ostream &out,const scad::doc::Package &pkg);
   void parameter(std::ostream &out,const orthodocs::doc::Parameter &param);
   void function(std::ostream &out,const scad::doc::Function &func);
