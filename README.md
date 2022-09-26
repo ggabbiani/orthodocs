@@ -1,10 +1,10 @@
 # OrthoDocs
 
-![Package output example](docs/package.png "Package output example")
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ggabbiani_orthodocs&metric=alert_status)](https://sonarcloud.io/project/overview?id=ggabbiani_orthodocs)
 
-OrthoDocs is a API documentation generator and a static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
+![Package output example](docs/package.png "Package output example")
+
+OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
 
 ## Design
 
