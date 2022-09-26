@@ -157,8 +157,7 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
     for(auto &[key, item]: toc) {
       bar.status(key);
       // see https://www.markdownguide.org/extended-syntax/#heading-ids
-      char  initial = std::toupper(item->indexKey()[0]);
-      if (current!=initial) {  // new sub toc
+      if (auto initial=(char)std::toupper(item->indexKey()[0]); current!=initial) {  // new sub toc
         if (sub.size()) { // write previous sub toc
           subToc(sub,out,current);
           out << endl;
