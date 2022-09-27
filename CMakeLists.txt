@@ -81,3 +81,7 @@ target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
 if (EXPERIMENTAL)
   add_subdirectory(experimental)
 endif()
+
+if (BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
