@@ -58,7 +58,7 @@ public:
   void exitPkg(Parser::PkgContext *ctx)                     override;
 
 private:
-  std::filesystem::path _pkg_path;
+  const std::filesystem::path &_pkg_path;
 };
 
 }
