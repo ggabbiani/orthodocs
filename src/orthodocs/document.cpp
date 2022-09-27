@@ -44,7 +44,7 @@ string Item::indexKey() const {
   return res;
 }
 
-Signature Item::signature() const {
+Signature Item::_signature() const {
   ostringstream ss;
   ss << name << "(";
   for(auto i=parameters.begin();i!=parameters.end();i++) {

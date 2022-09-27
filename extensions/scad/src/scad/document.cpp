@@ -51,7 +51,7 @@ string Package::indexKey() const {
 
 namespace style {
 
-static char        buffer[256];
+static char buffer[256];
 
 // calculate the number of lines
 static size_t lines(const string &text) {
@@ -76,7 +76,10 @@ string Single::manage(const string &text) {
   return text.length()==3 ? string() : text.substr(text.find_first_not_of(' ',3));
 }
 
-const char *Simple::decoration[2] = {"/*!","*/"};
+array<const char *,2> Simple::decoration{
+  "/*!",
+   "*/"
+};
 
 bool Simple::check(const string &text) {
   auto len = lines(text);
@@ -91,9 +94,9 @@ bool Simple::check(const string &text) {
     const char *m = i==1 ? decoration[start] : i==len ? decoration[end] : nullptr;
     if (m) {
       auto p = strstr(buffer, m);
-      goon = (i==1 ? p==buffer : p==buffer+strlen(buffer)-strlen(m));
+      goon = (i==1 ? p==buffer : p==buffer+strnlen(buffer,sizeof buffer)-strlen(m));
     } else {
-      this->column  = this->column==-1 ? strspn(buffer," ") : min((int)strspn(buffer," "),this->column);
+      this->column  = this->column==-1 ? (int)strspn(buffer," ") : min((int)strspn(buffer," "),this->column);
     }
     ++i;
   }
@@ -121,7 +124,11 @@ const char *Simple::id() {
   return Simple::ID;
 }
 
-const char *Fine::decoration[3] = {"/*!"," */"," *"};
+array<const char *,3> Fine::decoration{
+  "/*!",
+  " */",
+  " *"
+};
 
   /**
    * @brief 
@@ -147,7 +154,7 @@ bool Fine::check(const string &text) {
     } else if (row==2) {       // we take the column number of the '*'
       goon  = pos!=nullptr;
       if (goon)
-        this->column  = pos-buffer+1;
+        this->column  = (int)(pos-buffer+1);
     } else if (row<len) // check if '*' column is equal to the one we got in row 2
       goon  = (pos-buffer+1==this->column);
     ++row;

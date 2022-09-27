@@ -44,7 +44,7 @@ namespace language {
 class Extension {
 public:
   explicit Extension(const char *id) : id(id) {}
-  using Map = std::map<std::string,Extension*>;
+  using Map = std::map<std::string,Extension*,std::less<>>;
   const char * const id;
   virtual ~Extension() = default;
   virtual std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const = 0;
@@ -65,7 +65,7 @@ namespace writer {
 class Extension {
 public:
   explicit Extension(const char *id) : id(id) {}
-  using Map = std::map<std::string,Extension*>;
+  using Map = std::map<std::string,Extension*,std::less<>>;
   const char * const id;
   virtual ~Extension() = default;
   /**

@@ -63,7 +63,7 @@ public:
   virtual std::string type() const = 0;
 
   /**
-   * return true if the item identifier is private, false otherwise.
+   * return wether the item identifier is private or not.
    * NOTE: it uses the global option private_prefix.
    */
   virtual bool privateId() const;
@@ -95,7 +95,7 @@ public:
 
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
-  Signature signature() const; 
+  Signature _signature() const; 
 };
 
 using ItemPtr       = std::unique_ptr<Item>;
@@ -136,7 +136,7 @@ public:
    * 
    * NOTE: see doc::Key()
    */
-  using Index = std::map<std::string,doc::ItemPtr>;
+  using Index = std::map< std::string,doc::ItemPtr,std::less<> >;
   /**
    * return the number of item of type «type»
    */
@@ -144,8 +144,7 @@ public:
   size_t size() const {
     size_t size  = 0;
     for(auto i=index.begin(); i!=index.end(); ++i) {
-      auto item = i->second.get();
-      size += (typeid(*item)==typeid(T));
+      size += (typeid(*i->second)==typeid(T));
     }
     return size;
   }

@@ -48,14 +48,14 @@ public:
 class Function : public orthodocs::doc::Item {
 public:
   Function(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
-  orthodocs::doc::Signature signature() const {return orthodocs::doc::Item::signature();}
+  orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "function";}
 };
 
 class Module : public orthodocs::doc::Item {
 public:
   Module(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
-  orthodocs::doc::Signature signature() const {return orthodocs::doc::Item::signature();}
+  orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "module";}
 };
 
@@ -108,6 +108,7 @@ public:
  * outside source specific coding.
  */
 struct AbstractStyle {
+  virtual ~AbstractStyle() = default;
   virtual bool check(const std::string &text) = 0;
   virtual std::string manage(const std::string &text) = 0;
   virtual const char *id() = 0;
@@ -139,7 +140,7 @@ class Simple : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static const char *decoration[2];
+  static std::array<const char *,2> decoration;
 };
 
 class Fine : public AbstractStyle {
@@ -152,7 +153,7 @@ class Fine : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static const char *decoration[3];
+  static std::array<const char *,3> decoration;
 };
 
 } // namespace style
