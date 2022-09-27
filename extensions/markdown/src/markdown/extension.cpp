@@ -283,11 +283,6 @@ void Extension::write(const scad::doc::Function &func, ostream &out) const {
             write(param.get(),out);
         }
       );
-      // for(auto i=func.parameters.begin();i!=func.parameters.end();i++) {
-      //   auto p = **i;
-      //   if (!p.annotation().empty())
-      //     write(i->get(),out);
-      // }
       out << endl;
     }
   }
