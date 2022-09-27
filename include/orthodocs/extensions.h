@@ -64,10 +64,11 @@ namespace writer {
 
 class Extension {
 public:
-  explicit Extension(const char *id) : id(id) {}
   using Map = std::map<std::string,Extension*,std::less<>>;
-  const char * const id;
+
+  explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
+  
   /**
    * return the extension corresponding to the Option::writer()
    */
@@ -75,7 +76,7 @@ public:
   /**
    * write a set of documents
    */
-  void save(const orthodocs::Analizer::DocumentList &docs);
+  void save(const orthodocs::DocumentList &docs);
   /**
    * write a document in the concrete instance native format
    */
@@ -88,6 +89,8 @@ public:
    * write sub-root graphs
    */
   virtual void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) = 0;
+
+  const char * const id;
 };
 
 } // namespace writer

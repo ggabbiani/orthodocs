@@ -47,8 +47,6 @@ namespace orthodocs {
  */
 class Analizer {
 public:
-  using DocumentList = std::vector<std::unique_ptr<Document>>;
-
   explicit Analizer(language::Extension *language): _parser(language) {}
 
   // analize a set of files / directories

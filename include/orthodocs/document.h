@@ -154,6 +154,7 @@ public:
   Index index;
   std::filesystem::path source;
 };
+using DocumentList = std::vector<std::unique_ptr<Document>>;
 
 namespace doc {
 

@@ -51,7 +51,7 @@ Extension *Extension::factory() {
     throw runtime_error("No language extension found for id '"+Option::writer()+'\'');
 }
 
-void Extension::save(const orthodocs::Analizer::DocumentList &docs) {
+void Extension::save(const orthodocs::DocumentList &docs) {
   try {
     orthodocs::Bar bar(docs,"saved documents");
     for(const auto &doc: docs) {
