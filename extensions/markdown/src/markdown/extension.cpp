@@ -41,37 +41,50 @@ void headingId(string &s) {
   s.erase(remove(s.begin(), s.end(), '/'), s.end());  // remove all '/'
 }
 
+using Filter = function<bool(const graph::Connection&)>;
+
 /**
  * save to «out» the «src_package» dependencies in mermaid format.
  * NOTE: must be preceeded and followed by proper mermaid open/close statements
  */
-void saveme(const scad::doc::Package *src_package, 
-  graph::Node::Map &nodemap, 
-  IncLabel &label, 
-  ostream &out,
-  std::function<bool(const graph::Connection &)> filter= [](const graph::Connection &) {return true;}
+void saveme(
+  const scad::doc::Package  *src_package, 
+  graph::Node::Map          &nodemap, 
+  IncLabel                  &label, 
+  ostream                   &out,
+  const Filter              &filter= [] (const graph::Connection &) {return true;}
 ) {
-  auto src_it = nodemap.find(src_package->name);
-  graph::Node src_node = src_it!=nodemap.end() ? src_it->second : graph::Node(src_package->path,label);
-  auto written = 0;
-  for(auto &dst_name: src_package->includes) {
-    auto dst_it = nodemap.find(dst_name);
-    graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
-    graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node);
-    if (filter(connection)) {
-      connection.write(out,nodemap);
-      ++written;
+  auto src_it   = nodemap.find(src_package->name);
+  auto src_node = src_it!=nodemap.end() ? src_it->second : graph::Node(src_package->path,label);
+
+  auto written = count_if(
+    src_package->includes.begin(),
+    src_package->includes.end(),
+    [&out,&filter,&src_node,&label,&nodemap] (const decltype(src_package->includes)::value_type &dst_name) {
+      auto dst_it   = nodemap.find(dst_name);
+      auto dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+      if (graph::Connection connection(src_node,graph::Connection::Type::inc,dst_node); filter(connection)) {
+        connection.write(out,nodemap);
+        return true;
+      }
+      return false;
     }
-  }
-  for(auto &dst_name: src_package->uses) {
-    auto dst_it = nodemap.find(dst_name);
-    graph::Node dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
-    graph::Connection connection(src_node,graph::Connection::Type::use,dst_node);
-    if (filter(connection)) {
-      connection.write(out,nodemap);
-      ++written;
+  );
+
+  written += count_if(
+    src_package->uses.begin(),
+    src_package->uses.end(),
+    [&out,&filter,&src_node,&label,&nodemap] (const decltype(src_package->uses)::value_type &dst_name) {
+      auto dst_it   = nodemap.find(dst_name);
+      auto dst_node = dst_it!=nodemap.end() ? dst_it->second : graph::Node(dst_name,label);
+      if (graph::Connection connection(src_node,graph::Connection::Type::use,dst_node); filter(connection)) {
+        connection.write(out,nodemap);
+        return true;
+      }
+      return false;
     }
-  }
+  );
+
   if (!written) { // write an isolated node
     out << "    ";
     src_node.write(out,nodemap);
@@ -99,24 +112,26 @@ void Extension::save(const orthodocs::Document &doc) {
   auto md = source.parent_path() / source.stem().replace_extension(".md");
   ofstream out(md);
 
-  for (auto i=doc.begin(); i!=doc.end(); ++i) {
-    auto pkg = i->second.get();
-    if (is<scad::doc::Package>(*pkg)) {
+  for_each(doc.begin(),doc.end(),[this, &out, &md] (const orthodocs::Document::Index::value_type &value) {
+    if (auto pkg = dynamic_cast<scad::doc::Package*>(value.second.get()); pkg) {
       pkg->uri = md;
-      write(dynamic_cast<const scad::doc::Package*>(pkg),out);
+      write(pkg,out);
     }
-  }
+  });
 
   if (doc.size<scad::doc::Variable>()) {
     out << H("Variables",2)
         << endl;
-    for (auto i=doc.begin(); i!=doc.end(); ++i) {
-      auto var  = i->second.get();
-      if (is<scad::doc::Variable>(*var)) {
-        var->uri = md;
-        write(dynamic_cast<const scad::doc::Variable&>(*var),out);
+    for_each(
+      doc.index.begin(),
+      doc.index.end(),
+      [this, &out, &md] (const decltype(doc.index)::value_type &value) {
+        if (auto var = dynamic_cast<scad::doc::Variable*>(value.second.get()); var) {
+          var->uri = md;
+          write(var,out);
+        }
       }
-    }
+    );
   }
 
   if (doc.size<scad::doc::Function>()) {
@@ -126,7 +141,7 @@ void Extension::save(const orthodocs::Document &doc) {
       auto func = i->second.get();
       if (is<scad::doc::Function>(*func)) {
         func->uri = md;
-        write(dynamic_cast<const scad::doc::Function&>(*func),out);
+        write(dynamic_cast<const scad::doc::Function*>(func),out);
       }
     }
   }
@@ -138,7 +153,7 @@ void Extension::save(const orthodocs::Document &doc) {
       auto mod = i->second.get();
       if (is<scad::doc::Module>(*mod)) {
         mod->uri = md;
-        write(dynamic_cast<const scad::doc::Module&>(*mod),out);
+        write(dynamic_cast<const scad::doc::Module*>(mod),out);
       }
     }
   }
@@ -233,41 +248,43 @@ void Extension::write(const orthodocs::doc::Parameter *param, ostream &out) cons
       << endl;
 }
 
-void Extension::write(const scad::doc::Variable &var, ostream &out) const {
+void Extension::write(const scad::doc::Variable *var, ostream &out) const {
+  assert(var);
   out << HRULE()
-      << H("variable "+var.name,3)
+      << H("variable "+var->name,3)
       << endl;
-  if (!var.defaults.empty())
+  if (!var->defaults.empty())
     out << BOLD("Default:") << endl
         << endl
-        << "    " << var.defaults << endl
+        << "    " << var->defaults << endl
         << endl;
-  if (!var.annotation.empty())
-    out << var.annotation << endl
+  if (!var->annotation.empty())
+    out << var->annotation << endl
         << endl;
 }
 
-void Extension::write(const scad::doc::Function &func, ostream &out) const {
+void Extension::write(const scad::doc::Function *func, ostream &out) const {
+  assert(func);
   out << HRULE()
-      << H("function "+func.name,3)
+      << H("function "+func->name,3)
       << endl
       << BOLD("Syntax:") << endl
       << endl
       // << CODE(signature(func)) << endl
       << "```text\n"
-      << func.signature() << '\n'
+      << func->signature() << '\n'
       << "```\n"
       << endl;
-  if (!func.annotation.empty())
-    out << func.annotation << endl
+  if (!func->annotation.empty())
+    out << func->annotation << endl
         << endl;
 
-  if (func.parameters.size()) {
+  if (func->parameters.size()) {
     // how many annotated parameters do we have in place?
     auto annotations = count_if(
-      func.parameters.begin(),
-      func.parameters.end(),
-      [] (const decltype(func.parameters)::value_type &param) {
+      func->parameters.begin(),
+      func->parameters.end(),
+      [] (const decltype(func->parameters)::value_type &param) {
         return !param->annotation().empty();
       }
     );
@@ -276,9 +293,9 @@ void Extension::write(const scad::doc::Function &func, ostream &out) const {
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(
-        func.parameters.begin(),
-        func.parameters.end(),
-        [this,&out] (const decltype(func.parameters)::value_type &param) {
+        func->parameters.begin(),
+        func->parameters.end(),
+        [this,&out] (const decltype(func->parameters)::value_type &param) {
           if (!param->annotation().empty())
             write(param.get(),out);
         }
@@ -288,22 +305,23 @@ void Extension::write(const scad::doc::Function &func, ostream &out) const {
   }
 }
 
-void Extension::write(const scad::doc::Module &mod, ostream &out) const {
+void Extension::write(const scad::doc::Module *mod, ostream &out) const {
+  assert(mod);
   out << HRULE()
-      << H("module "+mod.name,3)
+      << H("module "+mod->name,3)
       << endl
       << BOLD("Syntax:") << endl
       << endl
       // << CODE(signature(mod)) << endl
-      << "    " << mod.signature() << endl
+      << "    " << mod->signature() << endl
       << endl;
-  if (!mod.annotation.empty())
-    out << mod.annotation << endl
+  if (!mod->annotation.empty())
+    out << mod->annotation << endl
         << endl;
 
-  if (mod.parameters.size()) {
+  if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?
-    auto annotations = count_if(mod.parameters.begin(),mod.parameters.end(),
+    auto annotations = count_if(mod->parameters.begin(),mod->parameters.end(),
       [] (const orthodocs::doc::ParameterPtr &p) {
         return !p->annotation().empty();
       }
@@ -311,7 +329,7 @@ void Extension::write(const scad::doc::Module &mod, ostream &out) const {
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
-      for_each(mod.parameters.begin(),mod.parameters.end(),
+      for_each(mod->parameters.begin(),mod->parameters.end(),
         [this,&out] (const orthodocs::doc::ParameterPtr &param) {
           if (!param->annotation().empty())
             write(param.get(),out);

@@ -41,9 +41,9 @@ private:
 
   void write(const scad::doc::Package         *pkg,   std::ostream &out) const;
   void write(const orthodocs::doc::Parameter  *param, std::ostream &out) const;
-  void write(const scad::doc::Function        &func,  std::ostream &out) const;
-  void write(const scad::doc::Module          &mod,   std::ostream &out) const;
-  void write(const scad::doc::Variable        &var,   std::ostream &out) const;
+  void write(const scad::doc::Function        *func,  std::ostream &out) const;
+  void write(const scad::doc::Module          *mod,   std::ostream &out) const;
+  void write(const scad::doc::Variable        *var,   std::ostream &out) const;
 
   std::string BOLD(const std::string &text) const;
   std::string BR() const;
