@@ -58,11 +58,12 @@ string existing_canonical_dir(string &dir) {
 
 string canonical_dir(string &dir) {
   try {
-    if (!fs::exists(dir)) 
-      fs::create_directories(dir);
-    if (!fs::is_directory(dir))
+    fs::path p(dir);
+    if (!fs::exists(p)) 
+      fs::create_directories(p);
+    if (!fs::is_directory(p))
       return  "If existing, must be a directory: " + dir;
-    dir = fs::canonical(dir);
+    dir = fs::canonical(p).string();
     return string();
   } catch(const fs::filesystem_error &error) {
     return error.what();
