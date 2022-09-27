@@ -76,7 +76,7 @@ string Single::manage(const string &text) {
   return text.length()==3 ? string() : text.substr(text.find_first_not_of(' ',3));
 }
 
-array<const char *,2> Simple::decoration{
+const array<const char *,2> Simple::decoration{
   "/*!",
    "*/"
 };
@@ -124,7 +124,7 @@ const char *Simple::id() {
   return Simple::ID;
 }
 
-array<const char *,3> Fine::decoration{
+const array<const char *,3> Fine::decoration{
   "/*!",
   " */",
   " *"

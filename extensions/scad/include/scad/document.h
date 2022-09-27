@@ -140,7 +140,7 @@ class Simple : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static std::array<const char *,2> decoration;
+  static const std::array<const char *,2> decoration;
 };
 
 class Fine : public AbstractStyle {
@@ -153,7 +153,7 @@ class Fine : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static std::array<const char *,3> decoration;
+  static const std::array<const char *,3> decoration;
 };
 
 } // namespace style
