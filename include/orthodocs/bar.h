@@ -20,6 +20,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "orthodocs/globals.h"
+
 #include "indicators/block_progress_bar.hpp"
 #include "indicators/cursor_control.hpp"
 
@@ -29,11 +31,12 @@ template <class T>
 class Bar {
 public:
   Bar(const T &container,const char *type,size_t width=50) : _end{"✔ "+std::to_string(std::size(container))+" "+type} {
-    indicators::show_console_cursor(false);
-    _bar.set_option(indicators::option::BarWidth{width});
-    _bar.set_option(indicators::option::MaxProgress{container.size()});
-    _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
-    
+    if (!Option::quiet()) {
+      indicators::show_console_cursor(false);
+      _bar.set_option(indicators::option::BarWidth{width});
+      _bar.set_option(indicators::option::MaxProgress{container.size()});
+      _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
+    }
   }
   Bar(const Bar&) = delete;
   Bar(const Bar&&) = delete;
@@ -41,16 +44,22 @@ public:
   Bar & operator = (Bar &&) = delete;
   // set text as postfix
   void status(const std::string &text) {
-    _bar.set_option(indicators::option::PostfixText{text});
+    if (!Option::quiet()) {
+      _bar.set_option(indicators::option::PostfixText{text});
+    }
   }
   // update progress bar
   void operator ++(int) {
-    _bar.tick();
+    if (!Option::quiet()) {
+      _bar.tick();
+    }
   }
   ~Bar() {
     try {
-      status(_end);
-      _bar.mark_as_completed();
+      if (!Option::quiet()) {
+        status(_end);
+        _bar.mark_as_completed();
+      }
     } catch(...) {
       indicators::show_console_cursor(true);
     }

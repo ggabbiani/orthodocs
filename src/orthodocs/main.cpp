@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "error_info.h"
 #include "orthodocs/analizer.h"
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
@@ -36,12 +37,37 @@ namespace fs=std::filesystem;
 namespace {
 
 /*
- * transforms an absolute or current working directory relative path in 
- * canonical form
+ * sets an existing directory in canonical form
  */
-string cwd2canonical(string &dir) {
-  dir = fs::canonical(dir).string();
-  return string();
+string existing_canonical_dir(string &dir) {
+  try {
+    if (!fs::exists(dir)) {
+      return "Directory does not exist: " + dir;
+    } else if (fs::is_regular_file(dir)) {
+      return  "Directory is actually a file: " + dir;
+    }
+    dir = fs::canonical(dir).string();
+    return string();
+  } catch(const fs::filesystem_error &error) {
+    return error.what();
+  } catch(...) {
+    throw_with_nested(runtime_error(ERR_CALL("\""+dir+"\"")));
+  }
+}
+
+string canonical_dir(string &dir) {
+  try {
+    if (!fs::exists(dir)) 
+      fs::create_directories(dir);
+    if (!fs::is_directory(dir))
+      return  "If existing, must be a directory: " + dir;
+    dir = fs::canonical(dir);
+    return string();
+  } catch(const fs::filesystem_error &error) {
+    return error.what();
+  } catch(...) {
+    throw_with_nested(runtime_error(ERR_CALL("\""+dir+"\"")));
+  }
 }
 
 /**
@@ -59,11 +85,12 @@ string sroot_relative(string &sub) {
 
 enum {
   ADMONITIONS,
-  DEPS,
   DOC_ROOT,
   GRAPHS,
   IGNORE,
   PRIVATE,
+  DEPS,
+  QUIET,
   SOURCES,
   SRC_ROOT,
   TOC,
@@ -74,44 +101,46 @@ struct {
   const char *desc;
 } const opt[] = {
   {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
   {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",         "list of root relative directories where placing graphs"                                      },
   {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
   {"-p,--private",        "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
+  {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
+  {"-q,--quiet",          "quiet mode"},
   {"sources",             "source sub-trees and/or files - either as absolute or «source tree root» relative path"      },
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
-  {"-t,--toc",            "generate a Table of Content in the document tree root"                                       },
+  {"-t,--toc",            "generate a Table of Contents in the document tree root"                                       },
 };
 
 }
 
 int main(int argc, const char *argv[]) {
-  CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
-  auto      result = EXIT_SUCCESS;
-
-  app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
-  auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
-    ->required()
-    ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
-    ->required()
-    ->transform(CLI::Validator(cwd2canonical,"DIR(existing)"));
-  auto sources_opt = app.add_option(opt[SOURCES].name, Option::_sources, opt[SOURCES].desc)
-    ->required()
-    ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-  app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
-  app.add_option(opt[IGNORE].name,Option::_ignore_prefix,opt[IGNORE].desc);
-  app.add_option(opt[DEPS].name,Option::_pkg_deps,opt[DEPS].desc)
-    ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
-  auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
-    ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-  app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
-
-  sources_opt->needs(sroot_opt);
-  graph_opt->needs(sroot_opt);
+    CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
+    auto      result = EXIT_SUCCESS;
 
   try {
+    app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
+    auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
+      ->required()
+      ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
+    app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
+      ->required()
+      ->transform(CLI::Validator(canonical_dir,"DIR"));
+    auto sources_opt = app.add_option(opt[SOURCES].name, Option::_sources, opt[SOURCES].desc)
+      ->required()
+      ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
+    app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
+    app.add_option(opt[IGNORE].name,Option::_ignore_prefix,opt[IGNORE].desc);
+    app.add_option(opt[DEPS].name,Option::_pkg_deps,opt[DEPS].desc)
+      ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
+    auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
+      ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
+    app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
+    app.add_flag(opt[QUIET].name,Option::_quiet,opt[QUIET].desc);
+
+    sources_opt->needs(sroot_opt);
+    graph_opt->needs(sroot_opt);
+
     app.parse(argc, argv);
     assert(Option::_droot.is_absolute());
     assert(Option::_sroot.is_absolute());

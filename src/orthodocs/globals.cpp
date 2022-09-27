@@ -31,6 +31,7 @@ string    Option::_language{"scad"};
 string    Option::_pkg_deps{"text"};
 string    Option::_ignore_prefix;
 string    Option::_private_prefix{"__"};
+bool      Option::_quiet{false};
 FileSet   Option::_sources;
 fs::path  Option::_sroot;
 bool      Option::_toc{false};
