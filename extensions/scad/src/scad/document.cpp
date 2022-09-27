@@ -91,8 +91,7 @@ bool Simple::check(const string &text) {
   bool goon     = true;
   this->column  = -1;
   while (goon && ss.getline(buffer,sizeof buffer)) {
-    const char *m = i==1 ? decoration[start] : i==len ? decoration[end] : nullptr;
-    if (m) {
+    if (const char *m = i==1 ? decoration[start] : i==len ? decoration[end] : nullptr; m) {
       auto p = strstr(buffer, m);
       goon = (i==1 ? p==buffer : p==buffer+strnlen(buffer,sizeof buffer)-strlen(m));
     } else {
@@ -174,7 +173,7 @@ string Fine::manage(const string &text) {
   while (goon && ss.getline(buffer,sizeof buffer)) {
     if (i>1 && i<len) {
       auto offset = this->column+1;
-      result.append(string(buffer+offset+(offset<strlen(buffer)))+'\n');
+      result.append(string(buffer+offset+(int)(offset<strlen(buffer)))+'\n');
     }
     ++i;
   }
