@@ -83,8 +83,8 @@ void saveme(const scad::doc::Package *src_package,
 
 namespace markdown {
 
-void Extension::save(const orthodocs::Document &document) {
-  auto &source = document.source;
+void Extension::save(const orthodocs::Document &doc) {
+  auto &source = doc.source;
   assert(source.is_relative());
   assert(Option::droot().is_absolute());
 
@@ -99,46 +99,46 @@ void Extension::save(const orthodocs::Document &document) {
   auto md = source.parent_path() / source.stem().replace_extension(".md");
   ofstream out(md);
 
-  for (auto i=document.begin(); i!=document.end(); ++i) {
+  for (auto i=doc.begin(); i!=doc.end(); ++i) {
     auto pkg = i->second.get();
     if (is<scad::doc::Package>(*pkg)) {
       pkg->uri = md;
-      package(out,dynamic_cast<const scad::doc::Package&>(*pkg));
+      write(dynamic_cast<const scad::doc::Package*>(pkg),out);
     }
   }
 
-  if (document.size<scad::doc::Variable>()) {
+  if (doc.size<scad::doc::Variable>()) {
     out << H("Variables",2)
         << endl;
-    for (auto i=document.begin(); i!=document.end(); ++i) {
+    for (auto i=doc.begin(); i!=doc.end(); ++i) {
       auto var  = i->second.get();
       if (is<scad::doc::Variable>(*var)) {
         var->uri = md;
-        variable(out,dynamic_cast<const scad::doc::Variable&>(*var));
+        write(dynamic_cast<const scad::doc::Variable&>(*var),out);
       }
     }
   }
 
-  if (document.size<scad::doc::Function>()) {
+  if (doc.size<scad::doc::Function>()) {
     out << H("Functions",2)
         << endl;
-    for (auto i=document.begin(); i!=document.end(); ++i) {
+    for (auto i=doc.begin(); i!=doc.end(); ++i) {
       auto func = i->second.get();
       if (is<scad::doc::Function>(*func)) {
         func->uri = md;
-        function(out,dynamic_cast<const scad::doc::Function&>(*func));
+        write(dynamic_cast<const scad::doc::Function&>(*func),out);
       }
     }
   }
 
-  if (document.size<scad::doc::Module>()) {
+  if (doc.size<scad::doc::Module>()) {
     out << H("Modules",2) << endl 
         << endl;
-    for (auto i=document.begin(); i!=document.end(); ++i) {
+    for (auto i=doc.begin(); i!=doc.end(); ++i) {
       auto mod = i->second.get();
       if (is<scad::doc::Module>(*mod)) {
         mod->uri = md;
-        module(out,dynamic_cast<const scad::doc::Module&>(*mod));
+        write(dynamic_cast<const scad::doc::Module&>(*mod),out);
       }
     }
   }
@@ -190,49 +190,50 @@ void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char curre
   }
 }
 
-void Extension::package(ostream &out, const scad::doc::Package &pkg) {
-  out << H("package "+pkg.name)
+void Extension::write(const scad::doc::Package *pkg,ostream &out) const {
+  assert(pkg);
+  out << H("package "+pkg->name)
       << endl;
 
-  if (pkg.includes.size() || pkg.uses.size()) {
+  if (pkg->includes.size() || pkg->uses.size()) {
     if (boost::iequals(Option::pkg_deps(),"graph")) {
       out << H("Dependencies",2) << '\n'
           << "```mermaid\n"
           << "graph LR" << endl;
-      graph(pkg,out);
+      graph(*pkg,out);
       out  << "```\n" << endl;
     } else {
-      if (!pkg.includes.empty()) {
+      if (!pkg->includes.empty()) {
         out << BOLD("Includes:") << '\n'
             << endl;
-        for(const auto &p: pkg.includes)
+        for(const auto &p: pkg->includes)
           out << "    " << p << '\n';
         out << endl;
       }
-      if (!pkg.uses.empty()) {
+      if (!pkg->uses.empty()) {
         out << BOLD("Uses:") << '\n'
             << '\n';
-        for(const auto &p: pkg.uses) 
+        for(const auto &p: pkg->uses) 
           out << "    " << p << '\n';
         out << endl;
       }
     }
   }
   // write annotation contents
-  if (!pkg.annotation.empty()) {
-    out << pkg.annotation << endl;
-    if (pkg.license) 
-      out << "*Published under " << "__" << pkg.license << "__*" << '\n' << endl;
+  if (!pkg->annotation.empty()) {
+    out << pkg->annotation << endl;
+    if (pkg->license) 
+      out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
   }
 }
 
-void Extension::parameter(ostream &out, const orthodocs::doc::Parameter &p) const {
-  out << BOLD(p.name()) << BR()
-      << p.annotation() << endl
+void Extension::write(const orthodocs::doc::Parameter *param, ostream &out) const {
+  out << BOLD(param->name()) << BR()
+      << param->annotation() << endl
       << endl;
 }
 
-void Extension::variable(ostream &out, const scad::doc::Variable &var) const {
+void Extension::write(const scad::doc::Variable &var, ostream &out) const {
   out << HRULE()
       << H("variable "+var.name,3)
       << endl;
@@ -246,7 +247,7 @@ void Extension::variable(ostream &out, const scad::doc::Variable &var) const {
         << endl;
 }
 
-void Extension::function(ostream &out, const scad::doc::Function &func) const {
+void Extension::write(const scad::doc::Function &func, ostream &out) const {
   out << HRULE()
       << H("function "+func.name,3)
       << endl
@@ -263,24 +264,36 @@ void Extension::function(ostream &out, const scad::doc::Function &func) const {
 
   if (func.parameters.size()) {
     // how many annotated parameters do we have in place?
-    auto annotations  = 0;
-    for(auto i=func.parameters.begin();i!=func.parameters.end();++i) {
-      annotations +=(!(*i)->annotation().empty());
-    }
+    auto annotations = count_if(
+      func.parameters.begin(),
+      func.parameters.end(),
+      [] (const decltype(func.parameters)::value_type &param) {
+        return !param->annotation().empty();
+      }
+    );
+
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
-      for(auto i=func.parameters.begin();i!=func.parameters.end();i++) {
-        auto p = **i;
-        if (!p.annotation().empty())
-          parameter(out,**i);
-      }
+      for_each(
+        func.parameters.begin(),
+        func.parameters.end(),
+        [this,&out] (const decltype(func.parameters)::value_type &param) {
+          if (!param->annotation().empty())
+            write(param.get(),out);
+        }
+      );
+      // for(auto i=func.parameters.begin();i!=func.parameters.end();i++) {
+      //   auto p = **i;
+      //   if (!p.annotation().empty())
+      //     write(i->get(),out);
+      // }
       out << endl;
     }
   }
 }
 
-void Extension::module(ostream &out, const scad::doc::Module &mod) const {
+void Extension::write(const scad::doc::Module &mod, ostream &out) const {
   out << HRULE()
       << H("module "+mod.name,3)
       << endl
@@ -304,9 +317,9 @@ void Extension::module(ostream &out, const scad::doc::Module &mod) const {
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(mod.parameters.begin(),mod.parameters.end(),
-        [this,&out] (const orthodocs::doc::ParameterPtr &p) {
-          if (!p->annotation().empty())
-            parameter(out,*p);
+        [this,&out] (const orthodocs::doc::ParameterPtr &param) {
+          if (!param->annotation().empty())
+            write(param.get(),out);
         }
       );
       out << endl;
@@ -346,7 +359,7 @@ std::string Extension::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Extension::graph(const scad::doc::Package &pkg, ostream &out) {
+void Extension::graph(const scad::doc::Package &pkg, ostream &out) const {
   IncLabel label("A");
   graph::Node::Map nodemap;
   saveme(&pkg,nodemap,label,out);
@@ -360,7 +373,6 @@ void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
     // from here we move on each directory passed in the FileSet
     for(auto &dir: dirs) {
       bar.status(dir.string());
-      // cout << "dir: " << dir << endl;
       assert(dir.is_relative());
       // select only doc::Package items
       auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &path,const orthodocs::doc::Item *item) -> bool {

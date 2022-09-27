@@ -80,7 +80,7 @@ public:
   /**
    * write a document in the concrete instance native format
    */
-  virtual void save(const orthodocs::Document &document) = 0;
+  virtual void save(const orthodocs::Document &doc) = 0;
   /**
    * write a table of contents in the concrete instance native format
    */

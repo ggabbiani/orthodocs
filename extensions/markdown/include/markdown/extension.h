@@ -26,20 +26,24 @@
 namespace markdown {
 
 class Extension : public writer::Extension {
+
 public:
-  static constexpr const char *ID = "markdown";
+  static constexpr const char * const ID = "markdown";
   Extension() : writer::Extension(ID) {}
-  void save(const orthodocs::Document &document) override;
+
+  void save(const orthodocs::Document &doc) override;
   void save(const orthodocs::doc::ToC &toc) override;
   void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) override;
+
 private:
-  void graph(const scad::doc::Package &pkg, std::ostream &out);
+  void graph(const scad::doc::Package &pkg, std::ostream &out) const;
   void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char current) const;
-  void package(std::ostream &out,const scad::doc::Package &pkg);
-  void parameter(std::ostream &out,const orthodocs::doc::Parameter &param) const;
-  void function(std::ostream &out,const scad::doc::Function &func) const;
-  void module(std::ostream &out,const scad::doc::Module &mod) const;
-  void variable(std::ostream &out,const scad::doc::Variable &var) const;
+
+  void write(const scad::doc::Package         *pkg,   std::ostream &out) const;
+  void write(const orthodocs::doc::Parameter  *param, std::ostream &out) const;
+  void write(const scad::doc::Function        &func,  std::ostream &out) const;
+  void write(const scad::doc::Module          &mod,   std::ostream &out) const;
+  void write(const scad::doc::Variable        &var,   std::ostream &out) const;
 
   std::string BOLD(const std::string &text) const;
   std::string BR() const;

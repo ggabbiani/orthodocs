@@ -34,10 +34,11 @@ public:
 
   std::unique_ptr<orthodocs::Document> document;
   
-  doc::Package      *curr_package;  // only one package during the parsing of a source
-  orthodocs::doc::ItemPtrStack  curr_item;
-  orthodocs::doc::ItemPtrStack  curr_variable;
-  orthodocs::doc::ParameterPtr  curr_parameter;
+  // only one package during the parsing of a source
+  doc::Package                  *curr_package;  
+  orthodocs::doc::ItemPtrStack   curr_item;
+  orthodocs::doc::ItemPtrStack   curr_variable;
+  orthodocs::doc::ParameterPtr   curr_parameter;
 
   explicit Listener(const std::filesystem::path &pkg_source);
 
