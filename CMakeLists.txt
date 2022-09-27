@@ -7,7 +7,7 @@ project(OrthoDocs)
 option(BUILD_TESTING    "Generate tests"              ON)
 option(LANGUAGE_SCAD    "OpenSCAD language extension" ON)
 option(WRITER_MARKDOWN  "Markdown writer extension"   ON)
-option(EXPERIMENTAL     "Experimental tests"         OFF)
+option(EXPERIMENTAL     "Experimental tests"          ON)
 
 include(CTest)
 
