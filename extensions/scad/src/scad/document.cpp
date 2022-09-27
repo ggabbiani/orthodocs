@@ -147,7 +147,7 @@ bool Fine::check(const string &text) {
   bool goon     = true;
   this->column  = -1;
   while (goon && ss.getline(buffer,sizeof buffer)) {
-    const char *m = row==1 ? decoration[start] : row==len ? decoration[end] : decoration[body];
+    const char * const m = row==1 ? decoration[start] : row==len ? decoration[end] : decoration[body];
     auto pos = strstr(buffer, m);
     if (row==1) {         // parser strip any trailing space on first row
       goon  = pos==buffer;
