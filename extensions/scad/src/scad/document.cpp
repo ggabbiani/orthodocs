@@ -173,7 +173,7 @@ string Fine::manage(const string &text) {
   while (goon && ss.getline(buffer,sizeof buffer)) {
     if (i>1 && i<len) {
       auto offset = this->column+1;
-      result.append(string(buffer+offset+(int)(offset<strlen(buffer)))+'\n');
+      result.append(string(buffer+offset+(int)(offset<strnlen(buffer,sizeof buffer)))+'\n');
     }
     ++i;
   }
