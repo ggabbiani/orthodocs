@@ -37,8 +37,8 @@ private:
   void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char current) const;
   void package(std::ostream &out,const scad::doc::Package &pkg);
   void parameter(std::ostream &out,const orthodocs::doc::Parameter &param) const;
-  void function(std::ostream &out,const scad::doc::Function &func);
-  void module(std::ostream &out,const scad::doc::Module &mod);
+  void function(std::ostream &out,const scad::doc::Function &func) const;
+  void module(std::ostream &out,const scad::doc::Module &mod) const;
   void variable(std::ostream &out,const scad::doc::Variable &var) const;
 
   std::string BOLD(const std::string &text) const;

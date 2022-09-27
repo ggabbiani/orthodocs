@@ -246,7 +246,7 @@ void Extension::variable(ostream &out, const scad::doc::Variable &var) const {
         << endl;
 }
 
-void Extension::function(ostream &out, const scad::doc::Function &func) {
+void Extension::function(ostream &out, const scad::doc::Function &func) const {
   out << HRULE()
       << H("function "+func.name,3)
       << endl
@@ -280,7 +280,7 @@ void Extension::function(ostream &out, const scad::doc::Function &func) {
   }
 }
 
-void Extension::module(ostream &out, const scad::doc::Module &mod) {
+void Extension::module(ostream &out, const scad::doc::Module &mod) const {
   out << HRULE()
       << H("module "+mod.name,3)
       << endl

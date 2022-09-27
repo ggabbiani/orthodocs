@@ -37,16 +37,17 @@ namespace fs=std::filesystem;
 namespace {
 
 /*
- * sets an existing directory in canonical form
+ * set existing «dir» in canonical form
  */
 string existing_canonical_dir(string &dir) {
   try {
-    if (!fs::exists(dir)) {
+    fs::path p(dir);
+    if (!fs::exists(p)) {
       return "Directory does not exist: " + dir;
-    } else if (fs::is_regular_file(dir)) {
+    } else if (fs::is_regular_file(p)) {
       return  "Directory is actually a file: " + dir;
     }
-    dir = fs::canonical(dir).string();
+    dir = fs::canonical(p).string();
     return string();
   } catch(const fs::filesystem_error &error) {
     return error.what();

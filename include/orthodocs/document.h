@@ -138,15 +138,11 @@ public:
    */
   using Index = std::map< std::string,doc::ItemPtr,std::less<> >;
   /**
-   * return the number of item of type «type»
+   * return the number of item of type «T»
    */
   template <class T>
-  size_t size() const {
-    size_t size  = 0;
-    for(auto i=index.begin(); i!=index.end(); ++i) {
-      size += (typeid(*i->second)==typeid(T));
-    }
-    return size;
+  inline size_t size() const {
+    return count_if(index.begin(),index.end(),[](const Index::value_type &value) {return dynamic_cast<T*>(value.second.get())!=nullptr;});
   }
 
   Index::iterator begin() {return index.begin();}
