@@ -342,7 +342,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
     orthodocs::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
     cwd pwd(Option::droot());
-    // from here we move on each directory passed in the FileSet
+    // from here we move on each directory passed in the FileSet «dirs»
     for(auto &dir: dirs) {
       bar.status(dir.string());
       assert(dir.is_relative());
@@ -369,7 +369,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
           << "graph TD" << endl;
       // build a dependency graph limited on packages located inside «current_dir»
       for(auto element: packages) {
-        const Package *package = dynamic_cast<const Package*>(element.second);
+        auto package = dynamic_cast<const Package*>(element.second);
         assert(package);
         // FIXME: unclear behaviour of path when using "." (current directory)
         if (dir!=".") {
