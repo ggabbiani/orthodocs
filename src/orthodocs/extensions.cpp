@@ -31,8 +31,7 @@ namespace language {
 
 Extension *Extension::factory() {
   auto &registry  = Singleton<Map>::instance();
-  auto i          = registry.find(Option::language());
-  if (i!=registry.end())
+  if (auto i=registry.find(Option::language()); i!=registry.end())
     return i->second;
   throw domain_error("No language extension found for id '"+Option::language()+'\'');
 }
@@ -43,8 +42,7 @@ namespace writer {
 
 Extension *Extension::factory() {
   auto &registry  = Singleton<Map>::instance();
-  auto i          = registry.find(Option::writer());
-  if (i!=registry.end())
+  if (auto i=registry.find(Option::writer()); i!=registry.end())
     return i->second;
   throw domain_error("No language extension found for id '"+Option::writer()+'\'');
 }

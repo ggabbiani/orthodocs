@@ -205,8 +205,6 @@ inline std::string title(const Item &item) {
 inline void add(const Document *document, ToC &toc) {
   for(auto &[key, value]: document->index) 
     toc.emplace(value->indexKey(),value.get());
-    // if (auto [i,success] = toc.emplace(value->indexKey(),value.get());!success)
-    //   throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in ToC");
 }
 
 /**
