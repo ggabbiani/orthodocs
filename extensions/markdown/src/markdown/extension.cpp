@@ -96,7 +96,7 @@ void saveme(
 
 namespace markdown {
 
-void Extension::save(const orthodocs::Document &doc) {
+void Extension::save(const Document &doc) {
   auto &source = doc.source;
   assert(source.is_relative());
   assert(Option::droot().is_absolute());
@@ -112,54 +112,13 @@ void Extension::save(const orthodocs::Document &doc) {
   auto md = source.parent_path() / source.stem().replace_extension(".md");
   ofstream out(md);
 
-  for_each(doc.begin(),doc.end(),[this, &out, &md] (const orthodocs::Document::Index::value_type &value) {
-    if (auto pkg = dynamic_cast<scad::doc::Package*>(value.second.get()); pkg) {
-      pkg->uri = md;
-      write(pkg,out);
-    }
-  });
-
-  if (doc.size<scad::doc::Variable>()) {
-    out << H("Variables",2)
-        << endl;
-    for_each(
-      doc.index.begin(),
-      doc.index.end(),
-      [this, &out, &md] (const decltype(doc.index)::value_type &value) {
-        if (auto var = dynamic_cast<scad::doc::Variable*>(value.second.get()); var) {
-          var->uri = md;
-          write(var,out);
-        }
-      }
-    );
-  }
-
-  if (doc.size<scad::doc::Function>()) {
-    out << H("Functions",2)
-        << endl;
-    for (auto i=doc.begin(); i!=doc.end(); ++i) {
-      auto func = i->second.get();
-      if (is<scad::doc::Function>(*func)) {
-        func->uri = md;
-        write(dynamic_cast<const scad::doc::Function*>(func),out);
-      }
-    }
-  }
-
-  if (doc.size<scad::doc::Module>()) {
-    out << H("Modules",2) << endl 
-        << endl;
-    for (auto i=doc.begin(); i!=doc.end(); ++i) {
-      auto mod = i->second.get();
-      if (is<scad::doc::Module>(*mod)) {
-        mod->uri = md;
-        write(dynamic_cast<const scad::doc::Module*>(mod),out);
-      }
-    }
-  }
+  write((Package*)Document::Header<Package> (doc,md),out);
+  write(Document::Topic<Variable> (doc,md,"Variables"),out);
+  write(Document::Topic<Function> (doc,md,"Functions"),out);
+  write(Document::Topic<Module>   (doc,md,"Modules"),out);
 }
 
-void Extension::save(const orthodocs::doc::ToC &toc) {
+void Extension::save(const ToC &toc) {
   assert(Option::droot().is_absolute());
 
   try {
@@ -194,7 +153,7 @@ void Extension::save(const orthodocs::doc::ToC &toc) {
 
 }
 
-void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char current) const {
+void Extension::subToc(const SubToC &sub,ostream &out,char current) const {
   out << H(current,2) << endl;
   for(auto &[key, item]: sub) {
     auto id     = item->type()+'-'+item->name;
@@ -205,7 +164,7 @@ void Extension::subToc(const orthodocs::doc::SubToC &sub,ostream &out,char curre
   }
 }
 
-void Extension::write(const scad::doc::Package *pkg,ostream &out) const {
+void Extension::write(const Package *pkg,ostream &out) const {
   assert(pkg);
   out << H("package "+pkg->name)
       << endl;
@@ -242,13 +201,13 @@ void Extension::write(const scad::doc::Package *pkg,ostream &out) const {
   }
 }
 
-void Extension::write(const orthodocs::doc::Parameter *param, ostream &out) const {
+void Extension::write(const Parameter *param, ostream &out) const {
   out << BOLD(param->name()) << BR()
       << param->annotation() << endl
       << endl;
 }
 
-void Extension::write(const scad::doc::Variable *var, ostream &out) const {
+void Extension::write(const Variable *var, ostream &out) const {
   assert(var);
   out << HRULE()
       << H("variable "+var->name,3)
@@ -263,7 +222,7 @@ void Extension::write(const scad::doc::Variable *var, ostream &out) const {
         << endl;
 }
 
-void Extension::write(const scad::doc::Function *func, ostream &out) const {
+void Extension::write(const Function *func, ostream &out) const {
   assert(func);
   out << HRULE()
       << H("function "+func->name,3)
@@ -305,7 +264,7 @@ void Extension::write(const scad::doc::Function *func, ostream &out) const {
   }
 }
 
-void Extension::write(const scad::doc::Module *mod, ostream &out) const {
+void Extension::write(const Module *mod, ostream &out) const {
   assert(mod);
   out << HRULE()
       << H("module "+mod->name,3)
@@ -372,13 +331,13 @@ std::string Extension::CODE(const std::string &text) const {
   return "`"+text+"`";
 }
 
-void Extension::graph(const scad::doc::Package &pkg, ostream &out) const {
+void Extension::graph(const Package &pkg, ostream &out) const {
   IncLabel label("A");
   graph::Node::Map nodemap;
   saveme(&pkg,nodemap,label,out);
 }
 
-void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
+void Extension::graphs(const ToC &toc, const FileSet &dirs) {
   try {
     orthodocs::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
@@ -390,7 +349,7 @@ void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
       // select only doc::Package items
       auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &path,const orthodocs::doc::Item *item) -> bool {
         bool result;
-        auto package = dynamic_cast<const scad::doc::Package*>(item);
+        auto package = dynamic_cast<const Package*>(item);
         if (package) {
           result = dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
         } else
@@ -410,7 +369,7 @@ void Extension::graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) {
           << "graph TD" << endl;
       // build a dependency graph limited on packages located inside «current_dir»
       for(auto element: packages) {
-        const scad::doc::Package *package = dynamic_cast<const scad::doc::Package*>(element.second);
+        const Package *package = dynamic_cast<const Package*>(element.second);
         assert(package);
         // FIXME: unclear behaviour of path when using "." (current directory)
         if (dir!=".") {

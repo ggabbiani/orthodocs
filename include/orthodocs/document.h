@@ -152,7 +152,48 @@ public:
 
 // private:
   Index index;
-  std::filesystem::path source;
+  const std::filesystem::path source;
+
+  /**
+   * this class represents Document Items grouped by topic «T»
+   */
+  template <class T>
+  class Topic {
+  public:
+    // sort is inherited by the underlaying items
+    using ItemList=std::vector<T*>;
+    Topic(
+      const Document &doc,
+      const std::filesystem::path &doc_path,
+      const char *title=nullptr,
+      int cardinality = -1
+    ) : title(title?title:""),cardinality(cardinality) {
+      for_each(
+        doc.index.begin(),
+        doc.index.end(),
+        [this, &doc_path] (const typename decltype(doc.index)::value_type &value) {
+          if (auto element = dynamic_cast<T*>(value.second.get()); element) {
+            element->uri  = doc_path;
+            items.emplace_back(element);
+          }
+        }
+      );
+      if (cardinality>-1 && items.size()>cardinality)
+        throw std::runtime_error("Wrong cardinality: expected "+std::to_string(cardinality)+" got "+std::to_string(items.size()));
+    }
+    const std::string title;
+    ItemList          items;
+    // -1 means any
+    const int         cardinality;
+  };
+
+  template <class T>
+  class Header : public Topic<T> {
+  public:
+    Header(const Document &doc,const std::filesystem::path &doc_path) : Topic<T>(doc,doc_path,nullptr,1) {}
+    explicit operator T* () {return this->items[0];}
+  };
+
 };
 using DocumentList = std::vector<std::unique_ptr<Document>>;
 

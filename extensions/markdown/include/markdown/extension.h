@@ -26,24 +26,47 @@
 namespace markdown {
 
 class Extension : public writer::Extension {
-
 public:
+  using Document  = orthodocs::Document;
+  using ToC       = orthodocs::doc::ToC;
+  using SubToC    = orthodocs::doc::SubToC;
+  using Parameter = orthodocs::doc::Parameter;
+  using Package   = scad::doc::Package;
+  using Function  = scad::doc::Function;
+  using Module    = scad::doc::Module;
+  using Variable  = scad::doc::Variable;
+
   static constexpr const char * const ID = "markdown";
   Extension() : writer::Extension(ID) {}
 
-  void save(const orthodocs::Document &doc) override;
-  void save(const orthodocs::doc::ToC &toc) override;
-  void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) override;
+  void save(const Document &doc) override;
+  void save(const ToC &toc) override;
+  void graphs(const ToC &toc, const FileSet &dirs) override;
 
 private:
-  void graph(const scad::doc::Package &pkg, std::ostream &out) const;
-  void subToc(const orthodocs::doc::SubToC &sub, std::ostream &out, char current) const;
+  void graph(const Package &pkg, std::ostream &out) const;
+  void subToc(const SubToC &sub, std::ostream &out, char current) const;
 
-  void write(const scad::doc::Package         *pkg,   std::ostream &out) const;
-  void write(const orthodocs::doc::Parameter  *param, std::ostream &out) const;
-  void write(const scad::doc::Function        *func,  std::ostream &out) const;
-  void write(const scad::doc::Module          *mod,   std::ostream &out) const;
-  void write(const scad::doc::Variable        *var,   std::ostream &out) const;
+  void write(const Package    *pkg,   std::ostream &out) const;
+  void write(const Parameter  *param, std::ostream &out) const;
+  void write(const Function   *func,  std::ostream &out) const;
+  void write(const Module     *mod,   std::ostream &out) const;
+  void write(const Variable   *var,   std::ostream &out) const;
+
+  template <class T>
+  void write(Document::Topic<T> &&topic, std::ostream &out) const {
+    if (topic.items.size()) {
+      out << H(topic.title,2)
+          << std::endl;
+      std::for_each(
+        topic.items.begin(),
+        topic.items.end(),
+        [this, &out] (const typename decltype(topic.items)::value_type &value) {
+          write(value,out);
+        }
+      );
+    }
+  }
 
   std::string BOLD(const std::string &text) const;
   std::string BR() const;
