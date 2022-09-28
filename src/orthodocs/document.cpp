@@ -1,5 +1,5 @@
 /*
- * abstract document implementation
+ * synthetic document implementation
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -25,9 +25,7 @@
 using namespace std;
 namespace fs=std::filesystem;
 
-namespace orthodocs {
-
-namespace doc {
+namespace orthodocs::doc {
 
 string Item::documentKey() const {
   return type()+' '+name;
@@ -50,8 +48,8 @@ Signature Item::_signature() const {
   for(auto i=parameters.begin();i!=parameters.end();i++) {
     if (i!=parameters.begin())
       ss << ",";
-    auto parameter = i->get();
-    ss << parameter->name();
+    const Parameter *parameter = i->get();
+    ss << parameter->name;
     if (!parameter->defaults.empty())
       ss << "=" << parameter->defaults;
   }
@@ -59,19 +57,4 @@ Signature Item::_signature() const {
   return ss.str();
 }
 
-namespace toc {
-
-SubToC filter(const fs::path &path,const ToC &toc, function<bool(const fs::path&,const Item*)> func) {
-  SubToC result;
-  for(auto& [key, value]: toc) {
-    if (func(path,value))
-      result.emplace(key,value);
-  }
-  return result;
-}
-
-} // namespace toc
-
-} // namespace doc
-
-} // namespace orthodocs
+} // namespace orthodocs::doc

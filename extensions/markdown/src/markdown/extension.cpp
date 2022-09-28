@@ -202,8 +202,8 @@ void Extension::write(const Package *pkg,ostream &out) const {
 }
 
 void Extension::write(const Parameter *param, ostream &out) const {
-  out << BOLD(param->name()) << BR()
-      << param->annotation() << endl
+  out << BOLD(param->name) << BR()
+      << param->annotation << endl
       << endl;
 }
 
@@ -244,7 +244,7 @@ void Extension::write(const Function *func, ostream &out) const {
       func->parameters.begin(),
       func->parameters.end(),
       [] (const decltype(func->parameters)::value_type &param) {
-        return !param->annotation().empty();
+        return !param->annotation.empty();
       }
     );
 
@@ -255,7 +255,7 @@ void Extension::write(const Function *func, ostream &out) const {
         func->parameters.begin(),
         func->parameters.end(),
         [this,&out] (const decltype(func->parameters)::value_type &param) {
-          if (!param->annotation().empty())
+          if (!param->annotation.empty())
             write(param.get(),out);
         }
       );
@@ -281,16 +281,16 @@ void Extension::write(const Module *mod, ostream &out) const {
   if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?
     auto annotations = count_if(mod->parameters.begin(),mod->parameters.end(),
-      [] (const orthodocs::doc::ParameterPtr &p) {
-        return !p->annotation().empty();
+      [] (const orthodocs::doc::Parameter::Ptr &p) {
+        return !p->annotation.empty();
       }
     );
     if (annotations) {
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(mod->parameters.begin(),mod->parameters.end(),
-        [this,&out] (const orthodocs::doc::ParameterPtr &param) {
-          if (!param->annotation().empty())
+        [this,&out] (const orthodocs::doc::Parameter::Ptr &param) {
+          if (!param->annotation.empty())
             write(param.get(),out);
         }
       );
@@ -341,23 +341,20 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
   try {
     orthodocs::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
-    cwd pwd(Option::droot());
+    cwd document_root(Option::droot());
     // from here we move on each directory passed in the FileSet «dirs»
     for(auto &dir: dirs) {
       bar.status(dir.string());
       assert(dir.is_relative());
       // select only doc::Package items
-      auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &path,const orthodocs::doc::Item *item) -> bool {
-        bool result;
-        auto package = dynamic_cast<const Package*>(item);
-        if (package) {
-          result = dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
-        } else
-          result = false;
-        return (result);
+      auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &,const orthodocs::doc::Item *item) {
+        if (auto package = dynamic_cast<const Package*>(item); package) 
+          return dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
+        else
+          return false;
       });
       // change the working directory to «dir»
-      cwd pwd(dir);
+      cwd graph_dir(dir);
       // create the sub graph file
       ofstream out("deps.md");
       // allocate graph resources on stack
@@ -371,7 +368,6 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
       for(auto element: packages) {
         auto package = dynamic_cast<const Package*>(element.second);
         assert(package);
-        // FIXME: unclear behaviour of path when using "." (current directory)
         if (dir!=".") {
           if (is_sub_of(package->path.parent_path(),dir))
             saveme(package,nodemap,label,out, [dir] (const graph::Connection &conn) -> bool {

@@ -1,6 +1,6 @@
 #pragma once
 /*
- * abstract document
+ * synthetic document
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -20,6 +20,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "orthodocs/error_info.h"
 #include "orthodocs/utils.h"
 
 #include <filesystem>
@@ -40,24 +41,26 @@ using Name        = std::string;
 using Signature   = std::string;
 //! always relative to document root
 using URI         = std::filesystem::path;
-//! defaults for variables and parameters
+//! default value for Variable and Parameter
 using Value       = std::string;
 
 class Parameter {
 public:
-  const Name &name() const {return _name;}
-  const Annotation &annotation() const {return _annotation;}
+  using Ptr  = std::unique_ptr<Parameter>;
+  using Vec  = std::vector<Ptr>;
+
   Value       defaults;
-// protected:
-  Name        _name;
-  Annotation  _annotation;
+  Name        name;
+  Annotation  annotation;
 };
-using ParameterPtr  = std::unique_ptr<Parameter>;
-using ParameterVec  = std::vector<ParameterPtr>;
 
 class Item {
   friend class Index;
 public:
+  using Ptr = std::unique_ptr<Item>;
+  // used by generators for stackable items (modules and variables)
+  using PtrStack  = std::stack<Ptr>;
+  
   virtual ~Item() = default;
 
   virtual std::string type() const = 0;
@@ -81,32 +84,26 @@ public:
    */
   virtual std::string indexKey() const;
 
-  Name          name;
-  Annotation    annotation;
-  ParameterVec  parameters;
-  const Value   defaults;
-  const bool    nested;
+  Name            name;
+  Annotation      annotation;
+  Parameter::Vec  parameters;
+  const Value     defaults;
+  const bool      nested;
   /**
    * the semantic of this field is language dependant
    */
   Item          *parent = nullptr;
-  // filled by writers
+  // filled by writers represent the uri of the saved document
   URI           uri;
 
 protected:
-  Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),nested(nested),defaults(defaults?*defaults:"") {}
+  Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),defaults(defaults?*defaults:""),nested(nested) {}
   Signature _signature() const; 
 };
 
-using ItemPtr       = std::unique_ptr<Item>;
-using ConstItemPtr  = std::unique_ptr<const Item>;
-// used by generators for stackable items (modules and variables)
-using ItemPtrStack  = std::stack<ItemPtr>;
-
 /**
  * Table of Contents
- * NOTE: no ownership of the contained items
- * FIXME: a std::map couldn't be enough for this?
+ * NOTE: NO OWNERSHIP OF THE CONTAINED ITEMS
  */
 using ToC = std::multimap<Name,Item*,nocase::Compare>;
 
@@ -120,8 +117,9 @@ using SubToC = std::multimap<Name,doc::Item*,nocase::Compare>;
 } // namespace doc
 
 class Document {
+  using path = std::filesystem::path;
 public:
-  explicit Document(const std::filesystem::path &source) : source(source) {}
+  explicit Document(const path &source) : source(source) {}
   /**
    * Document::Index format:
    * Key    ==> "function|module|variable <item name>"
@@ -136,7 +134,7 @@ public:
    * 
    * NOTE: see doc::Key()
    */
-  using Index = std::map< std::string,doc::ItemPtr,std::less<> >;
+  using Index = std::map< std::string,doc::Item::Ptr,std::less<> >;
   /**
    * return the number of item of type «T»
    */
@@ -145,14 +143,9 @@ public:
     return count_if(index.begin(),index.end(),[](const Index::value_type &value) {return dynamic_cast<T*>(value.second.get())!=nullptr;});
   }
 
-  Index::iterator begin() {return index.begin();}
-  Index::const_iterator begin() const {return index.begin();}
-  Index::iterator end() {return index.end();}
-  Index::const_iterator end() const {return index.end();}
-
 // private:
   Index index;
-  const std::filesystem::path source;
+  const path source;
 
   /**
    * this class represents Document Items grouped by topic «T»
@@ -163,10 +156,10 @@ public:
     // sort is inherited by the underlaying items
     using ItemList=std::vector<T*>;
     Topic(
-      const Document &doc,
-      const std::filesystem::path &doc_path,
-      const char *title=nullptr,
-      int cardinality = -1
+      const Document  &doc,
+      const path      &doc_path,
+      const char      *title        = nullptr,
+      int              cardinality  = -1
     ) : title(title?title:""),cardinality(cardinality) {
       for_each(
         doc.index.begin(),
@@ -179,7 +172,7 @@ public:
         }
       );
       if (cardinality>-1 && items.size()>cardinality)
-        throw std::runtime_error("Wrong cardinality: expected "+std::to_string(cardinality)+" got "+std::to_string(items.size()));
+        throw std::domain_error("Wrong cardinality: expected "+std::to_string(cardinality)+" got "+std::to_string(items.size()));
     }
     const std::string title;
     ItemList          items;
@@ -197,9 +190,7 @@ public:
 };
 using DocumentList = std::vector<std::unique_ptr<Document>>;
 
-namespace doc {
-
-namespace toc {
+namespace doc::toc {
 
 /**
  * build an index title in the form
@@ -212,18 +203,25 @@ inline std::string title(const Item &item) {
 
 // copy Document items into the Table of Contents
 inline void add(const Document *document, ToC &toc) {
-  for(auto &[key, value]: *document) 
+  for(auto &[key, value]: document->index) 
     toc.emplace(value->indexKey(),value.get());
+    // if (auto [i,success] = toc.emplace(value->indexKey(),value.get());!success)
+    //   throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in ToC");
 }
 
 /**
  * returns a «func()» filtered SubToC
  */
-extern SubToC filter(const std::filesystem::path &path,const ToC &toc, std::function<bool(const std::filesystem::path&,const Item*)> func);
+template <typename FUNC>
+SubToC filter(const std::filesystem::path &path,const ToC &toc, FUNC func) {
+  SubToC result;
+  for(auto& [key, value]: toc) {
+    if (func(path,value))
+      result.emplace(key,value);
+  }
+  return result;
+}
 
-} // namespace toc
-
-} // namespace doc
-
+} // namespace doc::toc
 
 } // namespace orthodocs

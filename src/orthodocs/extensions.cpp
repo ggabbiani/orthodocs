@@ -34,8 +34,7 @@ Extension *Extension::factory() {
   auto i          = registry.find(Option::language());
   if (i!=registry.end())
     return i->second;
-  else
-    throw runtime_error("No language extension found for id '"+Option::language()+'\'');
+  throw domain_error("No language extension found for id '"+Option::language()+'\'');
 }
 
 } // namespace language
@@ -47,8 +46,7 @@ Extension *Extension::factory() {
   auto i          = registry.find(Option::writer());
   if (i!=registry.end())
     return i->second;
-  else
-    throw runtime_error("No language extension found for id '"+Option::writer()+'\'');
+  throw domain_error("No language extension found for id '"+Option::writer()+'\'');
 }
 
 void Extension::save(const orthodocs::DocumentList &docs) {

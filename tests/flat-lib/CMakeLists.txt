@@ -1,6 +1,6 @@
 set(TEST_DD ${CMAKE_CURRENT_BINARY_DIR}/dd.sh)
 set(TEST_TARGET ${PROJECT_BINARY_DIR}/orthodocs)
-set(TEST_SOURCES "isolated.scad undocumented.scad")
+set(TEST_SOURCES "isolated.scad nested.scad undocumented.scad")
 set(TEST_SROOT ${CMAKE_CURRENT_SOURCE_DIR}/src-tree)
 set(TEST_DROOT ${CMAKE_CURRENT_BINARY_DIR}/doc-root)
 set(TEST_OKROOT ${CMAKE_CURRENT_SOURCE_DIR}/doc-root)

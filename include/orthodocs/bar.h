@@ -25,6 +25,8 @@
 #include "indicators/block_progress_bar.hpp"
 #include "indicators/cursor_control.hpp"
 
+#include <iostream>
+
 namespace orthodocs {
 
 template <class T>
@@ -57,7 +59,8 @@ public:
   ~Bar() {
     try {
       if (!Option::quiet()) {
-        status(_end);
+        if (!std::uncaught_exceptions())
+          status(_end);
         _bar.mark_as_completed();
       }
     } catch(...) {

@@ -19,9 +19,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "error_info.h"
 #include "scad/annotations.h"
 #include "scad/listener.h"
+#include "orthodocs/error_info.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
@@ -38,7 +38,7 @@ Listener::Listener(const fs::path &pkg_source) : document(make_unique<orthodocs:
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
-  curr_item.push(orthodocs::doc::ItemPtr(curr_package));
+  curr_item.push(orthodocs::doc::Item::Ptr(curr_package));
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
@@ -95,8 +95,9 @@ void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
 void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
   auto key  = func->documentKey();
-  if (!func->privateId())
-    document->index.emplace(key,move(func));
+  if (!func->nested && !func->privateId())
+    if (auto [i,success] = document->index.try_emplace(key,move(func)); !success)
+      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
   curr_item.pop();
 }
 
@@ -107,7 +108,6 @@ void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   item->parent    = curr_package;
   assert(curr_package);
   curr_item.emplace(item);
-  // curr_item.push(make_unique<doc::Module>(identifier,nested));
 }
 
 void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
@@ -131,7 +131,7 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
 
   // FIXME: a sigle if with multiple OR sould be ok
   if (is<scad::SCADParser::ParameterContext>(*ctx->parent->parent->parent)) {   // parameter's annotation
-    curr_parameter->_annotation = value;
+    curr_parameter->annotation = value;
   } else if (is<scad::SCADParser::Function_defContext>(*ctx->parent->parent)) { // function's annotation
     curr_item.top()->annotation = value;
   } else if (is<scad::SCADParser::Module_defContext>(*ctx->parent->parent)) {   // module's annotation
@@ -161,7 +161,7 @@ void Listener::enterLookup(scad::SCADParser::LookupContext *ctx) {
   auto value = ctx->ID()->getText();
   if (curr_parameter) {
     if (is<scad::SCADParser::ParameterContext>(*ctx->parent)) 
-      curr_parameter->_name = value;
+      curr_parameter->name = value;
   }
 }
 
@@ -169,13 +169,13 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
   auto id       = ctx->ID()->getText();
   auto defaults = ctx->expr()->getText();
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
-    auto nested             = is<doc::Module>(*curr_item.top());
-    doc::Variable *variable = new doc::Variable(id,defaults,nested);
+    auto nested   = dynamic_cast<doc::Module*>(curr_item.top().get())!=nullptr;
+    auto variable = new doc::Variable(id,defaults,nested);
     assert(curr_package);
     variable->parent        = curr_package;
-    curr_variable.push(orthodocs::doc::ItemPtr(variable));
+    curr_variable.push(orthodocs::doc::Item::Ptr(variable));
   } else if (curr_parameter) {
-    curr_parameter->_name      = id;
+    curr_parameter->name      = id;
     curr_parameter->defaults  = defaults;
   }
 }
@@ -185,8 +185,10 @@ void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
     if (curr_variable.size()) {
       auto &var   = curr_variable.top();
       auto key    = var->documentKey();
-      if (!var->nested && !var->privateId())
-        document->index.emplace(key, move(var));
+      if (!var->nested && !var->privateId()) {
+        if (auto [i,success] = document->index.try_emplace(key, move(var)); !success)
+          throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
+      }
       curr_variable.pop();
     }
   }

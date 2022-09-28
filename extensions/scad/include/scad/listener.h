@@ -36,9 +36,9 @@ public:
   
   // only one package during the parsing of a source
   doc::Package                  *curr_package;  
-  orthodocs::doc::ItemPtrStack   curr_item;
-  orthodocs::doc::ItemPtrStack   curr_variable;
-  orthodocs::doc::ParameterPtr   curr_parameter;
+  orthodocs::doc::Item::PtrStack   curr_item;
+  orthodocs::doc::Item::PtrStack   curr_variable;
+  orthodocs::doc::Parameter::Ptr   curr_parameter;
 
   explicit Listener(const std::filesystem::path &pkg_source);
 

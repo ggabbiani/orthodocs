@@ -19,8 +19,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "error_info.h"
 #include "orthodocs/analizer.h"
+#include "orthodocs/error_info.h"
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
