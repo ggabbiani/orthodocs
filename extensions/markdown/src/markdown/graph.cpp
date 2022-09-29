@@ -20,8 +20,7 @@
  */
 
 #include "markdown/graph.h"
-
-// #include <iostream>
+#include "orthodocs/error_info.h"
 
 using namespace std;
 
@@ -41,7 +40,8 @@ ostream &Node::write(ostream &os,Node::Map &nodemap) {
     label = (++(*labeller)).string();
     os << label << '[' << name() << "]";
     defined = true;
-    nodemap.emplace(name(),*this);
+    if (auto [i,success] = nodemap.try_emplace(name(),*this); !success)
+      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same nodemap");
   } else
     os << label;
   return os;
