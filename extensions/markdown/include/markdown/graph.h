@@ -42,7 +42,7 @@ struct Node {
 };
 
 struct Connection {
-  enum Type {inc,use};
+  enum class Type {inc,use};
 
   Connection(Node &source, Type type, Node &destination) : source(source),destination(destination),type(type) {}
   std::ostream &write(std::ostream &os,Node::Map &nodemap);

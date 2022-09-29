@@ -29,7 +29,7 @@ namespace graph {
 ostream &Connection::write(ostream &os,Node::Map &nodemap) {
   os << "    ";
   source.write(os,nodemap);
-  os << " --o|" << (type==inc ? "include" : "use") << "| ";
+  os << " --o|" << (type==Type::inc ? "include" : "use") << "| ";
   destination.write(os,nodemap);
   os << endl;
   return os;
