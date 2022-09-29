@@ -365,12 +365,12 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
           << "```mermaid\n"
           << "graph TD" << endl;
       // build a dependency graph limited on packages located inside «current_dir»
-      for(auto element: packages) {
-        auto package = dynamic_cast<const Package*>(element.second);
+      for(const auto& [name,item]: packages) {
+        auto package = dynamic_cast<const Package*>(item);
         assert(package);
         if (dir!=".") {
           if (is_sub_of(package->path.parent_path(),dir))
-            saveme(package,nodemap,label,out, [dir] (const graph::Connection &conn) -> bool {
+            saveme(package,nodemap,label,out, [dir] (const graph::Connection &conn) {
               return (is_sub_of(conn.destination.path.parent_path(),dir));
           });
         } else 
