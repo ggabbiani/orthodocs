@@ -4,10 +4,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(OrthoDocs)
 
-option(BUILD_TESTING    "Generate tests"              ON)
-option(LANGUAGE_SCAD    "OpenSCAD language extension" ON)
-option(WRITER_MARKDOWN  "Markdown writer extension"   ON)
-option(EXPERIMENTAL     "Experimental tests"          ON)
+option(OPTION_TESTS           "Generate tests"              OFF )
+option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension" ON  )
+option(OPTION_WRITER_MARKDOWN "Markdown writer extension"   ON  )
+option(OPTION_EXPERIMENTAL    "Experimental tests"          OFF )
 
 include(CTest)
 
@@ -15,7 +15,16 @@ include(CTest)
 set(CMAKE_CXX_STANDARD 17)
 # disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
 set(CMAKE_CXX_EXTENSIONS OFF)
+# if (APPLE)
+#   SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+#   SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+#   SET(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+#   SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+# endif()
 
+###############################################################################
+# global propedeutics to antrl4cpp
+###############################################################################
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
 
@@ -28,34 +37,36 @@ add_definitions(-DANTLR4CPP_STATIC)
 # to a zip file containing the libary source.
 # set(ANTLR4_TAG 4.10.1)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
-set(ANTLR4_ZIP_REPOSITORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
-
+set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
-include_directories(${ANTLR4_INCLUDE_DIRS})
+# include_directories(${ANTLR4_INCLUDE_DIRS})
 message("ANTLR4_INCLUDE_DIRS: ${ANTLR4_INCLUDE_DIRS}")
-
-# set variable pointing to the antlr tool that supports C++
-# this is not required if the jar file can be found under PATH environment
-# set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
-set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar)
-# add macros to generate ANTLR Cpp code from grammar
-find_package(ANTLR REQUIRED)
+###############################################################################
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
 set(ORTHODOCS_INCS include third-part)
 set(ORTHODOCS_LIBS antlr4_static)
 
-if (LANGUAGE_SCAD)
-  add_subdirectory(extensions/scad)
-  # list(APPEND ORTHODOCS_INCS extensions/scad/include)
-  list(APPEND ORTHODOCS_LIBS scad)
+if (OPTION_LANGUAGE_SCAD)
+  set(LANGUAGE      SCAD)
+  set(LEXER         ${LANGUAGE}Lexer)
+  set(PARSER        ${LANGUAGE}Parser)
+  set(LANGUAGE_LIB  Cpp${LANGUAGE})
+  set(LANGUAGE_JAR  J${LANGUAGE})
+  set(LANGUAGE_INCS ${ANTLR4_INCLUDE_DIRS})
+
+  add_subdirectory(extensions/${LANGUAGE})
+  list(APPEND ORTHODOCS_LIBS ${LANGUAGE_LIB})
 endif()
 
-if (WRITER_MARKDOWN)
-  add_subdirectory(extensions/markdown)
-  list(APPEND ORTHODOCS_LIBS markdown)
+if (OPTION_WRITER_MARKDOWN)
+  set(WRITER Markdown)
+  set(WRITER_LIB Markdown)
+
+  add_subdirectory(extensions/${WRITER})
+  list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
 endif()
 message("ORTHODOCS_INCS: ${ORTHODOCS_INCS}")
 message("ORTHODOCS_LIBS: ${ORTHODOCS_LIBS}")
@@ -69,19 +80,13 @@ add_executable(orthodocs
   src/orthodocs/utils.cpp
   src/orthodocs/xref.cpp
 )
-if (WRITER_MARKDOWN)
-  target_link_options(orthodocs PUBLIC "-Wl,--undefined,markdown_extension_loader")
-endif()
-if (LANGUAGE_SCAD)
-  target_link_options(orthodocs PUBLIC "-Wl,--undefined,scad_extension_loader")
-endif()
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
 
-if (EXPERIMENTAL)
+if (OPTION_EXPERIMENTAL)
   add_subdirectory(experimental)
 endif()
 
-if (BUILD_TESTING)
+if (OPTION_TESTS)
   add_subdirectory(tests)
 endif()

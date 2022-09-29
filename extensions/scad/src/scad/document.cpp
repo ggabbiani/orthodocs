@@ -24,17 +24,18 @@
 #include "orthodocs/utils.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <filesystem>
 #include <string.h>
-#include <sstream> 
+#include <sstream>
 
 using namespace std;
 
 namespace fs = std::filesystem;
 
 namespace scad {
-  
+
 namespace doc {
 
 string Package::indexKey(const string &s) {
@@ -85,7 +86,7 @@ bool Simple::check(const string &text) {
   auto len = lines(text);
   if (len<3)
     return false;
-  
+
   stringstream ss(text,ios_base::in);
   auto i        = 1;
   bool goon     = true;
@@ -99,20 +100,20 @@ bool Simple::check(const string &text) {
     }
     ++i;
   }
-  
+
   return goon;
 }
 
 string Simple::manage(const string &text) {
   auto len = lines(text);
   assert(len>2);
-  
+
   string result;
   stringstream ss(text,ios_base::in);
   auto i    = 1;
   bool goon = true;
   while (goon && ss.getline(buffer,sizeof buffer)) {
-    if (i>1 && i<len) 
+    if (i>1 && i<len)
       result.append(string(buffer).substr(this->column)+'\n');
     ++i;
   }
@@ -129,18 +130,11 @@ const array<const char *,3> Fine::decoration{
   " *"
 };
 
-  /**
-   * @brief 
-   * 
-   * @param text 
-   * @return true 
-   * @return false 
-   */
 bool Fine::check(const string &text) {
   auto len = lines(text);
   if (len<3)
     return false;
-  
+
   stringstream ss(text,ios_base::in);
   auto row        = 1;
   bool goon     = true;
@@ -158,7 +152,7 @@ bool Fine::check(const string &text) {
       goon  = (pos-buffer+1==this->column);
     ++row;
   }
-  
+
   return goon;
 }
 
@@ -166,7 +160,7 @@ string Fine::manage(const string &text) {
   string result;
   auto len = lines(text);
   assert(len>2);
-  
+
   stringstream ss(text,ios_base::in);
   auto i    = 1;
   bool goon = true;

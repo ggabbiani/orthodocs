@@ -27,7 +27,6 @@
 #include "orthodocs/utils.h"
 
 using namespace std;
-using namespace antlr4;
 
 namespace fs = std::filesystem;
 
@@ -80,7 +79,7 @@ void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &re
           lookup(FileSet{entry_path},extension,result);
         }
       }
-    } else 
+    } else
       throw domain_error("what is this '"+path.string()+"'?");
   }
 }

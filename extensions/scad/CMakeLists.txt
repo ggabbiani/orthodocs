@@ -1,65 +1,66 @@
-set(LANGUAGE SCAD)
-set(LEXER ${LANGUAGE}Lexer)
-set(PARSER ${LANGUAGE}Parser)
-
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+include_directories(${ANTLR4_INCLUDE_DIRS})
+# set variable pointing to the antlr tool that supports C++
+# this is not required if the jar file can be found under PATH environment
+# set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
+set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar)
+# add macros to generate ANTLR Cpp code from grammar
+find_package(ANTLR REQUIRED)
 
 ###############################################################################
-# 1) C++ split parser
+# C++ split parser
 
 # add lexer and grammar to the build dependencies.
 antlr_target(${LEXER} ${LEXER}.g4 LEXER PACKAGE scad)
-antlr_target(${PARSER} 
-  ${PARSER}.g4 
+antlr_target(${PARSER}
+  ${PARSER}.g4
   PARSER LISTENER
   PACKAGE scad
   DEPENDS_ANTLR ${LEXER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
 )
 
-###############################################################################
-# 2) C++ client application libs
-message("ANTLR_${LEXER}_CXX_OUTPUTS: ${ANTLR_${LEXER}_CXX_OUTPUTS}")
-message("ANTLR_${PARSER}_CXX_OUTPUTS: ${ANTLR_${PARSER}_CXX_OUTPUTS}")
-message("ANTLR_${LEXER}_OUTPUT_DIR: ${ANTLR_${LEXER}_OUTPUT_DIR}")
-message("ANTLR_${PARSER}_OUTPUT_DIR: ${ANTLR_${PARSER}_OUTPUT_DIR}")
+message("ANTLR_${LEXER}_CXX_OUTPUTS : ${ANTLR_${LEXER}_CXX_OUTPUTS}"  )
+message("ANTLR_${PARSER}_CXX_OUTPUTS: ${ANTLR_${PARSER}_CXX_OUTPUTS}" )
+message("ANTLR_${LEXER}_OUTPUT_DIR  : ${ANTLR_${LEXER}_OUTPUT_DIR}"   )
+message("ANTLR_${PARSER}_OUTPUT_DIR : ${ANTLR_${PARSER}_OUTPUT_DIR}"  )
 
-set(LIB_NAME scad)
-add_library(${LIB_NAME} STATIC
-  src/scad/annotations.cpp 
+###############################################################################
+# C++ client application libs
+add_library(${LANGUAGE_LIB} STATIC
+  src/scad/annotations.cpp
   src/scad/doc/license.cpp
-  src/scad/document.cpp 
+  src/scad/document.cpp
   src/scad/extension.cpp
   src/scad/listener.cpp
   src/scad/xref.cpp
   ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
-target_include_directories(${LIB_NAME}
+target_include_directories(${LANGUAGE_LIB}
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/include 
+    ${PROJECT_SOURCE_DIR}/include
     include
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
-target_link_libraries(${LIB_NAME} antlr4_static)
+target_link_libraries(${LANGUAGE_LIB} antlr4_static)
 
 ###############################################################################
-# 3) C++ application for annotation style testing
+# C++ application for annotation style testing
 
 # add_executable(style-tester
-#   src/style-tester.cpp 
-#   src/globals.cpp 
-#   src/utils.cpp 
+#   src/style-tester.cpp
+#   src/globals.cpp
+#   src/utils.cpp
 #   src/document.cpp
 # )
 # target_include_directories(style-tester PUBLIC include)
 # target_link_libraries(style-tester)
 
 ###############################################################################
-# 4) Java split parser for testing grammars via grun
+# Java split parser for testing grammars via grun
 #
 # NOTE: WHEN USING SEPARATED LEXER AND PARSER IT'S EXPECTED THAT THE LEXER ENDS
 # ON Lexer AND THE PARSER ENDS ON Parser. THE COMMON PART OF THE FILES IS THE
-# NAME OF GRAMMAR. I.E TestLexer AND TestParser -> Test IS THE NAME OF THE 
+# NAME OF GRAMMAR. I.E TestLexer AND TestParser -> Test IS THE NAME OF THE
 # GRAMMAR TO BE USED WITH GRUN.
 
 find_package(Java QUIET COMPONENTS Runtime REQUIRED)
@@ -68,8 +69,8 @@ include(UseJava)
 set(JAVA_ARTIFACTS_DIR ${CMAKE_CURRENT_BINARY_DIR}/java)
 
 # Lexer
-set(LEXER_GRAMMAR ${CMAKE_CURRENT_SOURCE_DIR}/${LEXER}.g4)
-set(LEXER_JAVA_SOURCES ${JAVA_ARTIFACTS_DIR}/${LEXER}.java )
+set(LEXER_GRAMMAR       ${CMAKE_CURRENT_SOURCE_DIR}/${LEXER}.g4 )
+set(LEXER_JAVA_SOURCES  ${JAVA_ARTIFACTS_DIR}/${LEXER}.java     )
 set(LEXER_JAVA_ARTIFACTS
     ${JAVA_ARTIFACTS_DIR}/${LEXER}.interp
     ${JAVA_ARTIFACTS_DIR}/${LEXER}.tokens
@@ -86,8 +87,8 @@ add_custom_command(
 )
 # Parser
 set(PARSER_GRAMMAR ${CMAKE_CURRENT_SOURCE_DIR}/${PARSER}.g4)
-set(PARSER_JAVA_SOURCES 
-  ${JAVA_ARTIFACTS_DIR}/${PARSER}.java 
+set(PARSER_JAVA_SOURCES
+  ${JAVA_ARTIFACTS_DIR}/${PARSER}.java
   ${JAVA_ARTIFACTS_DIR}/${PARSER}BaseListener.java
   ${JAVA_ARTIFACTS_DIR}/${PARSER}Listener.java
 )
@@ -106,8 +107,8 @@ add_custom_command(
     COMMENT "Building Java Parser artifacts"
 )
 add_jar(
-    ${LANGUAGE}
-    SOURCES 
+    ${LANGUAGE_JAR}
+    SOURCES
       ${LEXER_JAVA_SOURCES}
       ${PARSER_JAVA_SOURCES}
     INCLUDE_JARS ${ANTLR_EXECUTABLE}
@@ -147,7 +148,7 @@ function(new_test)
   set_property(TEST "${TEST_NAME}" PROPERTY RUN_SERIAL TRUE)
 endfunction(new_test)
 
-if (BUILD_TESTING)
+if (OPTION_TESTS)
   new_test(NAME comments      RULE pkg  FILE comments.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME uses          RULE pkg  FILE uses.scad          FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME vectors       RULE pkg  FILE vectors.scad       FAIL_REGULAR_EXPRESSION DEFAULT)

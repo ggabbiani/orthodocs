@@ -20,6 +20,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#cmakedefine LANGUAGE_SCAD
+#cmakedefine OPTION_LANGUAGE_SCAD
 
-#cmakedefine WRITER_MARKDOWN
+#cmakedefine OPTION_WRITER_MARKDOWN

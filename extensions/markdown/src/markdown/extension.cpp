@@ -23,15 +23,13 @@
 #include "markdown/extension.h"
 #include "markdown/graph.h"
 
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include <cassert>
 #include <fstream>
 
 using namespace std;
 namespace fs=std::filesystem;
-
-ExtensionLoader<markdown::Extension> markdown_extension_loader;
 
 namespace {
 
@@ -48,9 +46,9 @@ using Filter = function<bool(const graph::Connection&)>;
  * NOTE: must be preceeded and followed by proper mermaid open/close statements
  */
 void saveme(
-  const scad::doc::Package  *src_package, 
-  graph::Node::Map          &nodemap, 
-  IncLabel                  &label, 
+  const scad::doc::Package  *src_package,
+  graph::Node::Map          &nodemap,
+  IncLabel                  &label,
   ostream                   &out,
   const Filter              &filter= [] (const graph::Connection &) {return true;}
 ) {
@@ -143,7 +141,7 @@ void Extension::save(const ToC &toc) {
       bar++;
     }
     // write last sub toc
-    if (sub.size()) { 
+    if (sub.size()) {
       subToc(sub,out,current);
     }
   } catch(...) {
@@ -187,7 +185,7 @@ void Extension::write(const Package *pkg,ostream &out) const {
       if (!pkg->uses.empty()) {
         out << BOLD("Uses:") << '\n'
             << '\n';
-        for(const auto &p: pkg->uses) 
+        for(const auto &p: pkg->uses)
           out << "    " << p << '\n';
         out << endl;
       }
@@ -196,7 +194,7 @@ void Extension::write(const Package *pkg,ostream &out) const {
   // write annotation contents
   if (!pkg->annotation.empty()) {
     out << pkg->annotation << endl;
-    if (pkg->license) 
+    if (pkg->license)
       out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
   }
 }
@@ -348,7 +346,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
       assert(dir.is_relative());
       // select only doc::Package items
       auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &,const orthodocs::doc::Item *item) {
-        if (auto package = dynamic_cast<const Package*>(item); package) 
+        if (auto package = dynamic_cast<const Package*>(item); package)
           return dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
         else
           return false;
@@ -373,7 +371,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
             saveme(package,nodemap,label,out, [dir] (const graph::Connection &conn) {
               return (is_sub_of(conn.destination.path.parent_path(),dir));
           });
-        } else 
+        } else
           saveme(package,nodemap,label,out);
       }
       out  << "```\n" << endl;
@@ -386,3 +384,5 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
 }
 
 } // namespace markdown
+
+extern "C" writer::Extension *markdown_extension = &Singleton<markdown::Extension>::instance();

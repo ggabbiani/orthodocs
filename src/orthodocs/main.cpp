@@ -59,7 +59,7 @@ string existing_canonical_dir(string &dir) {
 string canonical_dir(string &dir) {
   try {
     fs::path p(dir);
-    if (!fs::exists(p)) 
+    if (!fs::exists(p))
       fs::create_directories(p);
     if (!fs::is_directory(p))
       return  "If existing, must be a directory: " + dir;
@@ -80,7 +80,7 @@ string sroot_relative(string &sub) {
   if (!Option::sroot().empty()) {
     cwd sroot(Option::sroot());
     sub = fs::relative(sub,Option::sroot()).string();
-  } else 
+  } else
     error = "«source tree root» is missing";
   return error;
 }
@@ -161,9 +161,9 @@ int main(int argc, const char *argv[]) {
     if (Option::toc())
       writer->save(analyst.toc());
     // save graphs
-    if (Option::graphs().size()) 
+    if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
-      
+
   } catch (const CLI::Error &error) {
     result  = app.exit(error);
   } catch(const exception &error) {

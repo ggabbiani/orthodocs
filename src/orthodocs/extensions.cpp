@@ -27,10 +27,23 @@
 
 using namespace std;
 
+#ifdef OPTION_LANGUAGE_SCAD
+extern "C" language::Extension *scad_extension;
+#endif // OPTION_LANGUAGE_SCAD
+
+#ifdef OPTION_WRITER_MARKDOWN
+extern "C" writer::Extension *markdown_extension;
+#endif // OPTION_WRITER_MARKDOWN
+
 namespace language {
 
 Extension *Extension::factory() {
-  auto &registry  = Singleton<Map>::instance();
+  static language::Extension::Map registry = {
+  #ifdef OPTION_LANGUAGE_SCAD
+  {scad_extension->id,scad_extension}
+  #endif // OPTION_LANGUAGE_SCAD
+  };
+
   if (auto i=registry.find(Option::language()); i!=registry.end())
     return i->second;
   throw domain_error("No language extension found for id '"+Option::language()+'\'');
@@ -41,7 +54,12 @@ Extension *Extension::factory() {
 namespace writer {
 
 Extension *Extension::factory() {
-  auto &registry  = Singleton<Map>::instance();
+  const writer::Extension::Map registry = {
+  #ifdef OPTION_WRITER_MARKDOWN
+  {markdown_extension->id,markdown_extension}
+  #endif // OPTION_WRITER_MARKDOWN
+  };
+
   if (auto i=registry.find(Option::writer()); i!=registry.end())
     return i->second;
   throw domain_error("No language extension found for id '"+Option::writer()+'\'');

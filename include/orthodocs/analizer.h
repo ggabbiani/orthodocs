@@ -22,8 +22,6 @@
 
 #include "orthodocs/document.h"
 
-#include "antlr4-runtime.h"
-
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -51,7 +49,7 @@ public:
 
   // analize a set of files / directories
   void process(const FileSet &sources);
-  
+
   /**
    * 1) produce an in-memory document of the source code passed
    * 2) add document contents to the Table of Contents
@@ -73,7 +71,7 @@ private:
     // list of source directories/files
     const FileSet &sources,
     // extension to filter out
-    const char *extension, 
+    const char *extension,
     // resulting list of source files matching «extension»
     FileSet &result
   );

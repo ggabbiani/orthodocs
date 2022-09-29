@@ -126,7 +126,7 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   auto style  = factory(anno);
   auto value  = style->manage(anno);
 
-  if (Option::admonitions)
+  if (Option::admonitions())
     mk_admonitions(value);
 
   // FIXME: a sigle if with multiple OR sould be ok
@@ -160,7 +160,7 @@ void Listener::exitParameter(scad::SCADParser::ParameterContext *ctx) {
 void Listener::enterLookup(scad::SCADParser::LookupContext *ctx) {
   auto value = ctx->ID()->getText();
   if (curr_parameter) {
-    if (is<scad::SCADParser::ParameterContext>(*ctx->parent)) 
+    if (is<scad::SCADParser::ParameterContext>(*ctx->parent))
       curr_parameter->name = value;
   }
 }

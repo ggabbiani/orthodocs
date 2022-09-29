@@ -31,8 +31,6 @@ using namespace std;
 using namespace antlr4;
 namespace fs=std::filesystem;
 
-ExtensionLoader<scad::Extension> scad_extension_loader;
-
 namespace {
 
 class ErrorHandler : public BaseErrorListener {
@@ -82,3 +80,5 @@ const char *Extension::sourcePostfix() const {
 }
 
 } // namespace scad
+
+extern "C" language::Extension *scad_extension = &Singleton<scad::Extension>::instance();

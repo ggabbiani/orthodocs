@@ -20,7 +20,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/analizer.h"
+// #include "orthodocs/analizer.h"
 #include "orthodocs/document.h"
 #include "orthodocs/globals.h"
 #include "singleton.h"
@@ -28,16 +28,6 @@
 #include <filesystem>
 #include <map>
 #include <string>
-
-template <class EXTENSION>
-class ExtensionLoader {
-public:
-  ExtensionLoader() {
-    EXTENSION &extension=Singleton<EXTENSION>::instance();
-    auto &registry = Singleton<typename EXTENSION::Map>::instance();
-    registry.emplace(extension.id,&extension);
-  }
-};
 
 namespace language {
 
@@ -71,7 +61,7 @@ public:
 
   explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
-  
+
   /**
    * return the extension corresponding to the Option::writer()
    */
