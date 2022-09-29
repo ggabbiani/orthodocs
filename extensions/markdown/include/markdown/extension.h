@@ -54,7 +54,7 @@ private:
   void write(const Variable   *var,   std::ostream &out) const;
 
   template <class T>
-  void write(Document::Topic<T> &&topic, std::ostream &out) const {
+  void write(const Document::Topic<T> &topic, std::ostream &out) const {
     if (topic.items.size()) {
       out << H(topic.title,2)
           << std::endl;
