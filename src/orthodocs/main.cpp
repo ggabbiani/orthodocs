@@ -158,11 +158,11 @@ int main(int argc, const char *argv[]) {
     // save documents
     writer->save(analyst.documents());
     // save table of contents
-    if (Option::_toc)
+    if (Option::toc())
       writer->save(analyst.toc());
     // save graphs
-    if (Option::_graphs.size()) 
-      writer->graphs(analyst.toc(),Option::_graphs);
+    if (Option::graphs().size()) 
+      writer->graphs(analyst.toc(),Option::graphs());
       
   } catch (const CLI::Error &error) {
     result  = app.exit(error);
