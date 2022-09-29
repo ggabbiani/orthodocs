@@ -52,7 +52,7 @@ void Analizer::process(const FileSet &sources) {
     FileSet files;
     lookup(sources,_parser->sourcePostfix(),files);
 
-    Bar bar(files,"analized sources");
+    Bar bar(files,"sources analized");
     for(const auto &file: files) {
       bar.status(file.string());
       document(file);

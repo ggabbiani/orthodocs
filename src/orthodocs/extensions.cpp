@@ -49,7 +49,7 @@ Extension *Extension::factory() {
 
 void Extension::save(const orthodocs::DocumentList &docs) {
   try {
-    orthodocs::Bar bar(docs,"saved documents");
+    orthodocs::Bar bar(docs,"documents saved");
     for(const auto &doc: docs) {
       bar.status(doc->source);
       save(*doc);
