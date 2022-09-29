@@ -96,8 +96,8 @@ public:
    * contains the full abstract package path: root relative path comprehensive of extension
    */
   std::filesystem::path path;
-  std::set<std::string> uses;
-  std::set<std::string> includes;
+  std::set<std::string,std::less<>> uses;
+  std::set<std::string,std::less<>> includes;
   // eventual license 
   const char *license = nullptr;
 };

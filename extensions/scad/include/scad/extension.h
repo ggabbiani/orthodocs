@@ -30,8 +30,6 @@ public:
   Extension() : language::Extension(ID) {}
   std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const override;
   const char *sourcePostfix() const override;
-private:
-  // static ExtensionLoader<Extension> loader;
 };
 
 } // namespace scad

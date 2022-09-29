@@ -3,9 +3,7 @@
 #include <regex>
 #include <string>
 
-namespace scad {
-  
-namespace doc {
+namespace scad::doc {
 
 class License {
 public:
@@ -27,6 +25,4 @@ private:
   std::regex _regex;
 };
 
-} // namespace doc
-
-} // namespace othodocs
+} // namespace scad::doc
