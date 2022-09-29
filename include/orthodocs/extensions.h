@@ -43,19 +43,22 @@ namespace language {
 
 class Extension {
 public:
-  explicit Extension(const char *id) : id(id) {}
   using Map = std::map<std::string,Extension*,std::less<>>;
-  const char * const id;
+
+  explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
+
   virtual std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const = 0;
   /**
    * return the source postfix
    */
   virtual const char *sourcePostfix() const = 0;
   /**
-   * return the extension corresponding to the Option::writer()
+   * return the extension corresponding to the Option::language()
    */
   static Extension *factory();
+
+  const char * const id;
 };
 
 } // namespace language
