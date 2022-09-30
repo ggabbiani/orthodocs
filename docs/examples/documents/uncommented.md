@@ -1,12 +1,12 @@
-# package foundation/3d
+# package uncommented
 
 ## Dependencies
 
 ```mermaid
 graph LR
-    A1[foundation/3d] --o|include| A2[foundation/2d]
-    A1 --o|include| A3[foundation/bbox]
-    A1 --o|include| A4[foundation/type_trait]
+    A1[uncommented] --o|include| A2[2d]
+    A1 --o|include| A3[bbox]
+    A1 --o|include| A4[type_trait]
 ```
 
 ## Variables
@@ -58,3 +58,4 @@ __Syntax:__
 __Syntax:__
 
     fl_cylinder(verbs=FL_ADD,h,r,r1,r2,d,d1,d2,octant,direction)
+

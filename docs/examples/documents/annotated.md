@@ -1,12 +1,12 @@
-# package foundation/3d
+# package annotated
 
 ## Dependencies
 
 ```mermaid
 graph LR
-    A1[foundation/3d] --o|include| A2[foundation/2d]
-    A1 --o|include| A3[foundation/bbox]
-    A1 --o|include| A4[foundation/type_trait]
+    A1[annotated] --o|include| A2[2d]
+    A1 --o|include| A3[bbox]
+    A1 --o|include| A4[type_trait]
 ```
 
 3d primitives replacing native OpenSCAD ones.
@@ -21,7 +21,10 @@ __Default:__
 
     2.71828
 
-The number e, also known as Euler's number, is a mathematical constant approximately equal to 2.71828 which can be characterized in many ways
+The number e, also known as Euler's number, is a mathematical
+constant approximately equal to 2.71828 which can be characterized
+in many ways.
+
 
 ## Functions
 
@@ -50,11 +53,14 @@ is equivalent to:
      [ 0, 0, +1],
     ];
 
+:memo: __note:__ this is an admonition!
+
 
 __Parameters:__
 
 __axes__  
 semi-axis list (es.["-x","±Z"])
+
 
 ---
 
@@ -91,6 +97,7 @@ when undef native positioning is used
 
 __direction__  
 desired direction [director,rotation] or native direction if undef
+
 
 ---
 
@@ -134,3 +141,5 @@ when undef native positioning is used
 
 __direction__  
 desired direction [director,rotation], native direction when undef ([+X+Y+Z])
+
+
