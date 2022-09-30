@@ -54,7 +54,6 @@ Assuming the following directory tree:
     /home/
     ┖── giampa/
         ┖── example/
-            ┠── docs/
             ┖── sources/
                 ┠── 2d.scad
                 ┠── annotated.scad
@@ -64,7 +63,7 @@ Assuming the following directory tree:
 
 the following command executed in the directory «/home/giampa»
 
-    /home/giampa $ orthodocs --src-root example/sources --doc-root example/doc
+    /home/giampa $ orthodocs --src-root example/sources --doc-root example/docs
 
 will scan all the SCAD sources in the source-root and produce the relative documents in the doc-root
 
@@ -86,7 +85,7 @@ will scan all the SCAD sources in the source-root and produce the relative docum
 
 If we want to keep the same source-root while documenting only one subset the following command
 
-    /home/giampa $ orthodocs --src-root example/sources --doc-root example/doc annotated.scad uncommented.scad
+    /home/giampa $ orthodocs --src-root example/sources --doc-root example/docs annotated.scad uncommented.scad
 
 will produce
 
@@ -103,20 +102,22 @@ will produce
                 ┠── type_trait.scad
                 ┖── uncommented.scad
 
-For more complex tasks this is the full option list:
+### Full command options
+
+For more complex tasks consult the full command option list:
 
 | Option             | Description
 | ------------------ | -----------
-| -h,--help          | Print the help message and exit
 | -a,--admonitions   | when enabled any admonition found in annotations will be enriched with a corresponding emoj
-| -s,--src-root      | source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
 | -d,--doc-root      | document tree root - either an absolute or current directory relative path. It is a **mandatory directory** parameter, if not existing is created.
-| -t,--toc           | generate a Table of Contents in the document tree root
+| -g,--graphs        | Needs: --src-root. List of root relative directories where placing dependency graphs
+| -h,--help          | Print the help message and exit
 | -i,--ignore-prefix | ignore this prefix in the Table of Contents when sorting
 | --pd,--pkg-deps    | set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
-| -g,--graphs        | Needs: --src-root. List of root relative directories where placing dependency graphs
 | -p,--private       | Every documentation item (variable, function or module) prefixed with this string will not be published.
-  -q,--quiet         | quiet mode, no statistics will be printed after successfully execution.
+| -q,--quiet         | quiet mode, no statistics will be printed after successfully execution.
+| -s,--src-root      | source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
+| -t,--toc           | generate a Table of Contents in the document tree root
 
 ## Project status
 
