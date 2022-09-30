@@ -38,7 +38,7 @@ Orthodocs annotations are single line or C style block comments in which the com
      //! This is a single line comment interpreted as a single line annotation
 
 
-[Here](docs/examples/documents/annotated.md) a document example from the same [source file enriched with annotations](docs/examples/documents/annotated.md).
+[Here](docs/examples/documents/annotated.md) a document example from the same [source file enriched with annotations](docs/examples/sources/annotated.scad).
 
 ## The command line
 
