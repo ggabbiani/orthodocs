@@ -9,6 +9,7 @@ option(OPTION_WRITER_MARKDOWN "Markdown writer extension"   ON  )
 option(OPTION_EXPERIMENTAL    "Experimental tests"          OFF )
 
 include(CTest)
+include(CMakePrintHelpers)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -41,7 +42,7 @@ set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
 # include_directories(${ANTLR4_INCLUDE_DIRS})
-message("ANTLR4_INCLUDE_DIRS: ${ANTLR4_INCLUDE_DIRS}")
+cmake_print_variables(ANTLR4_INCLUDE_DIRS)
 ###############################################################################
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
@@ -67,8 +68,7 @@ if (OPTION_WRITER_MARKDOWN)
   add_subdirectory(extensions/${WRITER})
   list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
 endif()
-message("ORTHODOCS_INCS: ${ORTHODOCS_INCS}")
-message("ORTHODOCS_LIBS: ${ORTHODOCS_LIBS}")
+cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
 
 add_executable(orthodocs
   src/orthodocs/analizer.cpp
@@ -81,6 +81,10 @@ add_executable(orthodocs
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
+cmake_print_properties(
+    TARGETS orthodocs
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+)
 
 if (OPTION_EXPERIMENTAL)
   add_subdirectory(experimental)

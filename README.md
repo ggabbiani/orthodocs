@@ -143,15 +143,18 @@ Given a source tree, it is possible to:
 
 ## Project status
 
-| Feature      | Status
-| -----------  | ------
+| Feature                   | Status
+| ------------------------- | ------
 | [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
 | comment styles            | ✔ 
 | cross-reference           | 🚧  
 | dependency graphs         | ✔
 | global values             | ✔
+| Linux support             | ✔
+| macOS support             | ✔
 | source license detection  | ✔
 | table of contents         | ✔
+| Windows support           | 🚧 
 
 Legenda:
 

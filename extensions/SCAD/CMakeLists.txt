@@ -19,10 +19,12 @@ antlr_target(${PARSER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
 )
 
-message("ANTLR_${LEXER}_CXX_OUTPUTS : ${ANTLR_${LEXER}_CXX_OUTPUTS}"  )
-message("ANTLR_${PARSER}_CXX_OUTPUTS: ${ANTLR_${PARSER}_CXX_OUTPUTS}" )
-message("ANTLR_${LEXER}_OUTPUT_DIR  : ${ANTLR_${LEXER}_OUTPUT_DIR}"   )
-message("ANTLR_${PARSER}_OUTPUT_DIR : ${ANTLR_${PARSER}_OUTPUT_DIR}"  )
+cmake_print_variables(
+  ANTLR_${LEXER}_CXX_OUTPUTS 
+  ANTLR_${PARSER}_CXX_OUTPUTS 
+  ANTLR_${LEXER}_OUTPUT_DIR 
+  ANTLR_${PARSER}_OUTPUT_DIR
+)
 
 ###############################################################################
 # C++ client application libs
@@ -38,10 +40,11 @@ add_library(${LANGUAGE_LIB} STATIC
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC
     ${PROJECT_SOURCE_DIR}/include
+  PRIVATE
     include
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
-target_link_libraries(${LANGUAGE_LIB} antlr4_static)
+target_link_libraries(${LANGUAGE_LIB} PRIVATE antlr4_static)
 
 ###############################################################################
 # C++ application for annotation style testing

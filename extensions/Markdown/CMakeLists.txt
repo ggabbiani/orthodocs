@@ -1,5 +1,5 @@
 find_package(Boost REQUIRED)
-message("Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS}")
+cmake_print_variables(Boost_INCLUDE_DIRS)
 
 set(WRITER_INCS
   include
@@ -11,8 +11,7 @@ if (OPTION_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
 endif()
 
-message("WRITER_INCS: ${WRITER_INCS}")
-message("WRITER_LIBS: ${WRITER_LIBS}")
+cmake_print_variables(WRITER_INCS WRITER_LIBS)
 
 add_library(${WRITER_LIB} STATIC
   src/markdown/graph.cpp
