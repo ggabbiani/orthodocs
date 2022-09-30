@@ -23,7 +23,7 @@ Even in a completely uncommented source tree, OrthoDocs will create a document w
 
 ### Annotations
 
-Orthodocs annotations are single line or C style block comments in which the comment start is immediately followed by the `!` character. All the other comments are ignored.
+Orthodocs annotations are single line or C-style block comments in which the comment start is immediately followed by the `!` character. All the other comments are ignored.
 
     /*
      * This is a C-style block comment and is ignored by OrthoDocs
@@ -32,7 +32,9 @@ Orthodocs annotations are single line or C style block comments in which the com
     // This is a single line comment ignored as well
 
     /*!
-     * This is a C-style block comment interpreted as a multi line annotation
+     * This is a C-style block comment interpreted
+     * as a multi
+     * line annotation
      */
 
      //! This is a single line comment interpreted as a single line annotation
@@ -65,7 +67,7 @@ the following command executed in the directory «/home/giampa»
 
     /home/giampa $ orthodocs --src-root example/sources --doc-root example/docs
 
-will scan all the SCAD sources in the source-root and produce the relative documents in the doc-root
+will scan all the SCAD sources in the source-root and produce the consequent documents in the doc-root
 
     /home/
     ┖── giampa/
@@ -83,7 +85,7 @@ will scan all the SCAD sources in the source-root and produce the relative docum
                 ┠── type_trait.scad
                 ┖── uncommented.scad
 
-If we want to keep the same source-root while documenting only one subset the following command
+If we want to keep the same source-root while documenting only one subset of the present sources the following command
 
     /home/giampa $ orthodocs --src-root example/sources --doc-root example/docs annotated.scad uncommented.scad
 
@@ -118,7 +120,7 @@ For more complex tasks consult the full command option list:
 | -q,--quiet         | **FLAG** - quiet mode, no statistics will be printed after successfully execution.
 | -s,--src-root      | **OPTION** - source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
 | -t,--toc           | **FLAG** - generate a Table of Contents in the document tree root
-| positional         | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
+| positionals        | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
 
 ## Project status
 
