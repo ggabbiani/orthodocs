@@ -124,6 +124,8 @@ For more complex tasks consult the full command option list:
 
 ## Project status
 
+The list of features expected in the v1 release with the correspondig status:
+
 | Feature                   | Status
 | ------------------------- | ------
 | [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
