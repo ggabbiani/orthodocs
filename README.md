@@ -108,16 +108,17 @@ For more complex tasks consult the full command option list:
 
 | Option             | Description
 | ------------------ | -----------
-| -a,--admonitions   | when enabled any admonition found in annotations will be enriched with a corresponding emoj
-| -d,--doc-root      | document tree root - either an absolute or current directory relative path. It is a **mandatory directory** parameter, if not existing is created.
-| -g,--graphs        | Needs: --src-root. List of root relative directories where placing dependency graphs
-| -h,--help          | Print the help message and exit
-| -i,--ignore-prefix | ignore this prefix in the Table of Contents when sorting
-| --pd,--pkg-deps    | set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
-| -p,--private       | Every documentation item (variable, function or module) prefixed with this string will not be published.
-| -q,--quiet         | quiet mode, no statistics will be printed after successfully execution.
-| -s,--src-root      | source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
-| -t,--toc           | generate a Table of Contents in the document tree root
+| -a,--admonitions   | **FLAG** - when this flag is enabled any admonition found in annotations will be enriched with a corresponding emoj
+| -d,--doc-root      | **OPTION** - specifies the target document tree root either as absolute or current directory relative path. It is a **mandatory directory** parameter and - if not existing - it will be automatically created.
+| -g,--graphs        | **OPTION** - List of root relative directories where placing dependency graphs. Needs --src-root.
+| -h,--help          | **FLAG** - Print the help message and exit
+| -i,--ignore-prefix | **OPTION** - ignore this prefix in the Table of Contents when sorting
+| --pd,--pkg-deps    | **OPTION** - set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
+| -p,--private       | **OPTION** - Every documentation item (variable, function or module) prefixed with this string will not be published.
+| -q,--quiet         | **FLAG** - quiet mode, no statistics will be printed after successfully execution.
+| -s,--src-root      | **OPTION** - source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
+| -t,--toc           | **FLAG** - generate a Table of Contents in the document tree root
+| positional         | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
 
 ## Project status
 
