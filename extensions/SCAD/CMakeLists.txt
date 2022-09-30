@@ -148,7 +148,7 @@ function(new_test)
   set_property(TEST "${TEST_NAME}" PROPERTY RUN_SERIAL TRUE)
 endfunction(new_test)
 
-if (OPTION_TESTS)
+if (BUILD_TESTING)
   new_test(NAME comments      RULE pkg  FILE comments.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME uses          RULE pkg  FILE uses.scad          FAIL_REGULAR_EXPRESSION DEFAULT)
   new_test(NAME vectors       RULE pkg  FILE vectors.scad       FAIL_REGULAR_EXPRESSION DEFAULT)

@@ -4,7 +4,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(OrthoDocs)
 
-option(OPTION_TESTS           "Generate tests"              OFF )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension" ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"   ON  )
 option(OPTION_EXPERIMENTAL    "Experimental tests"          OFF )
@@ -87,6 +86,6 @@ if (OPTION_EXPERIMENTAL)
   add_subdirectory(experimental)
 endif()
 
-if (OPTION_TESTS)
+if (BUILD_TESTING)
   add_subdirectory(tests)
 endif()
