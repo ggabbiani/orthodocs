@@ -54,14 +54,14 @@ source file analized).
 Assuming the following directory tree:
 
     /home/
-    ┖── giampa/
-        ┖── example/
-            ┖── sources/
-                ┠── 2d.scad
-                ┠── annotated.scad
-                ┠── bbox.scad
-                ┠── type_trait.scad
-                ┖── uncommented.scad
+    └── giampa/
+        └── example/
+            └── sources/
+                ├── 2d.scad
+                ├── annotated.scad
+                ├── bbox.scad
+                ├── type_trait.scad
+                └── uncommented.scad
 
 the following command executed in the directory «/home/giampa»
 
@@ -70,20 +70,20 @@ the following command executed in the directory «/home/giampa»
 will scan all the SCAD sources in the source-root and produce the consequent documents in the doc-root
 
     /home/
-    ┖── giampa/
-        ┖── example/
-            ┠── docs/
-            ┃   ┠── 2d.md
-            ┃   ┠── annotated.md
-            ┃   ┠── bbox.md
-            ┃   ┠── type_trait.md
-            ┃   ┖── uncommented.md
-            ┖── sources/
-                ┠── 2d.scad
-                ┠── annotated.scad
-                ┠── bbox.scad
-                ┠── type_trait.scad
-                ┖── uncommented.scad
+    └── giampa/
+        └── example/
+            ├── docs/
+            │   ├── 2d.md
+            │   ├── annotated.md
+            │   ├── bbox.md
+            │   ├── type_trait.md
+            │   └── uncommented.md
+            └── sources/
+                ├── 2d.scad
+                ├── annotated.scad
+                ├── bbox.scad
+                ├── type_trait.scad
+                └── uncommented.scad
 
 If we want to keep the same source-root while documenting only one subset of the present sources the following command
 
@@ -92,17 +92,17 @@ If we want to keep the same source-root while documenting only one subset of the
 will produce
 
     /home/
-    ┖── giampa/
-        ┖── example/
-            ┠── docs/
-            ┃   ┠── annotated.md
-            ┃   ┖── uncommented.md
-            ┖── sources/
-                ┠── 2d.scad
-                ┠── annotated.scad
-                ┠── bbox.scad
-                ┠── type_trait.scad
-                ┖── uncommented.scad
+    └── giampa/
+        └── example/
+            ├── docs/
+            │   ├── annotated.md
+            │   └── uncommented.md
+            └── sources/
+                ├── 2d.scad
+                ├── annotated.scad
+                ├── bbox.scad
+                ├── type_trait.scad
+                └── uncommented.scad
 
 ### Full command options
 
