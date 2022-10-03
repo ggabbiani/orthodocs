@@ -89,7 +89,6 @@ void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
   auto item       = new doc::Function(identifier,nested);
   item->parent    = curr_package;
   assert(curr_package);
-  // curr_item.push(make_unique<doc::Function>(identifier,nested));
   curr_item.emplace(item);
 }
 
@@ -105,18 +104,19 @@ void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
 void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto identifier = ctx->ID()->getText();
   auto nested     = is<doc::Module>(*curr_item.top());
-  auto item       = new doc::Module(identifier,nested);
-  item->parent    = curr_package;
+  auto item       = make_unique<doc::Module>(identifier,nested);
   assert(curr_package);
-  curr_item.emplace(item);
+  item->parent    = curr_package;
+  curr_item.emplace(item.release());
 }
 
 void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   // TODO: implement the whole piece of code as a Document function
-  auto &module  = curr_item.top();
-  auto key      = module->documentKey();
-  if (!module->nested && !module->privateId())
-    _document->index.emplace(key,move(module));
+  auto &mod = curr_item.top();
+  auto  key = mod->documentKey();
+  if (!mod->nested && !mod->privateId())
+    if (auto [i,success] = _document->index.emplace(key,move(mod)); !success)
+      throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
   curr_item.pop();
 }
 
@@ -130,17 +130,17 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
   if (Option::admonitions())
     mk_admonitions(value);
 
-  // FIXME: a sigle if with multiple OR sould be ok
-  if (is<scad::SCADParser::ParameterContext>(*ctx->parent->parent->parent)) {   // parameter's annotation
+  if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent->parent->parent))   { // parameter's annotation
     curr_parameter->annotation = value;
-  } else if (is<scad::SCADParser::Function_defContext>(*ctx->parent->parent)) { // function's annotation
+  } else if (dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent)) { // function's annotation
     curr_item.top()->annotation = value;
-  } else if (is<scad::SCADParser::Module_defContext>(*ctx->parent->parent)) {   // module's annotation
+  } else if (dynamic_cast<scad::SCADParser::Module_defContext*>(ctx->parent->parent))   { // module's annotation
     curr_item.top()->annotation = value;
-  } else if (is<scad::SCADParser::AssignmentContext>(*ctx->parent->parent)) {   // variable's annotation
+  } else if (dynamic_cast<scad::SCADParser::AssignmentContext*>(ctx->parent->parent))   { // variable's annotation
     curr_variable.top()->annotation = value;
-  } else if (is<scad::SCADParser::PkgContext>(*ctx->parent->parent))        {   // package's annotation
+  } else if (dynamic_cast<scad::SCADParser::PkgContext*>(ctx->parent->parent))          { // package's annotation
     auto package = dynamic_cast<scad::doc::Package *>(curr_item.top().get());
+    assert(package);
     // search and subsitute any - known - license note
     if (auto lic = doc::License::remove(value))
       package->license = lic->name;
