@@ -43,7 +43,7 @@ void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto &item  = curr_item.top();
-  if (auto [i,success] = _document->index.emplace(item->documentKey(),move(item)); !success)
+  if (auto [i,success] = _document->index.try_emplace(item->documentKey(),move(item)); !success)
     throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
   curr_item.pop();
   curr_package  = nullptr;
