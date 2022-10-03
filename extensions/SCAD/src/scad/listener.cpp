@@ -115,7 +115,7 @@ void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto &mod = curr_item.top();
   auto  key = mod->documentKey();
   if (!mod->nested && !mod->privateId())
-    if (auto [i,success] = _document->index.emplace(key,move(mod)); !success)
+    if (auto [i,success] = _document->index.try_emplace(key,move(mod)); !success)
       throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
   curr_item.pop();
 }
