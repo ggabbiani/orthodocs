@@ -46,10 +46,10 @@ void Analizer::document(const fs::path &source) {
   }
 }
 
-void Analizer::process(const FileSet &sources) {
+void Analizer::process() {
   try {
     FileSet files;
-    lookup(sources,_parser->sourcePostfix(),files);
+    lookup(Option::sources().size() ? Option::sources() : FileSet{"."},_parser->sourcePostfix(),files);
 
     Bar bar(files,"sources analized");
     for(const auto &file: files) {

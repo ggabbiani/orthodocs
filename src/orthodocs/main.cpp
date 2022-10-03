@@ -109,10 +109,11 @@ struct {
   {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
   {"-p,--private",        "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
   {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
-  {"-q,--quiet",          "quiet mode"},
-  {"sources",             "source sub-trees and/or files - either as absolute or «source tree root» relative path"      },
+  {"-q,--quiet",          "quiet mode"                                                                                  },
+  {"sources",             "source root sub-trees and/or files - either as absolute or «source tree root» relative path."
+                          " If missing all the source root will be scanned"                                             },
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
-  {"-t,--toc",            "generate a Table of Contents in the document tree root"                                       },
+  {"-t,--toc",            "generate a Table of Contents in the document tree root"                                      },
 };
 
 }
@@ -130,7 +131,6 @@ int main(int argc, const char *argv[]) {
       ->required()
       ->transform(CLI::Validator(canonical_dir,"DIR"));
     auto sources_opt = app.add_option(opt[SOURCES].name, Option::_sources, opt[SOURCES].desc)
-      ->required()
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
     app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
     app.add_option(opt[IGNORE].name,Option::_ignore_prefix,opt[IGNORE].desc);
@@ -153,7 +153,7 @@ int main(int argc, const char *argv[]) {
     // build proper analyst
     Analizer analyst(language);
     // in-memory source tree analysis
-    analyst.process(Option::sources());
+    analyst.process();
     // get desired writer extension
     auto writer = writer::Extension::factory();
     // save documents

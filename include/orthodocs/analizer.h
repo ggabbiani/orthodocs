@@ -47,8 +47,8 @@ class Analizer {
 public:
   explicit Analizer(language::Extension *language): _parser(language) {}
 
-  // analize a set of files / directories
-  void process(const FileSet &sources);
+  // analize a set of files / directories as specified from Option(s)
+  void process();
 
   /**
    * 1) produce an in-memory document of the source code passed
