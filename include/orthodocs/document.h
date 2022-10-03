@@ -60,7 +60,7 @@ public:
   using Ptr = std::unique_ptr<Item>;
   // used by generators for stackable items (modules and variables)
   using PtrStack  = std::stack<Ptr>;
-  
+
   virtual ~Item() = default;
 
   virtual std::string type() const = 0;
@@ -72,14 +72,14 @@ public:
   virtual bool privateId() const;
   /**
    * builds key value usable by Document
-   * 
+   *
    * «item type» «item name»
    */
   virtual std::string documentKey() const;
 
   /**
    * builds a key value usable by Index.
-   * 
+   *
    * «item name» («item type»)
    */
   virtual std::string indexKey() const;
@@ -98,7 +98,7 @@ public:
 
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),defaults(defaults?*defaults:""),nested(nested) {}
-  Signature _signature() const; 
+  Signature _signature() const;
 };
 
 /**
@@ -108,7 +108,7 @@ protected:
 using ToC = std::multimap<Name,Item*,nocase::Compare>;
 
 /**
- * SubToC is a filtered selection of ToC elements, as such its items are 
+ * SubToC is a filtered selection of ToC elements, as such its items are
  * simple pointers, because a SubToC has no ownerships over them.
  * It is critical that SubToC never survive its ToC.
  */
@@ -117,21 +117,23 @@ using SubToC = std::multimap<Name,doc::Item*,nocase::Compare>;
 } // namespace doc
 
 class Document {
-  using path = std::filesystem::path;
+  using path      = std::filesystem::path;
 public:
+  using Ownership = std::unique_ptr<Document>;
+
   explicit Document(const path &source) : source(source) {}
   /**
    * Document::Index format:
    * Key    ==> "function|module|variable <item name>"
    * Value  ==> unique_ptr<doc::Item>
-   * 
+   *
    * valid key examples:
-   * 
+   *
    * "variable $FL_ADD"
    * "function fl_description"
    * "module fl_manage"
    * "package defs"
-   * 
+   *
    * NOTE: see doc::Key()
    */
   using Index = std::map< std::string,doc::Item::Ptr,std::less<> >;
@@ -194,7 +196,7 @@ namespace doc::toc {
 
 /**
  * build an index title in the form
- * 
+ *
  * "«item name» («item type»)"
  */
 inline std::string title(const Item &item) {
@@ -203,7 +205,7 @@ inline std::string title(const Item &item) {
 
 // copy Document items into the Table of Contents
 inline void add(const Document *document, ToC &toc) {
-  for(auto &[key, value]: document->index) 
+  for(auto &[key, value]: document->index)
     toc.emplace(value->indexKey(),value.get());
 }
 

@@ -72,7 +72,7 @@ unique_ptr<orthodocs::Document> Extension::parse(const fs::path &source) const {
   tree::ParseTree       *tree = parser.pkg();
   // creation of the document
   walker.walk(&listener,tree);
-  return std::move(listener.document);
+  return listener.releaseDocument();
 }
 
 const char *Extension::sourcePostfix() const {

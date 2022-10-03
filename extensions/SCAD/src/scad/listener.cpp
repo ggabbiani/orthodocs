@@ -33,7 +33,7 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const fs::path &pkg_source) : document(make_unique<orthodocs::Document>(pkg_source)),_pkg_path(pkg_source) {
+Listener::Listener(const fs::path &pkg_source) : _pkg_path(pkg_source), _document(make_unique<orthodocs::Document>(pkg_source)) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
@@ -43,7 +43,8 @@ void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
   auto &item  = curr_item.top();
-  document->index.emplace(item->documentKey(),move(item));
+  if (auto [i,success] = _document->index.emplace(item->documentKey(),move(item)); !success)
+    throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
   curr_item.pop();
   curr_package  = nullptr;
 }
@@ -96,7 +97,7 @@ void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
   auto key  = func->documentKey();
   if (!func->nested && !func->privateId())
-    if (auto [i,success] = document->index.try_emplace(key,move(func)); !success)
+    if (auto [i,success] = _document->index.try_emplace(key,move(func)); !success)
       throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
   curr_item.pop();
 }
@@ -115,7 +116,7 @@ void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto &module  = curr_item.top();
   auto key      = module->documentKey();
   if (!module->nested && !module->privateId())
-    document->index.emplace(key,move(module));
+    _document->index.emplace(key,move(module));
   curr_item.pop();
 }
 
@@ -186,7 +187,7 @@ void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
       auto &var   = curr_variable.top();
       auto key    = var->documentKey();
       if (!var->nested && !var->privateId()) {
-        if (auto [i,success] = document->index.try_emplace(key, move(var)); !success)
+        if (auto [i,success] = _document->index.try_emplace(key, move(var)); !success)
           throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
       }
       curr_variable.pop();

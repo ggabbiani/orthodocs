@@ -28,19 +28,20 @@
 
 namespace scad {
 
+/**
+ * This listener is triggered during the parse-tree walk. The resulting synthetic
+ * document ownership is then passed to the calling environment through the
+ * documentRelease() call.
+ */
 class Listener : public scad::SCADParserBaseListener {
 public:
-  using Parser = scad::SCADParser;
-
-  std::unique_ptr<orthodocs::Document> document;
-  
-  // only one package during the parsing of a source
-  doc::Package                  *curr_package;  
-  orthodocs::doc::Item::PtrStack   curr_item;
-  orthodocs::doc::Item::PtrStack   curr_variable;
-  orthodocs::doc::Parameter::Ptr   curr_parameter;
+  using Parser    = scad::SCADParser;
+  using Document  = orthodocs::Document;
 
   explicit Listener(const std::filesystem::path &pkg_source);
+
+  // return the Document's ownership to the calling environment
+  Document::Ownership releaseDocument() {return std::move(_document);};
 
   void enterAnnotation(Parser::AnnotationContext *ctx)      override;
   void enterAssignment(Parser::AssignmentContext *ctx)      override;
@@ -51,7 +52,6 @@ public:
   void enterPkg(Parser::PkgContext *ctx)                    override;
   void enterIncl(SCADParser::InclContext *ctx)              override;
   void enterUse(SCADParser::UseContext *ctx)                override;
-
   void exitAssignment(Parser::AssignmentContext *ctx)       override;
   void exitFunction_def(Parser::Function_defContext *ctx)   override;
   void exitModule_def(Parser::Module_defContext * ctx)      override;
@@ -59,7 +59,17 @@ public:
   void exitPkg(Parser::PkgContext *ctx)                     override;
 
 private:
-  const std::filesystem::path &_pkg_path;
+  // the following members represents the actual status variables for the parser
+  doc::Package                    *curr_package;
+  orthodocs::doc::Item::PtrStack   curr_item;
+  orthodocs::doc::Item::PtrStack   curr_variable;
+  orthodocs::doc::Parameter::Ptr   curr_parameter;
+  /*
+   * this is a kludge: is there an official way for retrieving the current
+   * language source file from antlr4?
+   */
+  const std::filesystem::path     &_pkg_path;
+  orthodocs::Document::Ownership   _document;
 };
 
 }
