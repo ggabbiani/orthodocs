@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 cmake_policy(SET CMP0114 OLD)
-cmake_policy(SET CMP0135 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0") 
+  cmake_policy(SET CMP0135 NEW)
+endif()
 
 include(ExternalProject)
 
