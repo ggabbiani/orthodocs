@@ -29,8 +29,9 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: boost libraries install
+      - name: propedeutics install
         run: |
+          cat /etc/issue
           sudo apt-get update
           sudo apt-get install libboost-all-dev libcli11-dev
       - name: Download and set up sonar-scanner
