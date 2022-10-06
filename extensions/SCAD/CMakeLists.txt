@@ -19,12 +19,12 @@ antlr_target(${PARSER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
 )
 
-cmake_print_variables(
-  ANTLR_${LEXER}_CXX_OUTPUTS 
-  ANTLR_${PARSER}_CXX_OUTPUTS 
-  ANTLR_${LEXER}_OUTPUT_DIR 
-  ANTLR_${PARSER}_OUTPUT_DIR
-)
+# cmake_print_variables(
+#   ANTLR_${LEXER}_CXX_OUTPUTS
+#   ANTLR_${PARSER}_CXX_OUTPUTS
+#   ANTLR_${LEXER}_OUTPUT_DIR
+#   ANTLR_${PARSER}_OUTPUT_DIR
+# )
 
 ###############################################################################
 # C++ client application libs
@@ -119,8 +119,6 @@ add_jar(
 
 ###############################################################################
 # ctest(s)
-configure_file(grun.in grun USE_SOURCE_PERMISSIONS @ONLY)
-set(GRUN ${CMAKE_CURRENT_BINARY_DIR}/grun)
 
 function(new_test)
   set(options )
@@ -128,8 +126,12 @@ function(new_test)
   set(multiValueArgs PASS_REGULAR_EXPRESSION FAIL_REGULAR_EXPRESSION)
   cmake_parse_arguments(TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   set(test_default "^line")
-  # message("COMMAND grun ${LANGUAGE} ${TEST_RULE} ${TEST_FILE}")
-  add_test(NAME "${TEST_NAME}" COMMAND "${GRUN}" "${LANGUAGE}" "${TEST_RULE}" "${TEST_FILE}" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/parse-tests")
+  if (WIN32)
+    set(CLASS_PATH "${CMAKE_CURRENT_BINARY_DIR}/${LANGUAGE_JAR}.jar;${CMAKE_HOME_DIRECTORY}/tools/antlr-4.10.1-complete.jar")
+  else()
+    set(CLASS_PATH "${CMAKE_CURRENT_BINARY_DIR}/${LANGUAGE_JAR}.jar:${CMAKE_HOME_DIRECTORY}/tools/antlr-4.10.1-complete.jar")
+  endif()
+  add_test(NAME "${TEST_NAME}" COMMAND "${Java_JAVA_EXECUTABLE}" -cp "${CLASS_PATH}" -Xmx500M org.antlr.v4.gui.TestRig "${LANGUAGE}" "${TEST_RULE}" "${TEST_FILE}" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/parse-tests")
   if (DEFINED TEST_PASS_REGULAR_EXPRESSION)
     if (TEST_PASS_REGULAR_EXPRESSION STREQUAL "DEFAULT")
       set(value ${test_default})
