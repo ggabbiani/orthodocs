@@ -137,4 +137,4 @@ The list of features expected in the v1 release with their current status:
 | macOS support             | ✔
 | source license detection  | ✔
 | table of contents         | ✔
-| Windows support           | 🚧
+| Windows support           | ✔
