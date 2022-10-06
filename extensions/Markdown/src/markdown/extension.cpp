@@ -385,4 +385,4 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
 
 } // namespace markdown
 
-extern "C" writer::Extension *markdown_extension = &Singleton<markdown::Extension>::instance();
+writer::Extension *markdown_extension = &Singleton<markdown::Extension>::instance();

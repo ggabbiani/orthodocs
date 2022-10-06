@@ -25,7 +25,7 @@
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
-#include "CLI11.hpp"
+#include <CLI/CLI.hpp>
 
 #include <algorithm>
 #include <cassert>
