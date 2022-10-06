@@ -33,8 +33,8 @@ struct Node {
   Node(const std::filesystem::path &abstract_path, IncLabel &label) : labeller(&label),path(abstract_path) {}
 
   std::ostream &write(std::ostream &os,Map &nodemap);
-  std::string name() const {return path.parent_path()/path.stem();}
-  
+  std::string name() const {return (path.parent_path()/path.stem()).string();}
+
   bool                   defined = false;
   IncLabel              *labeller;
   std::string            label;

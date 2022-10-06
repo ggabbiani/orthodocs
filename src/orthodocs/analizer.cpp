@@ -68,13 +68,13 @@ void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &re
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)
-        result.insert(path);
+        result.push_back(path);
     } else if (fs::is_directory(path)) {
       for (auto &entry: fs::directory_iterator{path}) {
         const auto &entry_path = entry.path();
         if (fs::is_regular_file(entry_path)) {
           if (!extension || entry_path.extension()==extension)
-            result.insert(entry_path);
+            result.push_back(entry_path);
         } else if (fs::is_directory(entry_path)) {
           lookup(FileSet{entry_path},extension,result);
         }

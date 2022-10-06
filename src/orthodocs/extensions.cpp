@@ -69,7 +69,7 @@ void Extension::save(const orthodocs::DocumentList &docs) {
   try {
     orthodocs::Bar bar(docs,"documents saved");
     for(const auto &doc: docs) {
-      bar.status(doc->source);
+      bar.status(doc->source.string());
       save(*doc);
       bar++;
     }

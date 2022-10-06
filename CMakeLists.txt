@@ -11,10 +11,17 @@ option(OPTION_EXPERIMENTAL    "Experimental tests"          OFF )
 include(CTest)
 include(CMakePrintHelpers)
 
-# compiler must be 17
-set(CMAKE_CXX_STANDARD 17)
 # disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
+#set(CMAKE_CXX_EXTENSIONS OFF)
+# compiler must be 17
+#set(CMAKE_CXX_STANDARD 20)
+
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# cmake_print_variables(CMAKE_CXX_COMPILE_FEATURES)
 # if (APPLE)
 #   SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
 #   SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
@@ -42,7 +49,7 @@ set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
 # include_directories(${ANTLR4_INCLUDE_DIRS})
-cmake_print_variables(ANTLR4_INCLUDE_DIRS)
+# cmake_print_variables(ANTLR4_INCLUDE_DIRS)
 ###############################################################################
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
@@ -68,7 +75,10 @@ if (OPTION_WRITER_MARKDOWN)
   add_subdirectory(extensions/${WRITER})
   list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
 endif()
-cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
+# cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CLI11 REQUIRED CLI11>=2.2.0)
 
 add_executable(orthodocs
   src/orthodocs/analizer.cpp
@@ -81,10 +91,10 @@ add_executable(orthodocs
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
-cmake_print_properties(
-    TARGETS orthodocs
-    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-)
+# cmake_print_properties(
+#     TARGETS orthodocs
+#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+# )
 
 if (OPTION_EXPERIMENTAL)
   add_subdirectory(experimental)

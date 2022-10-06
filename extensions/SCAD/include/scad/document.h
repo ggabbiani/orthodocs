@@ -61,8 +61,8 @@ public:
 
 /**
  * manages OpenSCAD packages
- * 
- * NOTE: Item::name is set to the abstract package path, i.e. the relative 
+ *
+ * NOTE: Item::name is set to the abstract package path, i.e. the relative
  * path of the package from the source or document root without extension.
  */
 class Package : public orthodocs::doc::Item {
@@ -70,24 +70,24 @@ public:
   static constexpr const char *ID = "package";
   /**
    * Construct a new Package object
-   * 
+   *
    */
-  explicit Package(const std::filesystem::path &path) : orthodocs::doc::Item(path.parent_path()/path.stem(),nullptr,false), path(path) {}
+  explicit Package(const std::filesystem::path &path) : orthodocs::doc::Item((path.parent_path()/path.stem()).string(),nullptr,false), path(path) {}
   /**
    * always return "package"
    */
   std::string type() const override {return ID;}
   /**
    * return the Packages Index key from its path.
-   * 
+   *
    * «package stem» (package)
    */
   std::string indexKey() const override;
   /**
    * return the Package Index key from a path.
-   * This method is used for searching packages from the Package::include and 
+   * This method is used for searching packages from the Package::include and
    * Package::use member values.
-   * 
+   *
    * «package stem» (package)
    */
   static std::string indexKey(const std::string &s);
@@ -98,13 +98,13 @@ public:
   std::filesystem::path path;
   std::set<std::string,std::less<>> uses;
   std::set<std::string,std::less<>> includes;
-  // eventual license 
+  // eventual license
   const char *license = nullptr;
 };
 
 /**
  * base for comment styles.
- * FIXME: comment style management work on parsed text, as such it should be 
+ * FIXME: comment style management work on parsed text, as such it should be
  * outside source specific coding.
  */
 struct AbstractStyle {

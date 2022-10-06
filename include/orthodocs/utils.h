@@ -24,7 +24,7 @@
 #include <cctype>
 #include <filesystem>
 #include <string>
-#include <set>
+#include <vector>
 
 inline std::string trim(std::string str) {
   const char* ws = " \t\n\r\f\v";
@@ -33,7 +33,7 @@ inline std::string trim(std::string str) {
   return str;
 }
 
-using FileSet = std::set<std::filesystem::path>;
+using FileSet = std::vector<std::filesystem::path>;
 
 /*!
  * prints the explanatory string of an exception. If the exception is nested,
@@ -58,8 +58,8 @@ bool is(B &b) {
 
 /**
  * check if «sub» is a subdirectory of «base».
- * 
- * **NOTE:** for the function to work, both «sub» and «base» must be in the 
+ *
+ * **NOTE:** for the function to work, both «sub» and «base» must be in the
  * same format i.e both relative or both canonical.
  */
 extern bool is_sub_of(const std::filesystem::path &sub, const std::filesystem::path &base);
@@ -69,7 +69,7 @@ namespace nocase {
 template <class InputIt1,class InputIt2>
 InputIt1 find(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
   auto it = std::search(
-    first1, last1, 
+    first1, last1,
     first2, last2,
     [](char ch1, char ch2) {return std::toupper(ch1) == std::toupper(ch2);}
   );

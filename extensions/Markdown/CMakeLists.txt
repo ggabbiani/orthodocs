@@ -1,5 +1,8 @@
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+  cmake_policy(SET CMP0074 NEW)
+endif()
 find_package(Boost REQUIRED)
-cmake_print_variables(Boost_INCLUDE_DIRS)
+#cmake_print_variables(Boost_INCLUDE_DIRS)
 
 set(WRITER_INCS
   include
@@ -11,7 +14,7 @@ if (OPTION_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
 endif()
 
-cmake_print_variables(WRITER_INCS WRITER_LIBS)
+#cmake_print_variables(WRITER_INCS WRITER_LIBS)
 
 add_library(${WRITER_LIB} STATIC
   src/markdown/graph.cpp
