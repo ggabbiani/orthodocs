@@ -81,4 +81,4 @@ const char *Extension::sourcePostfix() const {
 
 } // namespace scad
 
-extern "C" language::Extension *scad_extension = &Singleton<scad::Extension>::instance();
+language::Extension *scad_extension = &Singleton<scad::Extension>::instance();
