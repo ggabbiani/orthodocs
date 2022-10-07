@@ -29,11 +29,10 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: propedeutics install
+      - name: install propedeutics for building
         run: |
-          cat /etc/issue
           sudo apt-get update
-          sudo apt-get install libboost-all-dev libcli11-dev
+          sudo apt-get install libboost-all-dev
       - name: Download and set up sonar-scanner
         env:
           SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
