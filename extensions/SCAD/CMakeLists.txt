@@ -45,10 +45,10 @@ target_include_directories(${LANGUAGE_LIB}
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
 target_link_libraries(${LANGUAGE_LIB} PRIVATE antlr4_static)
-cmake_print_properties(
-    TARGETS ${LANGUAGE_LIB}
-    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-)
+# cmake_print_properties(
+#     TARGETS ${LANGUAGE_LIB}
+#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+# )
 
 ###############################################################################
 # Java split parser for testing grammars via grun
