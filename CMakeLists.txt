@@ -42,7 +42,7 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
-set(ORTHODOCS_INCS include third-part)
+set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/third-part)
 set(ORTHODOCS_LIBS antlr4_static)
 
 if (OPTION_LANGUAGE_SCAD)
@@ -77,10 +77,10 @@ add_executable(orthodocs
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
-cmake_print_properties(
-    TARGETS orthodocs
-    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-)
+# cmake_print_properties(
+#     TARGETS orthodocs
+#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+# )
 
 if (OPTION_OTHER_TESTS)
   add_subdirectory(tests-other)
