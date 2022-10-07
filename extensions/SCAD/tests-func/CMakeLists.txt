@@ -62,6 +62,7 @@ add_executable(style-factory-test
   ${PROJECT_SOURCE_DIR}/src/orthodocs/utils.cpp
   ${PROJECT_SOURCE_DIR}/src/orthodocs/document.cpp
 )
+target_include_directories(style-factory-test PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(style-factory-test ${LANGUAGE_LIB})
 
 parse_test(NAME all           RULE pkg  FILE all.scad           FAIL_REGULAR_EXPRESSION DEFAULT)
