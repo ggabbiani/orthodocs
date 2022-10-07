@@ -1,7 +1,30 @@
-#include "document.h"
-#include "utils.h"
+/*
+ * Functional test of class scad::doc::style::Factory capability to recognize 
+ * the comment style used inside an annotation.
+ *
+ * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
+ * This file is part of the 'OrthoDocs' (ODOX) project.
+ *
+ * ODOX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ODOX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "CLI11.hpp"
+#include "orthodocs/globals.h"
+#include "orthodocs/utils.h"
+#include "scad/document.h"
+
+#include <CLI/CLI.hpp>
 
 #include <fstream>
 #include <string>
@@ -11,18 +34,37 @@ using namespace std;
 
 namespace fs=std::filesystem;
 
+void lookup(const FileSet &sources, const char *extension, FileSet &result) {
+  cwd pwd(Option::sroot());
+  for(auto &path: sources) {
+    if (fs::is_regular_file(path)) {
+      if (!extension || path.extension()==extension)
+        result.push_back(path);
+    } else if (fs::is_directory(path)) {
+      for (auto &entry: fs::directory_iterator{path}) {
+        const auto &entry_path = entry.path();
+        if (fs::is_regular_file(entry_path)) {
+          if (!extension || entry_path.extension()==extension)
+            result.push_back(entry_path);
+        } else if (fs::is_directory(entry_path)) {
+          lookup(FileSet{entry_path},extension,result);
+        }
+      }
+    } else
+      throw domain_error("what is this '"+path.string()+"'?");
+  }
+}
+
 int main(int argc, const char *argv[]) {
   CLI::App app{"style-tester: outputs the checked annotation text or the detected annotation styles from the passed .anno files."};
   auto      result = EXIT_SUCCESS;
   fs::path  sroot;
-  FileSet   sources;
   string    expected;
 
   app.add_option("-s,--src-root", sroot, "Source root directory")
     ->required()
     ->check(CLI::ExistingDirectory);
-  app.add_option("sources", sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
-    ->required()
+  app.add_option("sources", Option::_sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
         auto path = fs::path(file);
@@ -34,14 +76,14 @@ int main(int argc, const char *argv[]) {
     ))
     ->check(CLI::ExistingPath);
   app.add_option("-e,--expected",expected,"Expected annotation type, when empty only the resulted annotation style will be reported")
-    ->check(CLI::IsMember({"SINGLE","SIMPLE","FINE"}));
+    ->check(CLI::IsMember({"SINGLE","SIMPLE","FINE"}, CLI::ignore_case));
 
   try {
     app.parse(argc, argv);
 
     // lookup for annotation files (*.anno)
     FileSet src_files;
-    lookup(sources,".anno",&src_files);
+    lookup(Option::sources().size() ? Option::sources() : FileSet{"."},".anno",src_files);
 
     string annotation;
     string fname;
@@ -62,9 +104,9 @@ int main(int argc, const char *argv[]) {
       }
 
       // detected annotation style 
-      doc::AbstractStyle *style;
+      scad::doc::AbstractStyle *style;
       try {
-        style  = doc::style::Factory()(annotation);
+        style  = scad::doc::style::Factory()(annotation);
       } catch (runtime_error &error) {  
         // we catch and re-throw after contextualizing the error message with the file name
         throw runtime_error(fname+": "+error.what());

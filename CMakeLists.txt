@@ -4,30 +4,19 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(OrthoDocs)
 
-option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension" ON  )
-option(OPTION_WRITER_MARKDOWN "Markdown writer extension"   ON  )
-option(OPTION_EXPERIMENTAL    "Experimental tests"          OFF )
+option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
+option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
+option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
+option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
 
 include(CTest)
 include(CMakePrintHelpers)
 
-# disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
-#set(CMAKE_CXX_EXTENSIONS OFF)
 # compiler must be 17
-#set(CMAKE_CXX_STANDARD 20)
-
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-# cmake_print_variables(CMAKE_CXX_COMPILE_FEATURES)
-# if (APPLE)
-#   SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-#   SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-#   SET(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-#   SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-# endif()
 
 ###############################################################################
 # global propedeutics to antrl4cpp
@@ -69,16 +58,13 @@ if (OPTION_LANGUAGE_SCAD)
 endif()
 
 if (OPTION_WRITER_MARKDOWN)
-  set(WRITER Markdown)
-  set(WRITER_LIB Markdown)
+  set(WRITER      Markdown)
+  set(WRITER_LIB  Markdown)
 
   add_subdirectory(extensions/${WRITER})
   list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
 endif()
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
-
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(CLI11 REQUIRED CLI11>=2.2.0)
 
 add_executable(orthodocs
   src/orthodocs/analizer.cpp
@@ -91,15 +77,15 @@ add_executable(orthodocs
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
-# cmake_print_properties(
-#     TARGETS orthodocs
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-# )
+cmake_print_properties(
+    TARGETS orthodocs
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+)
 
-if (OPTION_EXPERIMENTAL)
-  add_subdirectory(experimental)
+if (OPTION_OTHER_TESTS)
+  add_subdirectory(tests-other)
 endif()
 
-if (BUILD_TESTING)
-  add_subdirectory(tests)
+if (OPTION_FUNC_TESTS)
+  add_subdirectory(tests-func)
 endif()

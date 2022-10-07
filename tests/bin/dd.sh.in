@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -e
-@TEST_TARGET@ --src-root @TEST_SROOT@ --doc-root @TEST_DROOT@ --toc --quiet @TEST_SOURCES@
-@DIFF@ @TEST_OKROOT@ @TEST_DROOT@

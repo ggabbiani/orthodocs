@@ -1,5 +1,5 @@
 /*!
  This package is a test for the Simple annotation style
-   line 2
-line 3
+   i.e. comments are not aligned
+to any decoration star '*'
 */
