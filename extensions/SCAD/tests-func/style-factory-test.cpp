@@ -1,5 +1,5 @@
 /*
- * Functional test of class scad::doc::style::Factory capability to recognize 
+ * Functional test of class scad::doc::style::Factory capability to recognize
  * the comment style used inside an annotation.
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
@@ -88,33 +88,33 @@ int main(int argc, const char *argv[]) {
     string annotation;
     string fname;
     // just one reusable input stream
-    ifstream in;  
+    ifstream in;
     for(auto file: src_files) {
       static char buffer[256];
       in.open(file);
-      fname = file.filename();
+      fname = file.filename().string();
 
       // getline() method consumes the ending newline, so we have to re-insert
       auto line = 1;
       while (in.getline(buffer, sizeof buffer)) {
         annotation.append(string(buffer)+'\n');
-        if (line==1)  // skip leading spaces in first row 
+        if (line==1)  // skip leading spaces in first row
           annotation = annotation.substr(annotation.find('/'));
         ++line;
       }
 
-      // detected annotation style 
+      // detected annotation style
       scad::doc::AbstractStyle *style;
       try {
         style  = scad::doc::style::Factory()(annotation);
-      } catch (runtime_error &error) {  
+      } catch (runtime_error &error) {
         // we catch and re-throw after contextualizing the error message with the file name
         throw runtime_error(fname+": "+error.what());
       }
       if (expected.empty()) { // detected style report only
         cout << fname << ": " << style->id() << endl;
       } else { // full check and report
-        if (expected.compare(style->id())!=0) 
+        if (expected.compare(style->id())!=0)
           throw runtime_error("File "+fname+": expected "+expected+" got "+style->id());
         cout  << "          1         2         3         4" << endl
               << "01234567890123456789012345678901234567890" << endl
