@@ -42,7 +42,7 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
-set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/third-part)
+set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party)
 set(ORTHODOCS_LIBS antlr4_static)
 
 if (OPTION_LANGUAGE_SCAD)

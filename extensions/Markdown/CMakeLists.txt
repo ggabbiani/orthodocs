@@ -7,7 +7,7 @@ find_package(Boost REQUIRED)
 set(WRITER_INCS
   include
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/third-part
+  ${PROJECT_SOURCE_DIR}/3rd-party
 )
 
 if (OPTION_LANGUAGE_SCAD)
