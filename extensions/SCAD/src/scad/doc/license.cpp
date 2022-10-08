@@ -2,11 +2,9 @@
 
 using namespace std;
 
-namespace scad {
+namespace scad::doc {
 
-namespace doc {
-
-smatch License::match(const string &s) {
+smatch License::match(const string &s) const {
   smatch result;
   return regex_search(s, result, _regex) ? result : smatch();
 }
@@ -31,7 +29,4 @@ const License *License::remove(std::string &s) {
   return nullptr;
 }
 
-} // namespace doc
-
-
-} // namespace orthodocs
+} // namespace scad::doc

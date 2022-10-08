@@ -35,9 +35,7 @@
 
 class Index;
 
-namespace scad {
-
-namespace doc {
+namespace scad::doc {
 
 class Variable : public orthodocs::doc::Item {
 public:
@@ -158,6 +156,4 @@ class Fine : public AbstractStyle {
 
 } // namespace style
 
-} // namespace doc
-
-} // namespace scad
+} // namespace scad::doc

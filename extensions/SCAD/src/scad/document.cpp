@@ -34,9 +34,7 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
-namespace scad {
-
-namespace doc {
+namespace scad::doc {
 
 string Package::indexKey(const string &s) {
   return fs::path(s).stem().string()+" ("+ID+")";
@@ -196,6 +194,4 @@ AbstractStyle *Factory::operator()(const string &text) {
 
 }
 
-} // namespace doc
-
-} // namespace scad
+} // namespace scad::doc

@@ -14,7 +14,7 @@ public:
    * Verify the presence of a known license inside «s».
    * Return a 'ready' smatch in case of success, an empty one otherwise.
    */
-  std::smatch match(const std::string &s);
+  std::smatch match(const std::string &s) const;
   /**
    * Analize «s» searching for a known license match. If any, removes it from 
    * «s» and returns the found license or nullprt otherwise.

@@ -44,10 +44,8 @@ void mk_admonitions(std::string &anno) {
       {"__warning:__",    ":warning: "  },
     }
   };
-  for(const auto adm: admonitions) {
-    auto search_s = adm.first;
-    auto insert_s = adm.second;
-    auto pos = 0;
+  for(const auto &[search_s, insert_s]: admonitions) {
+    size_t pos = 0;
     while ((pos = nocase::rfind(anno,search_s,pos)) != std::string::npos) {
         anno.insert(anno.length()-pos-search_s.length(),insert_s);
         pos += insert_s.length();

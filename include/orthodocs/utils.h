@@ -47,6 +47,8 @@ public:
   ~cwd() {
     std::filesystem::current_path(_old);
   }
+  explicit cwd(const cwd &) = delete;
+  cwd operator = (const cwd&) = delete;
 private:
   std::filesystem::path _old = std::filesystem::current_path();
 };
@@ -76,18 +78,18 @@ InputIt1 find(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) 
   return it;
 }
 
-inline size_t find(const std::string &str, const std::string &sub, size_t pos=0) {
+inline size_t find(std::string_view str, std::string_view sub, size_t pos=0) {
   auto it = find(str.begin()+pos,str.end(),sub.begin(),sub.end());
   return it!=str.end() ? it-str.begin() : std::string::npos;
 }
 
-inline size_t rfind(const std::string &str, const std::string &sub, size_t pos=0) {
+inline size_t rfind(std::string_view str, std::string_view sub, size_t pos=0) {
   auto it = find(str.rbegin()+pos,str.rend(),sub.rbegin(),sub.rend());
   return it!=str.rend() ? it-str.rbegin() : std::string::npos;
 }
 
 inline bool compare(std::string str1,std::string str2) {
-  return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](char & c1, char & c2) {return (std::toupper(c1) == std::toupper(c2));})
+  return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](const char & c1,const char & c2) {return (std::toupper(c1) == std::toupper(c2));})
   ;
 }
 
@@ -107,7 +109,7 @@ struct Compare {
 // Factory for string labels with postfix operator
 class IncLabel {
 public:
-  IncLabel(const char *base,int start = 0) : number(start),base(base) {}
+  IncLabel(const char *base,int start = 0) : base(base),number(start) {}
   IncLabel operator++() {++number;return *this;}
   IncLabel operator++(int) {number++;return *this;}
   std::string string() const {return base+std::to_string(number);}

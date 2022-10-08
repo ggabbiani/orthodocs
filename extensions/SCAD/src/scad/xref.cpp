@@ -16,14 +16,14 @@ auto XRef::key(orthodocs::doc::Item *item) const -> Key {
   } else if (auto function = dynamic_cast<scad::doc::Function*>(item)) {
     assert(parent);
     return parent->name+'/'+function->name+"()";
-  } else if (auto module = dynamic_cast<scad::doc::Module*>(item)) {
+  } else if (auto mod = dynamic_cast<scad::doc::Module*>(item)) {
     assert(parent);
-    return parent->name+'/'+module->name+"()";
+    return parent->name+'/'+mod->name+"()";
   } else if (auto package = dynamic_cast<scad::doc::Package*>(item)) {
     assert(!parent);
     return package->name;
   } else {
-    throw runtime_error("type "+item->type()+" not suitable for xref");
+    throw domain_error("type "+item->type()+" not suitable for xref");
   }
 }
 

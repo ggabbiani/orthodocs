@@ -161,7 +161,7 @@ void Listener::exitParameter(scad::SCADParser::ParameterContext *ctx) {
 void Listener::enterLookup(scad::SCADParser::LookupContext *ctx) {
   auto value = ctx->ID()->getText();
   if (curr_parameter) {
-    if (is<scad::SCADParser::ParameterContext>(*ctx->parent))
+    if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent))
       curr_parameter->name = value;
   }
 }
