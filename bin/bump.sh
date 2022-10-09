@@ -42,7 +42,7 @@ git_version() {
 
 git_chk() {
   ERROR_MSG="Bad Git status"
-  git status --porcelain|wc -l|grep '0' && info "Git status is clean"
+  git status --porcelain|wc -l|grep '0' >/dev/null && info "Git status is clean"
 }
 
 REMOTE="NO"
