@@ -165,6 +165,6 @@ if [ "$DRYRUN" -eq "1" ]; then
 fi
 warn_read "press «RETURN» to continue or «CTRL-C» to exit"
 
-echo git commit -m "Version $VERSION bumped" -a
-echo git tag -m "Version $VERSION bumped" $TAG $BRANCH
-echo git push --follow-tags
+git commit -m "Version $VERSION bumped" -a
+git tag -m "Version $VERSION bumped" $TAG $BRANCH
+git push --follow-tags
