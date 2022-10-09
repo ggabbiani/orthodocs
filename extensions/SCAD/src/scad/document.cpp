@@ -189,7 +189,7 @@ AbstractStyle *Factory::operator()(const string &text) {
   else if (single.check(text))
     return static_cast<AbstractStyle*>(&single);
   else
-    throw logic_error("**Unrecognized comment type**");
+    throw domain_error("**Unrecognized comment type**");
 }
 
 }
