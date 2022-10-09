@@ -23,7 +23,7 @@ Common flags
 Mutually exclusive optional arguments about VERSION auto increment.
   -M, --major       auto increment current major release number
   -m, --minor       auto increment current minor release number
-  -p, --patch       auto increment current patch release number
+  -p, --patch       auto increment current patch release number (default)
 
 The VERSION argument is formatted  according to Semantic Versioning v2.0.0.
 Given a version number MAJOR.MINOR.PATCH, increment the:
@@ -52,6 +52,7 @@ MAX=1
 POSITIONALS=""
 VERBOSE="0"
 DRYRUN="0"
+INCREMENT="PATCH"
 while (( "$#" )); do
   case "$1" in
     '-?'|-h|--help)
@@ -70,7 +71,6 @@ while (( "$#" )); do
       fi
       MAX=0
       INCREMENT="MAJOR"
-      I=0
       ;;
     -m|--minor)
       shift
@@ -79,7 +79,6 @@ while (( "$#" )); do
       fi
       MAX=0
       INCREMENT="MINOR"
-      I=1
       ;;
     -p|--patch)
       shift
@@ -88,7 +87,6 @@ while (( "$#" )); do
       fi
       MAX=0
       INCREMENT="PATCH"
-      I=2
       ;;
     -v|--verbose)
       shift
@@ -122,8 +120,6 @@ if [[ "$INCREMENT" != "" ]]; then
   info "Current version is $VERSION"
   # replace points, split into array
   V=( ${VERSION//./ } )
-  # increment revision (or other part)
-  # ((V[$I]++))
   # compose new version
   if [ "$INCREMENT" == "MAJOR" ]; then
     # ((V[0]++))
