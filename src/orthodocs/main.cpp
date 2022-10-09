@@ -20,6 +20,7 @@
  */
 
 #include "orthodocs/analizer.h"
+#include "orthodocs/config.h"
 #include "orthodocs/error_info.h"
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
@@ -97,6 +98,7 @@ enum {
   SOURCES,
   SRC_ROOT,
   TOC,
+  VERSION,
 };
 
 struct {
@@ -114,6 +116,7 @@ struct {
                           " If missing all the source root will be scanned"                                             },
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
   {"-t,--toc",            "generate a Table of Contents in the document tree root"                                      },
+  {"-v,--version",        "orthodocs version " ODOX_VERSION_STR                                                         },
 };
 
 }
@@ -140,6 +143,7 @@ int main(int argc, const char *argv[]) {
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
     app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
     app.add_flag(opt[QUIET].name,Option::_quiet,opt[QUIET].desc);
+    app.set_version_flag(opt[VERSION].name, opt[VERSION].desc);
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);

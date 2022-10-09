@@ -2,7 +2,14 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-project(OrthoDocs)
+include(CMakePrintHelpers)
+include(GitUtils)
+# get GIT_BRANCH_VERSION
+git_branch_version()
+# cmake_print_variables(GIT_BRANCH_VERSION)
+
+project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
+# cmake_print_variables(PROJECT_VERSION PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH PROJECT_VERSION_TWEAK)
 
 option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
@@ -10,7 +17,6 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
 
 include(CTest)
-include(CMakePrintHelpers)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -19,7 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ###############################################################################
-# global propedeutics to antrl4cpp
+# global propedeutics for antrl4cpp
 ###############################################################################
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
