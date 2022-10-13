@@ -47,9 +47,14 @@ include(ExternalAntlr4Cpp)
 # cmake_print_variables(ANTLR4_INCLUDE_DIRS)
 ###############################################################################
 
+###############################################################################
+# global propedeutics for orthodocs
+###############################################################################
+add_subdirectory(3rd-party/cpp-trace)
+
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
-set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party)
-set(ORTHODOCS_LIBS antlr4_static)
+set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/cpp-trace/include)
+set(ORTHODOCS_LIBS antlr4_static trace)
 
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)

@@ -88,12 +88,12 @@ inline size_t rfind(std::string_view str, std::string_view sub, size_t pos=0) {
   return it!=str.rend() ? it-str.rbegin() : std::string::npos;
 }
 
-inline bool compare(std::string str1,std::string str2) {
+inline bool equal(std::string str1,std::string str2) {
   return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](const char & c1,const char & c2) {return (std::toupper(c1) == std::toupper(c2));})
   ;
 }
 
-struct Compare {
+struct Less {
   using is_transparent = void; // enables heterogeneous lookup
   bool operator() (std::string_view lhs, std::string_view rhs) const {
     std::string str1(lhs.length(),' ');

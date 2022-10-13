@@ -1,0 +1,15 @@
+###############################################################################
+# This file is produced automatically do not change it manually.
+# this command will execute test binary and check the produced output with the
+# attended one.
+###############################################################################
+
+message("Executing @CMAKE_BUILD_TYPE@ test (attended @DESIRED_RESULT@)")
+execute_process(
+  COMMAND @TEST_BIN@
+  COMMAND @DIFF@ --new-file - @DESIRED_RESULT@
+  RESULT_VARIABLE CMD_RESULT
+)
+if(CMD_RESULT)
+  message(FATAL_ERROR "****ERROR****")
+endif()

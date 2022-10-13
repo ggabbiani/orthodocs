@@ -36,10 +36,7 @@ bool Item::privateId() const {
 }
 
 string Item::indexKey() const {
-  auto len  = Option::ignore_prefix().length();
-  string s  = len==0 || !nocase::compare(name.substr(0,len),Option::ignore_prefix()) ? name : name.substr(len);
-  auto res  = s+" ("+type()+')';
-  return res;
+  return Option::prefix_abbreviation(name)+" ("+type()+')';
 }
 
 Signature Item::_signature() const {

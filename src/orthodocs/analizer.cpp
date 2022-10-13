@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "debug/trace.h"
 #include "orthodocs/analizer.h"
 #include "orthodocs/bar.h"
 #include "orthodocs/error_info.h"
@@ -32,10 +33,22 @@ namespace fs = std::filesystem;
 
 namespace orthodocs {
 
-void Analizer::document(const fs::path &source) {
+std::filesystem::path subpath(const std::filesystem::path &path, std::filesystem::path::iterator from) {
+  std::filesystem::path result;
+  for(auto &i=from; i!=path.end(); ++i) {
+    result /= *i;
+  }
+  return result;
+}
+
+void Analizer::document(fs::path source) {
+  TR_FUNC;
   assert(source.is_relative());
   assert(source.has_filename());
+  if (source.begin()!=source.end() && *source.begin()==".")
+    source = subpath(source,++source.begin());
   try {
+    TR_MSG("source:",source);
     auto document = _parser->parse(source);
     // copy document contents to the Table of Contents
     doc::toc::add(document.get(),_toc);
@@ -47,12 +60,14 @@ void Analizer::document(const fs::path &source) {
 }
 
 void Analizer::process() {
+  TR_FUNC;
   try {
     FileSet files;
-    lookup(Option::sources().size() ? Option::sources() : FileSet{"."},_parser->sourcePostfix(),files);
+    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _parser->sourcePostfix(),files);
 
     Bar bar(files,"sources analized");
     for(const auto &file: files) {
+      TR_MSG("writing document", file);
       bar.status(file.string());
       document(file);
       bar++;
@@ -64,14 +79,17 @@ void Analizer::process() {
 }
 
 void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
+  TR_FUNC;
   cwd pwd(Option::sroot());
   for(auto &path: sources) {
+    TR_MSG("path:", path);
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)
         result.push_back(path);
     } else if (fs::is_directory(path)) {
       for (auto &entry: fs::directory_iterator{path}) {
         const auto &entry_path = entry.path();
+        TR_MSG("entry_path:", entry_path);
         if (fs::is_regular_file(entry_path)) {
           if (!extension || entry_path.extension()==extension)
             result.push_back(entry_path);

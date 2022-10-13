@@ -42,9 +42,12 @@ void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
-  auto &item  = curr_item.top();
-  if (auto [i,success] = _document->index.try_emplace(item->documentKey(),move(item)); !success)
-    throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
+  auto &pkg  = curr_item.top();
+#ifndef NDEBUG
+  auto key  = pkg->documentKey();
+#endif // NDEBUG
+  if (auto [i,success] = _document->index.emplace(move(pkg)); !success)
+    throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
   curr_item.pop();
   curr_package  = nullptr;
 }
@@ -94,10 +97,12 @@ void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
 
 void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
+#ifndef NDEBUG
   auto key  = func->documentKey();
+#endif // NDEBUG
   if (!func->nested && !func->privateId())
-    if (auto [i,success] = _document->index.try_emplace(key,move(func)); !success)
-      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same document");
+    if (auto [i,success] = _document->index.emplace(move(func)); !success)
+      throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
   curr_item.pop();
 }
 
@@ -113,10 +118,12 @@ void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
 void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
   // TODO: implement the whole piece of code as a Document function
   auto &mod = curr_item.top();
+#ifndef NDEBUG
   auto  key = mod->documentKey();
+#endif // NDEBUG
   if (!mod->nested && !mod->privateId())
-    if (auto [i,success] = _document->index.try_emplace(key,move(mod)); !success)
-      throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
+    if (auto [i,success] = _document->index.emplace(move(mod)); !success)
+      throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
   curr_item.pop();
 }
 
@@ -185,10 +192,12 @@ void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
   if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
     if (curr_variable.size()) {
       auto &var   = curr_variable.top();
+#ifndef NDEBUG
       auto key    = var->documentKey();
+#endif // NDEBUG
       if (!var->nested && !var->privateId()) {
-        if (auto [i,success] = _document->index.try_emplace(key, move(var)); !success)
-          throw std::domain_error(ERR_INFO+"Key «"+i->first+"» already present in document");
+        if (auto [i,success] = _document->index.emplace(move(var)); !success)
+          throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
       }
       curr_variable.pop();
     }

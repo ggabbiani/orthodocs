@@ -10,4 +10,5 @@ if (OPTION_LANGUAGE_SCAD)
       ${PROJECT_SOURCE_DIR}/extensions/SCAD/include
       ${PROJECT_SOURCE_DIR}/include
   )
+  target_link_libraries(licenses trace)
 endif()

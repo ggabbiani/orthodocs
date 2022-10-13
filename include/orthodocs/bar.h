@@ -25,8 +25,6 @@
 #include "indicators/block_progress_bar.hpp"
 #include "indicators/cursor_control.hpp"
 
-#include <iostream>
-
 namespace orthodocs {
 
 template <class T>
@@ -45,9 +43,10 @@ public:
   Bar & operator = (const Bar &) = delete;
   Bar & operator = (Bar &&) = delete;
   // set text as postfix
-  void status(const std::string &text) {
+  void status([[maybe_unused]] const std::string_view &text) {
     if (!Option::quiet()) {
       _bar.set_option(indicators::option::PostfixText{text});
+      _bar.print_progress();
     }
   }
   // update progress bar

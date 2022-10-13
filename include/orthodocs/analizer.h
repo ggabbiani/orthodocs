@@ -56,7 +56,7 @@ public:
    */
   void document(
     // source file relative to source root
-    const std::filesystem::path &source
+    std::filesystem::path source
   );
 
   // documents getter

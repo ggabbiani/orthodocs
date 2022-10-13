@@ -59,7 +59,11 @@ public:
   /**
    * ignore this package prefix in the Table of Contents sort
    */
-  static const std::string &ignore_prefix() {return _ignore_prefix;}
+  static const std::vector<std::string> &ignore_prefix() {return _ignore_prefix;}
+  /**
+   * if name matches any of the ignored prefixes then abbreviate
+   */
+  static std::string prefix_abbreviation(const std::string &name);
   /**
    * prefix used for private (i.e. not to be documented) IDs (variable, 
    * function, module or whatever ...)
@@ -88,16 +92,16 @@ public:
    */
   static const std::string &writer() {return _writer;}
 private:
-  static bool                  _admonitions;
-  static std::filesystem::path _droot;
-  static std::string           _pkg_deps;
-  static FileSet               _graphs;
-  static std::string           _language;
-  static std::string           _ignore_prefix;
-  static std::string           _private_prefix;
-  static bool                  _quiet;
-  static FileSet               _sources;
-  static std::filesystem::path _sroot;
-  static bool                  _toc;
-  static std::string           _writer;
+  static bool                     _admonitions;
+  static std::filesystem::path    _droot;
+  static std::string              _pkg_deps;
+  static FileSet                  _graphs;
+  static std::string              _language;
+  static std::vector<std::string> _ignore_prefix;
+  static std::string              _private_prefix;
+  static bool                     _quiet;
+  static FileSet                  _sources;
+  static std::filesystem::path    _sroot;
+  static bool                     _toc;
+  static std::string              _writer;
 };

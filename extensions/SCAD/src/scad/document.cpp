@@ -41,11 +41,7 @@ string Package::indexKey(const string &s) {
 }
 
 string Package::indexKey() const {
-  auto    len   = Option::ignore_prefix().length();
-  auto    stem  = path.stem().string();
-  string  s     = len==0 || !nocase::compare(stem.substr(0,len),Option::ignore_prefix()) ? stem : stem.substr(len);
-  auto    res   = s+" ("+type()+')';
-  return res;
+  return Option::prefix_abbreviation(path.stem().string())+" ("+type()+')';
 }
 
 namespace style {

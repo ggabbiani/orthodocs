@@ -28,12 +28,17 @@ __var__ = 10;
 /*!
  * this variable will be published.
  */
-PUB_VAR = "public variable";
+PREFIX_PUB_VAR = "public variable";
+
+/*!
+ * this $variable will be published.
+ */
+$PREFIX_PUB_VAR = "$public variable";
 
 /*!
  * this variable must demonstrate that the Table Of Contents sort is case insensitive.
  */
-pab_var = "public lower case variable";
+prefix_pub_var = "public lower case variable";
 
 /*!
  * private func not published even if annotated.
@@ -43,7 +48,7 @@ function __func__(param1,param2="default value") = false;
 /*!
  * this function will be published.
  */
-function radial(
+function prefix_radial(
   // this parameter will be NOT published
   r=1,
   //! this parameter will be published

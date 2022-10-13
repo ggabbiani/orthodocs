@@ -26,6 +26,7 @@
 #include <filesystem>
 #include <functional>
 #include <map>
+#include <set>
 #include <stack>
 #include <string>
 #include <vector>
@@ -57,6 +58,7 @@ public:
 class Item {
   friend class Index;
 public:
+
   using Ptr = std::unique_ptr<Item>;
   // used by generators for stackable items (modules and variables)
   using PtrStack  = std::stack<Ptr>;
@@ -71,9 +73,16 @@ public:
    */
   virtual bool privateId() const;
   /**
-   * builds key value usable by Document
-   *
+   * builds a key usable by Document::Index in the following format:
+   * 
    * «item type» «item name»
+   * 
+   * examples:
+   * 
+   * "package artifacts/spacer"
+   * "module fl_spacer"
+   * "function fl_bb_spacer"
+   * "variable FL_SPC_NS"
    */
   virtual std::string documentKey() const;
 
@@ -105,14 +114,14 @@ protected:
  * Table of Contents
  * NOTE: NO OWNERSHIP OF THE CONTAINED ITEMS
  */
-using ToC = std::multimap<Name,Item*,nocase::Compare>;
+using ToC = std::multimap<Name,Item*,nocase::Less>;
 
 /**
  * SubToC is a filtered selection of ToC elements, as such its items are
  * simple pointers, because a SubToC has no ownerships over them.
  * It is critical that SubToC never survive its ToC.
  */
-using SubToC = std::multimap<Name,doc::Item*,nocase::Compare>;
+using SubToC = std::multimap<Name,doc::Item*,nocase::Less>;
 
 } // namespace doc
 
@@ -123,26 +132,22 @@ public:
 
   explicit Document(const path &source) : source(source) {}
   /**
-   * Document::Index format:
-   * Key    ==> "function|module|variable <item name>"
-   * Value  ==> unique_ptr<doc::Item>
-   *
-   * valid key examples:
-   *
-   * "variable $FL_ADD"
-   * "function fl_description"
-   * "module fl_manage"
-   * "package defs"
-   *
-   * NOTE: see doc::Key()
+   * CASE SENSITIVE Document::Index comparison functor.
+   * NOTE: see doc::Item::documentKey() for the format
    */
-  using Index = std::map< std::string,doc::Item::Ptr,std::less<> >;
+  struct IndexLesser {
+    inline bool operator() (const doc::Item::Ptr &lhs, const doc::Item::Ptr &rhs) const {
+      return  lhs->documentKey() < rhs->documentKey();
+    }
+  };
+
+  using Index = std::set< doc::Item::Ptr, IndexLesser >;
   /**
    * return the number of item of type «T»
    */
   template <class T>
   inline size_t size() const {
-    return count_if(index.begin(),index.end(),[](const Index::value_type &value) {return dynamic_cast<T*>(value.second.get())!=nullptr;});
+    return count_if(index.begin(),index.end(),[](const Index::value_type &value) {return dynamic_cast<T*>(value.get())!=nullptr;});
   }
 
 // private:
@@ -167,7 +172,7 @@ public:
         doc.index.begin(),
         doc.index.end(),
         [this, &doc_path] (const typename decltype(doc.index)::value_type &value) {
-          if (auto element = dynamic_cast<T*>(value.second.get()); element) {
+          if (auto element = dynamic_cast<T*>(value.get()); element) {
             element->uri  = doc_path;
             items.emplace_back(element);
           }
@@ -205,7 +210,7 @@ inline std::string title(const Item &item) {
 
 // copy Document items into the Table of Contents
 inline void add(const Document *document, ToC &toc) {
-  for(auto &[key, value]: document->index)
+  for(auto &value: document->index)
     toc.emplace(value->indexKey(),value.get());
 }
 

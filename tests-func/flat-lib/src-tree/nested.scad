@@ -19,16 +19,18 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+include <isolated.scad>
+include <undocumented.scad>
 
 /*!
  * public func to be published.
  */
-function global_func(param1,param2="default value") = false;
+function prefix_global_func(param1,param2="default value") = false;
 
 /*!
  * public module to be published.
  */
-module global_module(param1="default value for parm1",param2) {
+module prefix_global_module(param1="default value for parm1",param2) {
   /*!
    * nested func to be ignored.
    */

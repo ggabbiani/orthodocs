@@ -10,7 +10,18 @@ list will be shown.
 
 ---
 
-### variable PUB_VAR
+### variable $PREFIX_PUB_VAR
+
+__Default:__
+
+    "$public variable"
+
+this $variable will be published.
+
+
+---
+
+### variable PREFIX_PUB_VAR
 
 __Default:__
 
@@ -21,7 +32,7 @@ this variable will be published.
 
 ---
 
-### variable pab_var
+### variable prefix_pub_var
 
 __Default:__
 
@@ -34,12 +45,12 @@ this variable must demonstrate that the Table Of Contents sort is case insensiti
 
 ---
 
-### function radial
+### function prefix_radial
 
 __Syntax:__
 
 ```text
-radial(r=1,theta=0)
+prefix_radial(r=1,theta=0)
 ```
 
 this function will be published.
