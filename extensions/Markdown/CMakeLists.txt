@@ -9,12 +9,13 @@ set(WRITER_INCS
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/3rd-party
 )
+set(WRITER_LIBS indicators::indicators)
 
 if (OPTION_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
 endif()
 
-#cmake_print_variables(WRITER_INCS WRITER_LIBS)
+cmake_print_variables(WRITER_INCS WRITER_LIBS)
 
 add_library(${WRITER_LIB} STATIC
   src/markdown/graph.cpp

@@ -2,8 +2,10 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+include(FetchContent)
 include(CMakePrintHelpers)
 include(GitUtils)
+
 # get GIT_BRANCH_VERSION
 git_branch_version()
 # cmake_print_variables(GIT_BRANCH_VERSION)
@@ -11,12 +13,12 @@ git_branch_version()
 project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
 # cmake_print_variables(PROJECT_VERSION PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH PROJECT_VERSION_TWEAK)
 
+include(CTest)
+
 option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
-
-include(CTest)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -50,11 +52,28 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 # global propedeutics for orthodocs
 ###############################################################################
-add_subdirectory(3rd-party/cpp-trace)
+
+FetchContent_Declare(
+  cpp-trace
+  GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
+  GIT_TAG        48d3dbf1ca25988a8bb4de07685ed3fa0a4e9c41 # v1.5.2
+)
+FetchContent_Declare(
+  cli11
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+  GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
+)
+FetchContent_Declare(
+  indicators
+  GIT_REPOSITORY https://github.com/p-ranav/indicators.git
+  GIT_TAG        6432875ef4c866d25e324c19a787b5bb90b0ab12 # v2.2
+)
+
+FetchContent_MakeAvailable(cpp-trace cli11 indicators)
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
-set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/cpp-trace/include)
-set(ORTHODOCS_LIBS antlr4_static trace)
+set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators trace)
 
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)
