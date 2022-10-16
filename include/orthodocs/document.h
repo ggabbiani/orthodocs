@@ -63,6 +63,32 @@ public:
   // used by generators for stackable items (modules and variables)
   using PtrStack  = std::stack<Ptr>;
 
+  /**
+   * CASE SENSITIVE Document::Index comparison functor.
+   * NOTE: see doc::Item::documentKey() for the format
+   */
+  struct Less {
+    inline bool operator() (const Ptr &lhs, const Ptr &rhs) const {
+      return  lhs->documentKey() < rhs->documentKey();
+    }
+  };
+  /**
+   * CASE INSENSITIVE doc::ToC comparison functor.
+   * NOTE: see doc::Item::documentKey() for the format
+   */
+  struct LessNoCase {
+    using is_transparent = void; // enables heterogeneous lookup
+    bool operator() (const Ptr &lhs, const Ptr &rhs) const {
+      std::string key1  = lhs->documentKey();
+      std::string key2  = rhs->documentKey();
+      std::string s1(key1.length(),' ');
+      std::string s2(key2.length(),' ');
+      std::transform(key1.begin(), key1.end(), s1.begin(), ::tolower);
+      std::transform(key2.begin(), key2.end(), s2.begin(), ::tolower);
+      return  s1 < s2;
+    }
+  };
+
   virtual ~Item() = default;
 
   virtual std::string type() const = 0;
@@ -131,17 +157,8 @@ public:
   using Ownership = std::unique_ptr<Document>;
 
   explicit Document(const path &source) : source(source) {}
-  /**
-   * CASE SENSITIVE Document::Index comparison functor.
-   * NOTE: see doc::Item::documentKey() for the format
-   */
-  struct IndexLesser {
-    inline bool operator() (const doc::Item::Ptr &lhs, const doc::Item::Ptr &rhs) const {
-      return  lhs->documentKey() < rhs->documentKey();
-    }
-  };
 
-  using Index = std::set< doc::Item::Ptr, IndexLesser >;
+  using Index = std::set<doc::Item::Ptr, doc::Item::Less>;
   /**
    * return the number of item of type «T»
    */
