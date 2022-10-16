@@ -17,6 +17,6 @@
 - [x] implement license recognition on packages
 - [x] connect to sonarcloud
 - [ ] finalize input sources management from CLI
-- [ ] set -i,--ignore-prefix cli option as multiple option
+- [x] set -i,--ignore-prefix cli option as multiple option
 - [ ] set -i,--ignore-prefix cli option as a regex
 - [ ] implement boost unit tests
