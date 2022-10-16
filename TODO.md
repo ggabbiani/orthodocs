@@ -16,7 +16,7 @@
 - [x] fix bug on repeated cli argument --pkg-deps (and likely also to others)
 - [x] implement license recognition on packages
 - [x] connect to sonarcloud
-- [ ] finalize input sources management from CLI
+- [x] finalize input sources management from CLI
 - [x] set -i,--ignore-prefix cli option as multiple option
 - [ ] set -i,--ignore-prefix cli option as a regex
 - [ ] implement boost unit tests
