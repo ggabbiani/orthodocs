@@ -126,10 +126,10 @@ void Extension::save(const ToC &toc) {
     out << H("Table of Contents",1) << endl;
     orthodocs::doc::SubToC sub;
     char current = 0;
-    for(auto &[key, item]: toc) {
-      bar.status(key);
+    for(auto item: toc) {
+      bar.status(item->tocKey());
       // see https://www.markdownguide.org/extended-syntax/#heading-ids
-      if (auto initial=(char)std::toupper(item->indexKey()[0]); current!=initial) {  // new sub toc
+      if (auto initial=(char)std::toupper(item->tocKey()[0]); current!=initial) {  // new sub toc
         if (sub.size()) { // write previous sub toc
           subToc(sub,out,current);
           out << endl;
@@ -137,7 +137,7 @@ void Extension::save(const ToC &toc) {
         }
         current = initial;
       }
-      sub.emplace(key,item);
+      sub.emplace(item);
       bar++;
     }
     // write last sub toc
@@ -153,7 +153,7 @@ void Extension::save(const ToC &toc) {
 
 void Extension::subToc(const SubToC &sub,ostream &out,char current) const {
   out << H(current,2) << endl;
-  for(auto &[key, item]: sub) {
+  for(const auto *item: sub) {
     auto id     = item->type()+'-'+item->name;
     headingId(id);
     auto link   = item->uri.string();
@@ -363,7 +363,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
           << "```mermaid\n"
           << "graph TD" << endl;
       // build a dependency graph limited on packages located inside «current_dir»
-      for(const auto& [name,item]: packages) {
+      for(const auto *item: packages) {
         auto package = dynamic_cast<const Package*>(item);
         assert(package);
         if (dir!=".") {

@@ -36,11 +36,11 @@ namespace fs = std::filesystem;
 
 namespace scad::doc {
 
-string Package::indexKey(const string &s) {
+string Package::tocKey(const string &s) {
   return fs::path(s).stem().string()+" ("+ID+")";
 }
 
-string Package::indexKey() const {
+string Package::tocKey() const {
   return Option::prefix_abbreviation(path.stem().string())+" ("+type()+')';
 }
 
@@ -73,7 +73,7 @@ string Single::manage(const string &text) {
 
 const array<const char *,2> Simple::decoration{
   "/*!",
-   "*/"
+  "*/"
 };
 
 bool Simple::check(const string &text) {

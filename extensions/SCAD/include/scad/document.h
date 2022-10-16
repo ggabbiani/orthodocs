@@ -80,7 +80,7 @@ public:
    *
    * «package stem» (package)
    */
-  std::string indexKey() const override;
+  std::string tocKey() const override;
   /**
    * return the Package Index key from a path.
    * This method is used for searching packages from the Package::include and
@@ -88,7 +88,7 @@ public:
    *
    * «package stem» (package)
    */
-  static std::string indexKey(const std::string &s);
+  static std::string tocKey(const std::string &s);
 
   /**
    * contains the full abstract package path: root relative path comprehensive of extension

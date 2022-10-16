@@ -78,14 +78,8 @@ public:
    */
   struct LessNoCase {
     using is_transparent = void; // enables heterogeneous lookup
-    bool operator() (const Ptr &lhs, const Ptr &rhs) const {
-      std::string key1  = lhs->documentKey();
-      std::string key2  = rhs->documentKey();
-      std::string s1(key1.length(),' ');
-      std::string s2(key2.length(),' ');
-      std::transform(key1.begin(), key1.end(), s1.begin(), ::tolower);
-      std::transform(key2.begin(), key2.end(), s2.begin(), ::tolower);
-      return  s1 < s2;
+    bool operator() (const Item *lhs, const Item *rhs) const {
+      return nocase::Less()(lhs->tocKey(),rhs->tocKey());
     }
   };
 
@@ -113,11 +107,11 @@ public:
   virtual std::string documentKey() const;
 
   /**
-   * builds a key value usable by Index.
+   * builds a key value usable by doc::ToC.
    *
    * «item name» («item type»)
    */
-  virtual std::string indexKey() const;
+  virtual std::string tocKey() const;
 
   Name            name;
   Annotation      annotation;
@@ -140,14 +134,14 @@ protected:
  * Table of Contents
  * NOTE: NO OWNERSHIP OF THE CONTAINED ITEMS
  */
-using ToC = std::multimap<Name,Item*,nocase::Less>;
+using ToC = std::multiset<Item*,doc::Item::LessNoCase>;
 
 /**
  * SubToC is a filtered selection of ToC elements, as such its items are
  * simple pointers, because a SubToC has no ownerships over them.
  * It is critical that SubToC never survive its ToC.
  */
-using SubToC = std::multimap<Name,doc::Item*,nocase::Less>;
+using SubToC = ToC;
 
 } // namespace doc
 
@@ -155,10 +149,10 @@ class Document {
   using path      = std::filesystem::path;
 public:
   using Ownership = std::unique_ptr<Document>;
+  using Index     = std::set<doc::Item::Ptr, doc::Item::Less>;
 
   explicit Document(const path &source) : source(source) {}
 
-  using Index = std::set<doc::Item::Ptr, doc::Item::Less>;
   /**
    * return the number of item of type «T»
    */
@@ -166,10 +160,6 @@ public:
   inline size_t size() const {
     return count_if(index.begin(),index.end(),[](const Index::value_type &value) {return dynamic_cast<T*>(value.get())!=nullptr;});
   }
-
-// private:
-  Index index;
-  const path source;
 
   /**
    * this class represents Document Items grouped by topic «T»
@@ -211,6 +201,8 @@ public:
     explicit operator T* () {return this->items[0];}
   };
 
+  Index index;
+  const path source;
 };
 using DocumentList = std::vector<std::unique_ptr<Document>>;
 
@@ -228,7 +220,7 @@ inline std::string title(const Item &item) {
 // copy Document items into the Table of Contents
 inline void add(const Document *document, ToC &toc) {
   for(auto &value: document->index)
-    toc.emplace(value->indexKey(),value.get());
+    toc.emplace(value.get());
 }
 
 /**
@@ -237,9 +229,9 @@ inline void add(const Document *document, ToC &toc) {
 template <typename FUNC>
 SubToC filter(const std::filesystem::path &path,const ToC &toc, FUNC func) {
   SubToC result;
-  for(auto& [key, value]: toc) {
+  for(auto value: toc) {
     if (func(path,value))
-      result.emplace(key,value);
+      result.emplace(value);
   }
   return result;
 }

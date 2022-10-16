@@ -19,7 +19,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define NTRACE
 #include "debug/trace.h"
+
 #include "orthodocs/analizer.h"
 #include "orthodocs/bar.h"
 #include "orthodocs/error_info.h"
