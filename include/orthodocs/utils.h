@@ -89,10 +89,18 @@ inline size_t rfind(std::string_view str, std::string_view sub, size_t pos=0) {
 }
 
 inline bool equal(std::string str1,std::string str2) {
-  return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](const char & c1,const char & c2) {return (std::toupper(c1) == std::toupper(c2));})
-  ;
+  return (str1.size() == str2.size()) 
+      && std::equal(
+        str1.begin(), str1.end(), 
+        str2.begin(), [](const char & c1,const char & c2) {
+          return (std::toupper(c1) == std::toupper(c2));
+        }
+      );
 }
 
+/**
+ * case insensitive lesser to be used with STL containers 
+ */
 struct Less {
   using is_transparent = void; // enables heterogeneous lookup
   bool operator() (std::string_view lhs, std::string_view rhs) const {
