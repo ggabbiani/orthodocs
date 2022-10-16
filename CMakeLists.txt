@@ -56,7 +56,7 @@ include(ExternalAntlr4Cpp)
 FetchContent_Declare(
   cpp-trace
   GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
-  GIT_TAG        48d3dbf1ca25988a8bb4de07685ed3fa0a4e9c41 # v1.5.2
+  GIT_TAG        00de6947cf7873286e2371324ce8852dfe966157 # v1.5.3
 )
 FetchContent_Declare(
   cli11
