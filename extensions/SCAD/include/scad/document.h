@@ -41,6 +41,12 @@ class Variable : public orthodocs::doc::Item {
 public:
   Variable(const orthodocs::doc::Name &name,const orthodocs::doc::Value &defaults,bool nested=false) : orthodocs::doc::Item(name,&defaults,nested) {}
   std::string type() const override {return "variable";}
+  /**
+   * return the xref key formatted as: «qualified package stem»+«variable name»
+   * 
+   * ex.: "artifacts/spacer/FL_SPC_NS"
+   */
+  std::string xrefKey() const override;
 };
 
 class Function : public orthodocs::doc::Item {
@@ -48,6 +54,12 @@ public:
   Function(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
   orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "function";}
+  /**
+   * return the xref key formatted as: «qualified package stem»+«function name»+"()"
+   * 
+   * ex.: "artifacts/spacer/fl_bb_spacer()"
+   */
+  std::string xrefKey() const override;
 };
 
 class Module : public orthodocs::doc::Item {
@@ -55,6 +67,12 @@ public:
   Module(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
   orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "module";}
+  /**
+   * return the xref key formatted as: «qualified package stem»+«module name»+"{}"
+   * 
+   * ex.: "artifacts/spacer/fl_spacer{}"
+   */
+  std::string xrefKey() const override;
 };
 
 /**
@@ -75,12 +93,21 @@ public:
    * always return "package"
    */
   std::string type() const override {return ID;}
+
   /**
    * return the Packages Index key from its path.
    *
    * «package stem» (package)
    */
   std::string tocKey() const override;
+
+  /**
+   * return the xref key formatted as: «qualified package stem»
+   * 
+   * ex.: "artifacts/spacer"
+   */
+  std::string xrefKey() const override;
+
   /**
    * return the Package Index key from a path.
    * This method is used for searching packages from the Package::include and

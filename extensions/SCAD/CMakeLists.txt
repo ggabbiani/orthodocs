@@ -34,7 +34,6 @@ add_library(${LANGUAGE_LIB} STATIC
   src/scad/document.cpp
   src/scad/extension.cpp
   src/scad/listener.cpp
-  src/scad/xref.cpp
   ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
 target_include_directories(${LANGUAGE_LIB}

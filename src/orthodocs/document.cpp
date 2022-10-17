@@ -27,6 +27,13 @@ namespace fs=std::filesystem;
 
 namespace orthodocs::doc {
 
+Item::XRef Item::xref;
+
+void Item::xrefEmplace(Item *item) {
+  if (const auto &[i, success] = xref.emplace(item); !success) 
+    throw domain_error(ERR_INFO+"Item "+(*i)->name+" already present");
+}
+
 string Item::documentKey() const {
   return type()+' '+name;
 }

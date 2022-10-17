@@ -57,21 +57,32 @@ public:
 
 class Item {
   friend class Index;
+  /**
+   * CASE INSENSITIVE XRef comparison functor.
+   */
+  struct XRefLesser {
+    bool operator() (const Item *lhs, const Item *rhs) const {
+      return nocase::Less()(lhs->xrefKey(),rhs->xrefKey());
+    }
+  };
+
 public:
 
-  using Ptr = std::unique_ptr<Item>;
+  using Owner = std::unique_ptr<Item>;
   // used by generators for stackable items (modules and variables)
-  using PtrStack  = std::stack<Ptr>;
+  using OwnerStack  = std::stack<Owner>;
+  using XRef = std::set<Item*,XRefLesser>;
 
   /**
    * CASE SENSITIVE Document::Index comparison functor.
    * NOTE: see doc::Item::documentKey() for the format
    */
   struct Less {
-    inline bool operator() (const Ptr &lhs, const Ptr &rhs) const {
+    inline bool operator() (const Owner &lhs, const Owner &rhs) const {
       return  lhs->documentKey() < rhs->documentKey();
     }
   };
+
   /**
    * CASE INSENSITIVE doc::ToC comparison functor.
    * NOTE: see doc::Item::documentKey() for the format
@@ -92,6 +103,7 @@ public:
    * NOTE: it uses the global option private_prefix.
    */
   virtual bool privateId() const;
+
   /**
    * builds a key usable by Document::Index in the following format:
    * 
@@ -113,11 +125,23 @@ public:
    */
   virtual std::string tocKey() const;
 
+  /**
+   * see the concrete language implementation for the actual format
+   */
+  virtual std::string xrefKey() const = 0;
+
+  /*
+   * emplace an item into xref, throw a domain_error if item already present.
+   */
+  static void xrefEmplace(Item *item);
+
   Name            name;
   Annotation      annotation;
   Parameter::Vec  parameters;
   const Value     defaults;
   const bool      nested;
+  static XRef     xref;
+
   /**
    * the semantic of this field is language dependant
    */
@@ -128,6 +152,7 @@ public:
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),defaults(defaults?*defaults:""),nested(nested) {}
   Signature _signature() const;
+
 };
 
 /**
@@ -146,10 +171,10 @@ using SubToC = ToC;
 } // namespace doc
 
 class Document {
-  using path      = std::filesystem::path;
+  using path  = std::filesystem::path;
 public:
-  using Ownership = std::unique_ptr<Document>;
-  using Index     = std::set<doc::Item::Ptr, doc::Item::Less>;
+  using Owner = std::unique_ptr<Document>;
+  using Index = std::set<doc::Item::Owner, doc::Item::Less>;
 
   explicit Document(const path &source) : source(source) {}
 

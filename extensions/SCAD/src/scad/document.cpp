@@ -44,6 +44,30 @@ string Package::tocKey() const {
   return Option::prefix_abbreviation(path.stem().string())+" ("+type()+')';
 }
 
+string Package::xrefKey() const {
+  auto parent = dynamic_cast<doc::Package*>(this->parent);
+  assert(!parent);
+  return this->name;
+}
+
+string Variable::xrefKey() const {
+  auto parent = dynamic_cast<doc::Package*>(this->parent);
+  assert(parent);
+  return parent->name+'/'+this->name;
+}
+
+string Function::xrefKey() const {
+  auto parent = dynamic_cast<doc::Package*>(this->parent);
+  assert(parent);
+  return parent->name+'/'+this->name+"()";
+}
+
+string Module::xrefKey() const {
+  auto parent = dynamic_cast<doc::Package*>(this->parent);
+  assert(parent);
+  return parent->name+'/'+this->name+"{}";
+}
+
 namespace style {
 
 static char buffer[256];
