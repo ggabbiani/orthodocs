@@ -38,7 +38,7 @@ Listener::Listener(const fs::path &pkg_source) : _pkg_path(pkg_source), _documen
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
-  curr_item.push(orthodocs::doc::Item::Ptr(curr_package));
+  curr_item.push(orthodocs::doc::Item::Owner(curr_package));
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
@@ -181,7 +181,7 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
     auto variable = new doc::Variable(id,defaults,nested);
     assert(curr_package);
     variable->parent        = curr_package;
-    curr_variable.push(orthodocs::doc::Item::Ptr(variable));
+    curr_variable.push(orthodocs::doc::Item::Owner(variable));
   } else if (curr_parameter) {
     curr_parameter->name      = id;
     curr_parameter->defaults  = defaults;

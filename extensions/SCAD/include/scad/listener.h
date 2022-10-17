@@ -41,7 +41,7 @@ public:
   explicit Listener(const std::filesystem::path &pkg_source);
 
   // return the Document's ownership to the calling environment
-  Document::Ownership releaseDocument() {return std::move(_document);};
+  Document::Owner releaseDocument() {return std::move(_document);};
 
   void enterAnnotation(Parser::AnnotationContext *ctx)      override;
   void enterAssignment(Parser::AssignmentContext *ctx)      override;
@@ -61,15 +61,15 @@ public:
 private:
   // the following members represents the actual status variables for the parser
   doc::Package                    *curr_package;
-  orthodocs::doc::Item::PtrStack   curr_item;
-  orthodocs::doc::Item::PtrStack   curr_variable;
+  orthodocs::doc::Item::OwnerStack   curr_item;
+  orthodocs::doc::Item::OwnerStack   curr_variable;
   orthodocs::doc::Parameter::Ptr   curr_parameter;
   /*
    * this is a kludge: is there an official way for retrieving the current
    * language source file from antlr4?
    */
-  const std::filesystem::path     &_pkg_path;
-  orthodocs::Document::Ownership   _document;
+  const std::filesystem::path &_pkg_path;
+  orthodocs::Document::Owner   _document;
 };
 
 }
