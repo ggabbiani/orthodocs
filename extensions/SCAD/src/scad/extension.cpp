@@ -27,8 +27,11 @@
 #include "SCADLexer.h"
 #include "SCADParser.h"
 
+#include <regex>
+
 using namespace std;
 using namespace antlr4;
+
 namespace fs=std::filesystem;
 
 namespace {
@@ -48,9 +51,37 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
 
 ErrorHandler handler;
 
+orthodocs::doc::XRef::Analysis::Results analyze(const orthodocs::doc::Annotation &annotation) {
+  static pair<string,regex> rules[]={
+    {"Function",  regex("([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)")},
+    {"Module",    regex("([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}")},
+    {"Variable",  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)")},
+    {"Package",   regex("package ([a-zA-Z_][a-zA-Z0-9_]*)")},
+  };
+  orthodocs::doc::XRef::Analysis::Results result;
+  for(auto i=0;i<4;++i) {
+    const char *t = annotation.c_str();
+    cmatch match;
+    while (regex_search(t, match, rules[i].second)) {
+      auto offset = (t-annotation.c_str());
+      orthodocs::doc::XRef::Analysis analysis {
+        match.position(0)+offset,
+        match.length(0),
+        annotation.substr(match.position(i>1)+offset,match.length(1))
+      };
+      TR_MSG(analysis.token,"matched","position",analysis.position,"length",analysis.length);
+      result.emplace(analysis.position,analysis);
+      t += analysis.position+analysis.length;
+    }
+  }
+}
+
+
 }
 
 namespace scad {
+
+Extension::Extension() : language::Extension(ID) {}
 
 unique_ptr<orthodocs::Document> Extension::parse(const fs::path &source) const {
   // change to source root
@@ -77,6 +108,10 @@ unique_ptr<orthodocs::Document> Extension::parse(const fs::path &source) const {
 
 const char *Extension::sourcePostfix() const {
   return ".scad";
+}
+
+auto Extension::analist() -> XRef::Analyzer {
+  return &analyze;
 }
 
 } // namespace scad

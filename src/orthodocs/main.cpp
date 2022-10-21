@@ -25,8 +25,10 @@
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
+#include "orthodocs/xref.h"
 
 #include <CLI/CLI.hpp>
+#include <debug/trace.h>
 
 #include <algorithm>
 #include <cassert>
@@ -122,8 +124,9 @@ struct {
 }
 
 int main(int argc, const char *argv[]) {
-    CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
-    auto      result = EXIT_SUCCESS;
+  TR_FUNC;
+  CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
+  auto      result = EXIT_SUCCESS;
 
   try {
     app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
@@ -154,12 +157,14 @@ int main(int argc, const char *argv[]) {
 
     // get desired language extension for source analysis
     auto language = language::Extension::factory();
-    // build proper analyst
+    doc::XRef  xref(language->analist());
+    // language analyst setup
     Analizer analyst(language);
-    // in-memory source tree analysis
-    analyst.process();
+    // in-memory source tree analysis prodution and cross-reference dictionary populate
+    analyst.process(xref.dictionary);
     // get desired writer extension
     auto writer = writer::Extension::factory();
+    writer->set(xref);
     // save documents
     writer->save(analyst.documents());
     // save table of contents

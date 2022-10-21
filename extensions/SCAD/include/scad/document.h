@@ -42,11 +42,9 @@ public:
   Variable(const orthodocs::doc::Name &name,const orthodocs::doc::Value &defaults,bool nested=false) : orthodocs::doc::Item(name,&defaults,nested) {}
   std::string type() const override {return "variable";}
   /**
-   * return the xref key formatted as: «qualified package stem»+«variable name»
-   * 
-   * ex.: "artifacts/spacer/FL_SPC_NS"
+   * return the dictionary key formatted as: «variable name»
    */
-  std::string xrefKey() const override;
+  std::string dictKey() const override;
 };
 
 class Function : public orthodocs::doc::Item {
@@ -55,11 +53,9 @@ public:
   orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "function";}
   /**
-   * return the xref key formatted as: «qualified package stem»+«function name»+"()"
-   * 
-   * ex.: "artifacts/spacer/fl_bb_spacer()"
+   * return the dictionary key formatted as: «function name»
    */
-  std::string xrefKey() const override;
+  std::string dictKey() const override;
 };
 
 class Module : public orthodocs::doc::Item {
@@ -68,11 +64,9 @@ public:
   orthodocs::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "module";}
   /**
-   * return the xref key formatted as: «qualified package stem»+«module name»+"{}"
-   * 
-   * ex.: "artifacts/spacer/fl_spacer{}"
+   * return the dictionary key formatted as: «module name»
    */
-  std::string xrefKey() const override;
+  std::string dictKey() const override;
 };
 
 /**
@@ -102,11 +96,9 @@ public:
   std::string tocKey() const override;
 
   /**
-   * return the xref key formatted as: «qualified package stem»
-   * 
-   * ex.: "artifacts/spacer"
+   * return the dictionary key formatted as: «qualified package stem»
    */
-  std::string xrefKey() const override;
+  std::string dictKey() const override;
 
   /**
    * return the Package Index key from a path.

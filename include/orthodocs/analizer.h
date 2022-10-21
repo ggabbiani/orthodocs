@@ -21,6 +21,7 @@
  */
 
 #include "orthodocs/document.h"
+#include "orthodocs/xref.h"
 
 #include <filesystem>
 #include <iostream>
@@ -47,12 +48,17 @@ class Analizer {
 public:
   explicit Analizer(language::Extension *language): _parser(language) {}
 
-  // analize a set of files / directories as specified from Option(s)
-  void process();
+  /**
+   * analize a set of files / directories as specified from Option(s), 
+   * populate xref dictionary 
+   */
+  void process(doc::XRef::Dictionary &dict);
 
   /**
    * 1) produce an in-memory document of the source code passed
    * 2) add document contents to the Table of Contents
+   * 3) populate item Dictionary
+   * 4) move the in memory document in the document list
    */
   void document(
     // source file relative to source root
@@ -75,9 +81,9 @@ private:
     // resulting list of source files matching «extension»
     FileSet &result
   );
-  DocumentList         _docs;
-  doc::ToC             _toc;
-  language::Extension *_parser;
+  DocumentList           _docs;
+  doc::ToC               _toc;
+  language::Extension   *_parser;
 };
 
 }

@@ -20,9 +20,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #include "orthodocs/analizer.h"
 #include "orthodocs/document.h"
 #include "orthodocs/globals.h"
+#include "orthodocs/xref.h"
 #include "singleton.h"
 
 #include <filesystem>
@@ -33,7 +33,8 @@ namespace language {
 
 class Extension {
 public:
-  using Map = std::map<std::string,Extension*,std::less<>>;
+  using Map   = std::map<std::string,Extension*,std::less<>>;
+  using XRef  = orthodocs::doc::XRef;
 
   explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
@@ -43,12 +44,17 @@ public:
    * return the source postfix
    */
   virtual const char *sourcePostfix() const = 0;
+  /*
+   * return the Annotation analyzer
+   */
+  virtual XRef::Analyzer analist() = 0;
   /**
    * return the extension corresponding to the Option::language()
    */
   static Extension *factory();
 
   const char * const id;
+
 };
 
 } // namespace language
@@ -57,33 +63,54 @@ namespace writer {
 
 class Extension {
 public:
-  using Map = std::map<std::string,Extension*,std::less<>>;
+  using Document      = orthodocs::Document;
+  using DocumentList  = orthodocs::DocumentList;
+  using Item          = orthodocs::doc::Item;
+  using Map           = std::map<std::string,Extension*,std::less<>>;
+  using ToC           = orthodocs::doc::ToC;
+  using XRef          = orthodocs::doc::XRef;
 
   explicit Extension(const char *id) : id(id) {}
-  virtual ~Extension() = default;
 
   /**
    * return the extension corresponding to the Option::writer()
    */
   static Extension *factory();
   /**
-   * write a set of documents
+   * write a set of documents using the passed dictionary for annotation cross-references
    */
-  void save(const orthodocs::DocumentList &docs);
+  void save(const DocumentList &docs);
   /**
    * write a document in the concrete instance native format
    */
-  virtual void save(const orthodocs::Document &doc) = 0;
+  virtual void save(const Document &doc) = 0;
   /**
    * write a table of contents in the concrete instance native format
    */
-  virtual void save(const orthodocs::doc::ToC &toc) = 0;
+  virtual void save(const ToC &toc) = 0;
   /**
    * write sub-root graphs
    */
-  virtual void graphs(const orthodocs::doc::ToC &toc, const FileSet &dirs) = 0;
+  virtual void graphs(const ToC &toc, const FileSet &dirs) = 0;
+
+  /**
+   * return the concrete reference string to the passed doc::Item
+   */
+  virtual std::string reference(const Item &item) const = 0;
 
   const char * const id;
+
+  void set(XRef &xref) {
+    _xref = &xref;
+  }
+
+protected:
+  XRef &xref() {
+    return *_xref;
+  }
+
+private:
+  XRef *_xref;
 };
 
 } // namespace writer

@@ -9,7 +9,7 @@ set(WRITER_INCS
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/3rd-party
 )
-set(WRITER_LIBS indicators::indicators)
+set(WRITER_LIBS indicators::indicators trace)
 
 if (OPTION_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)

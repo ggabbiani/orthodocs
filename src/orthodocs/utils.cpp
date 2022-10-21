@@ -34,7 +34,7 @@ using namespace std;
 namespace fs=std::filesystem;
 
 void print_exception(const exception& e, int level) {
-  cerr << string(level, ' ') << "exception: " << e.what() << '\n';
+  cerr << string(level, ' ') << "***EXCEPTION***: " << e.what() << '\n';
   try {
     rethrow_if_nested(e);
   } catch(const exception &nestedException) {

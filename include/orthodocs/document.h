@@ -31,6 +31,9 @@
 #include <string>
 #include <vector>
 
+// #undef NTRACE
+#include <debug/trace.h>
+
 namespace orthodocs {
 
 namespace doc {
@@ -56,22 +59,10 @@ public:
 };
 
 class Item {
-  friend class Index;
-  /**
-   * CASE INSENSITIVE XRef comparison functor.
-   */
-  struct XRefLesser {
-    bool operator() (const Item *lhs, const Item *rhs) const {
-      return nocase::Less()(lhs->xrefKey(),rhs->xrefKey());
-    }
-  };
-
 public:
-
   using Owner = std::unique_ptr<Item>;
   // used by generators for stackable items (modules and variables)
   using OwnerStack  = std::stack<Owner>;
-  using XRef = std::set<Item*,XRefLesser>;
 
   /**
    * CASE SENSITIVE Document::Index comparison functor.
@@ -128,19 +119,13 @@ public:
   /**
    * see the concrete language implementation for the actual format
    */
-  virtual std::string xrefKey() const = 0;
-
-  /*
-   * emplace an item into xref, throw a domain_error if item already present.
-   */
-  static void xrefEmplace(Item *item);
+  virtual std::string dictKey() const = 0;
 
   Name            name;
   Annotation      annotation;
   Parameter::Vec  parameters;
   const Value     defaults;
   const bool      nested;
-  static XRef     xref;
 
   /**
    * the semantic of this field is language dependant
@@ -156,8 +141,9 @@ protected:
 };
 
 /**
- * Table of Contents
- * NOTE: NO OWNERSHIP OF THE CONTAINED ITEMS
+ * Table of Contents with no ownership on represented items.
+ * 
+ * NOTE: the key is possibly abbreviated, in this case a collision is accepted
  */
 using ToC = std::multiset<Item*,doc::Item::LessNoCase>;
 
@@ -223,6 +209,7 @@ public:
   class Header : public Topic<T> {
   public:
     Header(const Document &doc,const std::filesystem::path &doc_path) : Topic<T>(doc,doc_path,nullptr,1) {}
+    // TODO: could we render the operator implicit?
     explicit operator T* () {return this->items[0];}
   };
 
@@ -231,7 +218,9 @@ public:
 };
 using DocumentList = std::vector<std::unique_ptr<Document>>;
 
-namespace doc::toc {
+namespace doc {
+
+namespace toc {
 
 /**
  * build an index title in the form
@@ -261,6 +250,8 @@ SubToC filter(const std::filesystem::path &path,const ToC &toc, FUNC func) {
   return result;
 }
 
-} // namespace doc::toc
+} // namespace toc
+
+} // namespace doc
 
 } // namespace orthodocs

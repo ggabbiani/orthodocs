@@ -27,14 +27,17 @@ namespace markdown {
 
 class Extension : public writer::Extension {
 public:
-  using Document  = orthodocs::Document;
-  using ToC       = orthodocs::doc::ToC;
-  using SubToC    = orthodocs::doc::SubToC;
-  using Parameter = orthodocs::doc::Parameter;
-  using Package   = scad::doc::Package;
-  using Function  = scad::doc::Function;
-  using Module    = scad::doc::Module;
-  using Variable  = scad::doc::Variable;
+  using Annotation  = orthodocs::doc::Annotation;
+  using Document    = orthodocs::Document;
+  using Function    = scad::doc::Function;
+  using Item        = orthodocs::doc::Item;
+  using Module      = scad::doc::Module;
+  using Package     = scad::doc::Package;
+  using Parameter   = orthodocs::doc::Parameter;
+  using SubToC      = orthodocs::doc::SubToC;
+  using ToC         = orthodocs::doc::ToC;
+  using Variable    = scad::doc::Variable;
+  using XRef        = orthodocs::doc::XRef;
 
   static constexpr const char * const ID = "markdown";
   Extension() : writer::Extension(ID) {}
@@ -42,6 +45,7 @@ public:
   void save(const Document &doc) override;
   void save(const ToC &toc) override;
   void graphs(const ToC &toc, const FileSet &dirs) override;
+  std::string reference(const Item &item) const override;
 
 private:
   void graph(const Package &pkg, std::ostream &out) const;
@@ -52,6 +56,11 @@ private:
   void write(const Function   *func,  std::ostream &out) const;
   void write(const Module     *mod,   std::ostream &out) const;
   void write(const Variable   *var,   std::ostream &out) const;
+
+  /*
+   * Annotation(s) need a specific method for the cross-reference expansion
+   */
+  void writeAnnotation(const Annotation &annotation, std::ostream &out);
 
   template <class T>
   void write(const Document::Topic<T> &topic, std::ostream &out) const {

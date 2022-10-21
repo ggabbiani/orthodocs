@@ -33,10 +33,11 @@ namespace fs=std::filesystem;
 
 namespace {
 
-// transforms the passed string in a markdown id
-void headingId(string &s) {
+// returns the passed string as a markdown id
+string headingId(string s) {
   replace( s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
   s.erase(remove(s.begin(), s.end(), '/'), s.end());  // remove all '/'
+  return s;
 }
 
 using Filter = function<bool(const graph::Connection&)>;
@@ -110,6 +111,7 @@ void Extension::save(const Document &doc) {
   auto md = source.parent_path() / source.stem().replace_extension(".md");
   ofstream out(md);
 
+  // TODO: could we render the operator T* () implicit for Document::Header<Package>?
   write((Package*)Document::Header<Package> (doc,md),out);
   write(Document::Topic<Variable> (doc,md,"Variables"),out);
   write(Document::Topic<Function> (doc,md,"Functions"),out);
@@ -154,11 +156,8 @@ void Extension::save(const ToC &toc) {
 void Extension::subToc(const SubToC &sub,ostream &out,char current) const {
   out << H(current,2) << endl;
   for(const auto *item: sub) {
-    auto id     = item->type()+'-'+item->name;
-    headingId(id);
-    auto link   = item->uri.string();
     auto title  = orthodocs::doc::toc::title(*item);
-    out << "- [" << title << "](" << link << "#" << id << ")" << endl;
+    out << "- [" << title << "](" << reference(*item) << ")" << endl;
   }
 }
 
@@ -196,6 +195,13 @@ void Extension::write(const Package *pkg,ostream &out) const {
     out << pkg->annotation << endl;
     if (pkg->license)
       out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
+  }
+}
+
+void Extension::writeAnnotation(const Annotation &annotation, ostream &out) {
+  if (!annotation.empty()) {
+    XRef::Analysis::Results result = xref().analize(annotation);
+    out << resolve(result,annotation) << endl;
   }
 }
 
@@ -381,6 +387,11 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
     indicators::show_console_cursor(true);
     throw;
   }
+}
+
+string Extension::reference(const orthodocs::doc::Item &item) const {
+  auto id = item.type()+'-'+item.name;
+  return item.uri.string()+"#"+headingId(id);
 }
 
 } // namespace markdown
