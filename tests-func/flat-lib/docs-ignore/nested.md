@@ -11,6 +11,7 @@ graph LR
 This file contains nested function and module that should be not published.
 
 
+
 *Published under __GNU General Public License v3__*
 
 ## Functions
