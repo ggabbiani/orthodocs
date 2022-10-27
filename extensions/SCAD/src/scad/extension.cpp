@@ -52,6 +52,7 @@ void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, 
 ErrorHandler handler;
 
 orthodocs::doc::XRef::Analysis::Results analyze(const orthodocs::doc::Annotation &annotation) {
+  TR_FUNC;
   static pair<string,regex> rules[]={
     {"Function",  regex("([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)")},
     {"Module",    regex("([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}")},
@@ -67,13 +68,14 @@ orthodocs::doc::XRef::Analysis::Results analyze(const orthodocs::doc::Annotation
       orthodocs::doc::XRef::Analysis analysis {
         match.position(0)+offset,
         match.length(0),
-        annotation.substr(match.position(i>1)+offset,match.length(1))
+        annotation.substr(match.position(0)+offset,match.length(0))
       };
-      TR_MSG(analysis.token,"matched","position",analysis.position,"length",analysis.length);
+      TR_MSG('\''+analysis.token+'\'',"matched","position",analysis.position,"length",analysis.length);
       result.emplace(analysis.position,analysis);
       t += analysis.position+analysis.length;
     }
   }
+  return result;
 }
 
 

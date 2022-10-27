@@ -19,7 +19,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #define NTRACE
 #include "debug/trace.h"
 
 #include "orthodocs/analizer.h"
@@ -78,14 +77,17 @@ void Analizer::process(doc::XRef::Dictionary &dict) {
     { // populate dictionary with candidate items
       Bar bar(_toc, "cross reference dictionary");
       for(auto &item: _toc) {
-        if (auto [i, success] = dict.emplace(item); !success) {
-          TR_MSG("****PRESENT****","dictionary key:",(*i)->dictKey(),"document key:",(*i)->documentKey());
+        auto key = item->dictKey();
+        bar.status(key);
+        if (auto [i, success] = dict.try_emplace(key,item); !success) {
+          TR_MSG("****PRESENT****","dictionary key:",i->second->dictKey(),"document key:",i->second->documentKey());
           TR_MSG("****SKIPPED****","dictionary key:",item->dictKey(),"document key:",item->documentKey());
           // TODO: implement a global warning api()
           // TODO: eventually implement the management in such a case of fully qualified references
           cout << "***WARN***: duplicate item " << item->dictKey() << " skipped" << endl;
         }
         TR_MSG("inserted",item->dictKey());
+        bar++;
       }
       TR_MSG("dictionary/toc size",dict.size(),"/",_toc.size());
     }

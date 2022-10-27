@@ -31,7 +31,6 @@
 #include <string>
 #include <vector>
 
-// #undef NTRACE
 #include <debug/trace.h>
 
 namespace orthodocs {
@@ -128,11 +127,9 @@ public:
   const bool      nested;
 
   /**
-   * the semantic of this field is language dependant
+   * this field is filled by the language extension
    */
   Item          *parent = nullptr;
-  // filled by writers represent the uri of the saved document
-  URI           uri;
 
 protected:
   Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),defaults(defaults?*defaults:""),nested(nested) {}
@@ -190,10 +187,8 @@ public:
         doc.index.begin(),
         doc.index.end(),
         [this, &doc_path] (const typename decltype(doc.index)::value_type &value) {
-          if (auto element = dynamic_cast<T*>(value.get()); element) {
-            element->uri  = doc_path;
+          if (auto element = dynamic_cast<T*>(value.get()); element) 
             items.emplace_back(element);
-          }
         }
       );
       if (cardinality>-1 && items.size()>cardinality)

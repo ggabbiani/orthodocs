@@ -105,6 +105,7 @@ public:
           string ref = "["+res.token+"]("+i->second+")";
           s.replace(res.position,res.length,ref);
         } else {
+          // FIXME: it would help to have also an indication of the item for which the warn was emitted
           cerr << "***WARN*** item " << res.token << " not present in dictionary" << endl;
         }
       }

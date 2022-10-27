@@ -19,7 +19,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define NTRACE
 #include "debug/trace.h"
 #include "orthodocs/globals.h"
 
@@ -40,13 +39,13 @@ bool            Option::_toc{false};
 string          Option::_writer{"markdown"};
 
 string Option::prefix_abbreviation(const string &name) {
-  TR_FUNC;
+  // TR_FUNC;
   string  abbreviated = name;
   for(const auto &pfx: _ignore_prefix) {
     auto    len = pfx.length();
     if (nocase::equal(name.substr(0,len),pfx)) {
       abbreviated = name.substr(len);
-      TR_MSG(name,"matched",pfx);
+      // TR_MSG(name,"matched",pfx);
       break;
     }
   }

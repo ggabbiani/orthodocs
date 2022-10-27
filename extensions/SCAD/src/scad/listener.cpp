@@ -116,7 +116,6 @@ void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
 }
 
 void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
-  // TODO: implement the whole piece of code as a Document function
   auto &mod = curr_item.top();
 #ifndef NDEBUG
   auto  key = mod->documentKey();

@@ -18,6 +18,7 @@ include(CTest)
 option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
+option(OPTION_TRACE           "Debug tracing facility"        OFF )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
 
 # compiler must be 17
@@ -56,7 +57,7 @@ include(ExternalAntlr4Cpp)
 FetchContent_Declare(
   cpp-trace
   GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
-  GIT_TAG        00de6947cf7873286e2371324ce8852dfe966157 # v1.5.3
+  GIT_TAG        c0dfa4d874e29296680c9b75d3bb833761fe813f # v1.6.2
 )
 FetchContent_Declare(
   cli11
@@ -70,6 +71,10 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(cpp-trace cli11 indicators)
+
+if (NOT OPTION_TRACE)
+  add_compile_definitions(NTRACE)
+endif()
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
 set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include)

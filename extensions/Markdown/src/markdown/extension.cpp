@@ -33,10 +33,41 @@ namespace fs=std::filesystem;
 
 namespace {
 
-// returns the passed string as a markdown id
+/*
+ * returns the passed string as a markdown id.
+ *
+ * FIXME: this is a PARTIAL implementation of [GitLab Flavored Markdown (GLFM) | GitLab](https://docs.gitlab.com/ee/user/markdown.html#header-ids-and-links)
+ * 
+ * The IDs generated should be conformant to the following rules:
+ *
+ * 1. All text is converted to lowercase.
+ * 2. All non-word text (such as punctuation or HTML) is removed.
+ * 3. All spaces are converted to hyphens.
+ * 4. Two or more hyphens in a row are converted to one.
+ * 5. If a header with the same ID has already been generated, a unique incrementing number is appended, starting at 1.
+ */
 string headingId(string s) {
-  replace( s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
-  s.erase(remove(s.begin(), s.end(), '/'), s.end());  // remove all '/'
+  // // rule 3: replace all ' ' to '-'
+  // replace( s.begin(), s.end(), ' ', '-'); 
+  // // rule 2 (incomplete): remove all '/'
+  // s.erase(remove(s.begin(), s.end(), '/'), s.end());
+
+  // rule 2: All non-word text (such as punctuation or HTML) is removed.
+  s.erase(
+    remove_if(
+      s.begin(),s.end(),
+      [] (unsigned char x) {return !isalnum(x) && !isblank(x) && x!='-' && x!='_' && x!='$';}
+    ),
+    s.end()
+  );
+
+  // rule 1: All text is converted to lowercase.
+  // rule 3: All spaces are converted to hyphens.
+  transform(s.cbegin(),s.cend(),s.begin(),
+    [] (unsigned char c) {
+      return isblank(c) ? '-' : tolower(c);
+    }
+  );
   return s;
 }
 
@@ -112,10 +143,10 @@ void Extension::save(const Document &doc) {
   ofstream out(md);
 
   // TODO: could we render the operator T* () implicit for Document::Header<Package>?
-  write((Package*)Document::Header<Package> (doc,md),out);
-  write(Document::Topic<Variable> (doc,md,"Variables"),out);
-  write(Document::Topic<Function> (doc,md,"Functions"),out);
-  write(Document::Topic<Module>   (doc,md,"Modules"),out);
+  write(doc,(Package*)Document::Header<Package>(doc,md),out);
+  write(doc,Document::Topic<Variable> (doc,md,"Variables"),out);
+  write(doc,Document::Topic<Function> (doc,md,"Functions"),out);
+  write(doc,Document::Topic<Module>   (doc,md,"Modules"),out);
 }
 
 void Extension::save(const ToC &toc) {
@@ -124,7 +155,8 @@ void Extension::save(const ToC &toc) {
   try {
     orthodocs::Bar bar(toc,"items in ToC");
     cwd pwd(Option::droot());
-    ofstream out("toc.md");
+    fs::path document_source("toc.md");
+    ofstream out(document_source);
     out << H("Table of Contents",1) << endl;
     orthodocs::doc::SubToC sub;
     char current = 0;
@@ -133,7 +165,7 @@ void Extension::save(const ToC &toc) {
       // see https://www.markdownguide.org/extended-syntax/#heading-ids
       if (auto initial=(char)std::toupper(item->tocKey()[0]); current!=initial) {  // new sub toc
         if (sub.size()) { // write previous sub toc
-          subToc(sub,out,current);
+          subToc(document_source,sub,out,current);
           out << endl;
           sub.clear();
         }
@@ -144,7 +176,7 @@ void Extension::save(const ToC &toc) {
     }
     // write last sub toc
     if (sub.size()) {
-      subToc(sub,out,current);
+      subToc(document_source,sub,out,current);
     }
   } catch(...) {
     indicators::show_console_cursor(true);
@@ -153,15 +185,17 @@ void Extension::save(const ToC &toc) {
 
 }
 
-void Extension::subToc(const SubToC &sub,ostream &out,char current) const {
+void Extension::subToc(const std::filesystem::path &document_source, const SubToC &sub,ostream &out,char current) const {
+  TR_FUNC;
   out << H(current,2) << endl;
   for(const auto *item: sub) {
     auto title  = orthodocs::doc::toc::title(*item);
-    out << "- [" << title << "](" << reference(*item) << ")" << endl;
+    out << "- [" << title << "](" << reference(item,&document_source) << ")" << endl;
+    // TR_MSG("reference",quoted(reference(item,&document_source)));
   }
 }
 
-void Extension::write(const Package *pkg,ostream &out) const {
+void Extension::write(const Document &document, const Package *pkg,ostream &out) const {
   assert(pkg);
   out << H("package "+pkg->name)
       << endl;
@@ -192,26 +226,46 @@ void Extension::write(const Package *pkg,ostream &out) const {
   }
   // write annotation contents
   if (!pkg->annotation.empty()) {
-    out << pkg->annotation << endl;
+    writeAnnotation(document,pkg->annotation,out);
     if (pkg->license)
       out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
   }
 }
 
-void Extension::writeAnnotation(const Annotation &annotation, ostream &out) {
+void Extension::writeAnnotation(const Document &document, const Annotation &annotation, ostream &out) const {
+  TR_FUNC;
+  auto &xref = this->xref();
   if (!annotation.empty()) {
-    XRef::Analysis::Results result = xref().analize(annotation);
-    out << resolve(result,annotation) << endl;
+    TR_MSG("*ANNOTATION*",'\''+annotation+'\'');
+    string s = annotation;
+    XRef::Analysis::Results results = xref.analize(annotation);
+    // xref substitution starts from last occurrence
+    for_each(results.rbegin(), results.rend(),
+      [this,&document,&s,&xref] (XRef::Analysis::Results::value_type value) {
+        // TR_MSG('\''+value.second.token+'\'',"matched","position",value.second.position,"length",value.second.length);
+        const auto &res = value.second;
+        if (auto i=xref.dictionary.find(res.token); i!=xref.dictionary.end()) {
+          auto ref = this->reference(i->second,&document.source);
+          TR_MSG("ref",quoted(ref));
+          string link = "["+res.token+"]("+ref+")";
+          s.replace(res.position,res.length,link);
+        } else {
+          // TODO: write a warning API
+          // FIXME: it would help to have also an indication of the item for which the warn was emitted
+          cerr << "***WARN*** item '" << res.token << "' not present in dictionary" << endl;
+        }
+      }
+    );
+    out << s << '\n' << endl;
   }
 }
 
-void Extension::write(const Parameter *param, ostream &out) const {
-  out << BOLD(param->name) << BR()
-      << param->annotation << endl
-      << endl;
+void Extension::write(const Document &document, const Parameter *param, ostream &out) const {
+  out << BOLD(param->name) << BR();
+  writeAnnotation(document,param->annotation,out);
 }
 
-void Extension::write(const Variable *var, ostream &out) const {
+void Extension::write(const Document &document, const Variable *var, ostream &out) const {
   assert(var);
   out << HRULE()
       << H("variable "+var->name,3)
@@ -221,12 +275,10 @@ void Extension::write(const Variable *var, ostream &out) const {
         << endl
         << "    " << var->defaults << endl
         << endl;
-  if (!var->annotation.empty())
-    out << var->annotation << endl
-        << endl;
+  writeAnnotation(document, var->annotation,out);
 }
 
-void Extension::write(const Function *func, ostream &out) const {
+void Extension::write(const Document &document, const Function *func, ostream &out) const {
   assert(func);
   out << HRULE()
       << H("function "+func->name,3)
@@ -238,9 +290,7 @@ void Extension::write(const Function *func, ostream &out) const {
       << func->signature() << '\n'
       << "```\n"
       << endl;
-  if (!func->annotation.empty())
-    out << func->annotation << endl
-        << endl;
+  writeAnnotation(document,func->annotation,out);
 
   if (func->parameters.size()) {
     // how many annotated parameters do we have in place?
@@ -258,9 +308,9 @@ void Extension::write(const Function *func, ostream &out) const {
       for_each(
         func->parameters.begin(),
         func->parameters.end(),
-        [this,&out] (const decltype(func->parameters)::value_type &param) {
+        [this,&document,&out] (const decltype(func->parameters)::value_type &param) {
           if (!param->annotation.empty())
-            write(param.get(),out);
+            write(document,param.get(),out);
         }
       );
       out << endl;
@@ -268,7 +318,7 @@ void Extension::write(const Function *func, ostream &out) const {
   }
 }
 
-void Extension::write(const Module *mod, ostream &out) const {
+void Extension::write(const Document &document, const Module *mod, ostream &out) const {
   assert(mod);
   out << HRULE()
       << H("module "+mod->name,3)
@@ -278,9 +328,7 @@ void Extension::write(const Module *mod, ostream &out) const {
       // << CODE(signature(mod)) << endl
       << "    " << mod->signature() << endl
       << endl;
-  if (!mod->annotation.empty())
-    out << mod->annotation << endl
-        << endl;
+  writeAnnotation(document,mod->annotation,out);
 
   if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?
@@ -293,9 +341,9 @@ void Extension::write(const Module *mod, ostream &out) const {
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(mod->parameters.begin(),mod->parameters.end(),
-        [this,&out] (const orthodocs::doc::Parameter::Ptr &param) {
+        [this,&document,&out] (const orthodocs::doc::Parameter::Ptr &param) {
           if (!param->annotation.empty())
-            write(param.get(),out);
+            write(document,param.get(),out);
         }
       );
       out << endl;
@@ -389,9 +437,25 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
   }
 }
 
-string Extension::reference(const orthodocs::doc::Item &item) const {
-  auto id = item.type()+'-'+item.name;
-  return item.uri.string()+"#"+headingId(id);
+string Extension::reference(const Item *item, const fs::path *document_source) const {
+  TR_FUNC;
+  auto id = headingId(item->type()+'-'+item->name);
+  auto package = dynamic_cast<const Package*>(item);
+  if (!package)
+    package = dynamic_cast<const Package*>(item->parent);
+  assert(package);
+  auto same_document = document_source ? package->path.parent_path()==document_source->parent_path() && package->path.stem() == document_source->stem() : true;
+  if (same_document)
+    return "#"+id;
+  else {
+    TR_MSG("document_source",quoted(document_source->string()));
+    TR_MSG("package->path",package->path);
+    auto base = document_source->parent_path();
+
+    // auto link = package->path.parent_path().lexically_relative(base);
+    auto link = base.empty() ? package->path : fs::relative(package->path,base);
+    return (link.parent_path()/package->path.stem()).string()+".md#"+id;
+  }
 }
 
 } // namespace markdown

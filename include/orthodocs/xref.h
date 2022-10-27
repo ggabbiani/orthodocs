@@ -67,7 +67,7 @@ public:
    * - language domain for the referred token (see DictLess and Item::dictKey());
    * - writer domain for the concrete reference (see writer::Extension::reference())
    */
-  using Dictionary  = std::set< orthodocs::doc::Item*, DictLess >;
+  using Dictionary  = std::map< std::string, orthodocs::doc::Item* >;
   using Analyzer    = Analysis::Results (*) (const Annotation&);
 
   explicit XRef(Analysis::Results (*analyst)(const Annotation&)) : _analist(analyst) {}

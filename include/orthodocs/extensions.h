@@ -96,7 +96,7 @@ public:
   /**
    * return the concrete reference string to the passed doc::Item
    */
-  virtual std::string reference(const Item &item) const = 0;
+  virtual std::string reference(const Item *item, const std::filesystem::path *document_source=nullptr) const = 0;
 
   const char * const id;
 
@@ -105,7 +105,7 @@ public:
   }
 
 protected:
-  XRef &xref() {
+  XRef &xref() const {
     return *_xref;
   }
 

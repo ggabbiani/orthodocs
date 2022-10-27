@@ -30,6 +30,7 @@
 using namespace std;
 
 void mk_admonitions(std::string &anno) {
+  // TODO: document the implemented admonitions
   static array<pair<string,string>,10> admonitions = {
     {
       {"**caution:**",    ":caution: "  },
