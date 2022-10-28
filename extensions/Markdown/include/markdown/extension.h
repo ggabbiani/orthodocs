@@ -40,7 +40,7 @@ public:
   using XRef        = orthodocs::doc::XRef;
 
   static constexpr const char * const ID = "markdown";
-  Extension(XRef &xref) : writer::Extension(ID,xref) {}
+  explicit Extension(XRef &xref) : writer::Extension(ID,xref) {}
 
   void save(const Document &doc) override;
   void save(const ToC &toc) override;

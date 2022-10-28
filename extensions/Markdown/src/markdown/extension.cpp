@@ -48,11 +48,6 @@ namespace {
  * 5. If a header with the same ID has already been generated, a unique incrementing number is appended, starting at 1.
  */
 string headingId(string s) {
-  // // rule 3: replace all ' ' to '-'
-  // replace( s.begin(), s.end(), ' ', '-'); 
-  // // rule 2 (incomplete): remove all '/'
-  // s.erase(remove(s.begin(), s.end(), '/'), s.end());
-
   // rule 2: All non-word text (such as punctuation or HTML) is removed.
   s.erase(
     remove_if(
@@ -196,7 +191,6 @@ void Extension::subToc(const std::filesystem::path &document_source, const SubTo
   for(const auto *item: sub) {
     auto title  = orthodocs::doc::toc::title(*item);
     out << "- [" << title << "](" << reference(item,&document_source) << ")" << endl;
-    // TR_MSG("reference",quoted(reference(item,&document_source)));
   }
 }
 
@@ -248,7 +242,6 @@ void Extension::writeAnnotation(const Document &document, const Annotation &anno
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
         [this,&document,&s,&xref] (const XRef::Analysis::Results::value_type &value) {
-          // TR_MSG('\''+value.second.token+'\'',"matched","position",value.second.position,"length",value.second.length);
           const auto &res = value.second;
           if (auto i=xref.dictionary.find(res.token); i!=xref.dictionary.end()) {
             auto ref = this->reference(i->second,&document.source);
@@ -449,8 +442,8 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
 
 string Extension::reference(const Item *item, const fs::path *document_source) const {
   TR_FUNC;
-  auto id = headingId(item->type()+'-'+item->name);
-  auto package = dynamic_cast<const Package*>(item);
+  auto id       = headingId(item->type()+'-'+item->name);
+  auto package  = dynamic_cast<const Package*>(item);
   if (!package)
     package = dynamic_cast<const Package*>(item->parent);
   assert(package);
@@ -458,11 +451,7 @@ string Extension::reference(const Item *item, const fs::path *document_source) c
   if (same_document)
     return "#"+id;
   else {
-    TR_MSG("document_source",quoted(document_source->string()));
-    TR_MSG("package->path",package->path);
     auto base = document_source->parent_path();
-
-    // auto link = package->path.parent_path().lexically_relative(base);
     auto link = base.empty() ? package->path : fs::relative(package->path,base);
     return (link.parent_path()/package->path.stem()).string()+".md#"+id;
   }
