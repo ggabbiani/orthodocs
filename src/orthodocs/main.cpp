@@ -163,8 +163,7 @@ int main(int argc, const char *argv[]) {
     // in-memory source tree analysis prodution and cross-reference dictionary populate
     analyst.process(xref.dictionary);
     // get desired writer extension
-    auto writer = writer::Extension::factory();
-    writer->set(xref);
+    auto writer = writer::Extension::factory(Option::writer(),xref);
     // save documents
     writer->save(analyst.documents());
     // save table of contents

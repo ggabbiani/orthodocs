@@ -32,7 +32,7 @@ extern "C" language::Extension *scad_extension;
 #endif // OPTION_LANGUAGE_SCAD
 
 #ifdef OPTION_WRITER_MARKDOWN
-extern "C" writer::Extension *markdown_extension;
+extern "C" writer::Extension::Builder markdown_extension;
 #endif // OPTION_WRITER_MARKDOWN
 
 namespace language {
@@ -53,15 +53,15 @@ Extension *Extension::factory() {
 
 namespace writer {
 
-Extension *Extension::factory() {
-  const writer::Extension::Map registry = {
-  #ifdef OPTION_WRITER_MARKDOWN
-  {markdown_extension->id,markdown_extension}
-  #endif // OPTION_WRITER_MARKDOWN
-  };
+Extension *Extension::factory(const string &writer_id,XRef &xref) {
+  writer::Extension *result = nullptr;
 
-  if (auto i=registry.find(Option::writer()); i!=registry.end())
-    return i->second;
+  #ifdef OPTION_WRITER_MARKDOWN
+  result = markdown_extension(writer_id,xref);
+  if (result)
+    return result;
+  #endif // OPTION_WRITER_MARKDOWN
+
   throw domain_error("No language extension found for id '"+Option::writer()+'\'');
 }
 

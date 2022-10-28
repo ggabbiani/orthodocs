@@ -19,6 +19,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "debug.h"
 #include "orthodocs/bar.h"
 #include "markdown/extension.h"
 #include "markdown/graph.h"
@@ -131,22 +132,26 @@ void Extension::save(const Document &doc) {
   assert(source.is_relative());
   assert(Option::droot().is_absolute());
 
-  cwd doc_root(Option::droot());
+  try {
+    cwd doc_root(Option::droot());
 
-  if (source.has_parent_path()) {
-    orthodocs::doc::URI directory  = source.parent_path();
-    if (!fs::exists(directory))
-      fs::create_directory(directory);
+    if (source.has_parent_path()) {
+      orthodocs::doc::URI directory  = source.parent_path();
+      if (!fs::exists(directory))
+        fs::create_directory(directory);
+    }
+
+    auto md = source.parent_path() / source.stem().replace_extension(".md");
+    ofstream out(md);
+
+    // TODO: could we render the operator T* () implicit for Document::Header<Package>?
+    write(doc,(Package*)Document::Header<Package>(doc,md),out);
+    write(doc,Document::Topic<Variable> (doc,md,"Variables"),out);
+    write(doc,Document::Topic<Function> (doc,md,"Functions"),out);
+    write(doc,Document::Topic<Module>   (doc,md,"Modules"),out);
+  } catch(...) {
+    throw_with_nested(runtime_error(ERR_CALL(doc.source)));
   }
-
-  auto md = source.parent_path() / source.stem().replace_extension(".md");
-  ofstream out(md);
-
-  // TODO: could we render the operator T* () implicit for Document::Header<Package>?
-  write(doc,(Package*)Document::Header<Package>(doc,md),out);
-  write(doc,Document::Topic<Variable> (doc,md,"Variables"),out);
-  write(doc,Document::Topic<Function> (doc,md,"Functions"),out);
-  write(doc,Document::Topic<Module>   (doc,md,"Modules"),out);
 }
 
 void Extension::save(const ToC &toc) {
@@ -233,30 +238,35 @@ void Extension::write(const Document &document, const Package *pkg,ostream &out)
 }
 
 void Extension::writeAnnotation(const Document &document, const Annotation &annotation, ostream &out) const {
-  TR_FUNC;
-  auto &xref = this->xref();
-  if (!annotation.empty()) {
-    TR_MSG("*ANNOTATION*",'\''+annotation+'\'');
-    string s = annotation;
-    XRef::Analysis::Results results = xref.analize(annotation);
-    // xref substitution starts from last occurrence
-    for_each(results.rbegin(), results.rend(),
-      [this,&document,&s,&xref] (XRef::Analysis::Results::value_type value) {
-        // TR_MSG('\''+value.second.token+'\'',"matched","position",value.second.position,"length",value.second.length);
-        const auto &res = value.second;
-        if (auto i=xref.dictionary.find(res.token); i!=xref.dictionary.end()) {
-          auto ref = this->reference(i->second,&document.source);
-          TR_MSG("ref",quoted(ref));
-          string link = "["+res.token+"]("+ref+")";
-          s.replace(res.position,res.length,link);
-        } else {
-          // TODO: write a warning API
-          // FIXME: it would help to have also an indication of the item for which the warn was emitted
-          cerr << "***WARN*** item '" << res.token << "' not present in dictionary" << endl;
+  try {
+    TR_FUNC;
+    auto &xref = this->xref();
+    if (!annotation.empty()) {
+      TR_MSG("*ANNOTATION*",'\''+annotation+'\'');
+      string s = annotation;
+      XRef::Analysis::Results results = xref.analize(annotation);
+      // xref substitution starts from last occurrence
+      for_each(results.rbegin(), results.rend(),
+        [this,&document,&s,&xref] (const XRef::Analysis::Results::value_type &value) {
+          // TR_MSG('\''+value.second.token+'\'',"matched","position",value.second.position,"length",value.second.length);
+          const auto &res = value.second;
+          if (auto i=xref.dictionary.find(res.token); i!=xref.dictionary.end()) {
+            auto ref = this->reference(i->second,&document.source);
+            TR_MSG("ref",quoted(ref));
+            string link = "["+res.token+"]("+ref+")";
+            s.replace(res.position,res.length,link);
+          } else {
+            // TODO: write a warning API
+            // FIXME: it would help to have also an indication of the item for which the warn was emitted
+            cerr << "***WARN*** item '" << res.token << "' not present in dictionary" << endl;
+          }
         }
-      }
-    );
-    out << s << '\n' << endl;
+      );
+      out << s << '\n' << endl;
+  }
+  } catch(...) {
+    deb(annotation);
+    throw_with_nested(runtime_error(ERR_CALL()));
   }
 }
 
@@ -458,6 +468,12 @@ string Extension::reference(const Item *item, const fs::path *document_source) c
   }
 }
 
+writer::Extension *Extension::builder(const string &writer_id,XRef &xref) {
+  return (writer_id==ID) ? &Singleton<Extension>::instance(xref) : nullptr;
+}
+
 } // namespace markdown
 
-writer::Extension *markdown_extension = &Singleton<markdown::Extension>::instance();
+extern "C" {
+  writer::Extension::Builder markdown_extension = markdown::Extension::builder;
+}

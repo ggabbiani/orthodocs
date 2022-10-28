@@ -69,13 +69,15 @@ public:
   using Map           = std::map<std::string,Extension*,std::less<>>;
   using ToC           = orthodocs::doc::ToC;
   using XRef          = orthodocs::doc::XRef;
+  using Builder       = Extension *(*)(const std::string &writer_id,XRef &xref);
 
-  explicit Extension(const char *id) : id(id) {}
+  explicit Extension(const char *writer_id,XRef &xref) : id(writer_id),_xref(&xref) {}
+  virtual ~Extension() = default;
 
   /**
    * return the extension corresponding to the Option::writer()
    */
-  static Extension *factory();
+  static Extension *factory(const std::string &writer_id,XRef &xref);
   /**
    * write a set of documents using the passed dictionary for annotation cross-references
    */
