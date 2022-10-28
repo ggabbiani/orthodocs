@@ -20,9 +20,10 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-template <typename T, typename ... Args>
+template <typename T>
 class Singleton {
 public:
+  template <typename ... Args>
   static T& instance(Args&& ... args) {
     static T i(std::forward<Args>(args) ...);
     return i;
