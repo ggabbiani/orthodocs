@@ -31,6 +31,7 @@ public:
 
   static constexpr const char *ID = "scad";
 
+  static language::Extension *builder(std::string_view language_id);
   Extension();
 
   std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const override;

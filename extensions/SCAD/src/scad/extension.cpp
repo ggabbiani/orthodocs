@@ -116,6 +116,14 @@ auto Extension::analist() -> XRef::Analyzer {
   return &analyze;
 }
 
+language::Extension *Extension::builder(string_view language_id) {
+  return (language_id==ID) ? &Singleton<Extension>::instance() : nullptr;
+}
+
 } // namespace scad
 
-language::Extension *scad_extension = &Singleton<scad::Extension>::instance();
+extern "C" {
+
+language::Extension::Builder scad_builder = scad::Extension::builder;
+
+}

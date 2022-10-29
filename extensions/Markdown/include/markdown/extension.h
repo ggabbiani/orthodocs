@@ -40,6 +40,8 @@ public:
   using XRef        = orthodocs::doc::XRef;
 
   static constexpr const char * const ID = "markdown";
+
+  static writer::Extension *builder(std::string_view writer_id,XRef &xref);
   explicit Extension(XRef &xref) : writer::Extension(ID,xref) {}
 
   void save(const Document &doc) override;
@@ -50,7 +52,6 @@ public:
    */
   std::string reference(const Item *item, const std::filesystem::path *document_source=nullptr) const override;
 
-  static writer::Extension *builder(const std::string &writer_id,XRef &xref);
 private:
   void graph(const Package &pkg, std::ostream &out) const;
   void subToc(const std::filesystem::path &document_source, const SubToC &sub, std::ostream &out, char current) const;

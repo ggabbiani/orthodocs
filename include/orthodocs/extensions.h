@@ -33,11 +33,16 @@ namespace language {
 
 class Extension {
 public:
-  using Map   = std::map<std::string,Extension*,std::less<>>;
-  using XRef  = orthodocs::doc::XRef;
+  using XRef    = orthodocs::doc::XRef;
+  using Builder = Extension *(*)(std::string_view language_id);
 
   explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
+
+  /**
+   * Returns the SCAD extension instance if the passed language_id matches, null otherwise.
+   */
+  static Extension *factory(const std::string &language_id);
 
   virtual std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const = 0;
   /**
@@ -48,13 +53,8 @@ public:
    * return the Annotation analyzer
    */
   virtual XRef::Analyzer analist() = 0;
-  /**
-   * return the extension corresponding to the Option::language()
-   */
-  static Extension *factory();
 
   const char * const id;
-
 };
 
 } // namespace language
@@ -66,16 +66,15 @@ public:
   using Document      = orthodocs::Document;
   using DocumentList  = orthodocs::DocumentList;
   using Item          = orthodocs::doc::Item;
-  using Map           = std::map<std::string,Extension*,std::less<>>;
   using ToC           = orthodocs::doc::ToC;
   using XRef          = orthodocs::doc::XRef;
-  using Builder       = Extension *(*)(const std::string &writer_id,XRef &xref);
+  using Builder       = Extension *(*)(std::string_view writer_id,XRef &xref);
 
   explicit Extension(const char *writer_id,XRef &xref) : id(writer_id),_xref(&xref) {}
   virtual ~Extension() = default;
 
   /**
-   * return the extension corresponding to the Option::writer()
+   * Returns the Markdown extension instance if the passed writer_id matches, null otherwise.
    */
   static Extension *factory(const std::string &writer_id,XRef &xref);
   /**

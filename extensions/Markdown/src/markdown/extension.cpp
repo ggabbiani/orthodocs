@@ -37,7 +37,7 @@ namespace {
 /*
  * returns the passed string as a markdown id.
  *
- * FIXME: this is a PARTIAL implementation of [GitLab Flavored Markdown (GLFM) | GitLab](https://docs.gitlab.com/ee/user/markdown.html#header-ids-and-links)
+ * Implementation of [GitLab Flavored Markdown (GLFM) | GitLab](https://docs.gitlab.com/ee/user/markdown.html#header-ids-and-links)
  * 
  * The IDs generated should be conformant to the following rules:
  *
@@ -46,25 +46,27 @@ namespace {
  * 3. All spaces are converted to hyphens.
  * 4. Two or more hyphens in a row are converted to one.
  * 5. If a header with the same ID has already been generated, a unique incrementing number is appended, starting at 1.
+ * 
+ * NOTE: in our case rule 5 should never occur
  */
-string headingId(string s) {
-  // rule 2: All non-word text (such as punctuation or HTML) is removed.
-  s.erase(
-    remove_if(
-      s.begin(),s.end(),
-      [] (unsigned char x) {return !isalnum(x) && !isblank(x) && x!='-' && x!='_' && x!='$';}
-    ),
-    s.end()
-  );
-
-  // rule 1: All text is converted to lowercase.
-  // rule 3: All spaces are converted to hyphens.
-  transform(s.cbegin(),s.cend(),s.begin(),
-    [] (unsigned char c) {
-      return isblank(c) ? '-' : tolower(c);
+string headingId(string_view s) {
+  string result;
+  result.reserve(s.size());
+  string::value_type prev=0;
+  for_each(s.begin(),s.end(),
+    [&prev,&result] (string::value_type c) {
+      if (c=='_'||c=='$')   // rule 1 shortcut for legal chars with no lowercase
+        prev  = c;
+      else if (isalnum(c))  // rule 1
+        prev  = static_cast<string::value_type>(tolower(c));
+      else if ((isblank(c)||c=='-') && prev!='-') // rule 3 and 4
+        prev  = '-';
+      else                  // rule 2
+        return;
+      result.push_back(prev);
     }
   );
-  return s;
+  return result;
 }
 
 using Filter = function<bool(const graph::Connection&)>;
@@ -457,12 +459,14 @@ string Extension::reference(const Item *item, const fs::path *document_source) c
   }
 }
 
-writer::Extension *Extension::builder(const string &writer_id,XRef &xref) {
+writer::Extension *Extension::builder(string_view writer_id,XRef &xref) {
   return (writer_id==ID) ? &Singleton<Extension>::instance(xref) : nullptr;
 }
 
 } // namespace markdown
 
 extern "C" {
-  writer::Extension::Builder markdown_extension = markdown::Extension::builder;
+
+writer::Extension::Builder markdown_builder = markdown::Extension::builder;
+
 }

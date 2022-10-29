@@ -70,7 +70,7 @@ public:
   using Dictionary  = std::map< std::string, orthodocs::doc::Item* >;
   using Analyzer    = Analysis::Results (*) (const Annotation&);
 
-  explicit XRef(Analysis::Results (*analyst)(const Annotation&)) : _analist(analyst) {}
+  explicit XRef(Analyzer analyst) : _analist(analyst) {}
 
   Analysis::Results analize(const Annotation &annotation) {
     return _analist(annotation);

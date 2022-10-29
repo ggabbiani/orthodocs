@@ -156,7 +156,7 @@ int main(int argc, const char *argv[]) {
     assert(Option::_sroot.is_absolute());
 
     // get desired language extension for source analysis
-    auto language = language::Extension::factory();
+    auto language = language::Extension::factory(Option::language());
     doc::XRef  xref(language->analist());
     // language analyst setup
     Analizer analyst(language);
