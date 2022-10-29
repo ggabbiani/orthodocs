@@ -23,6 +23,8 @@
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
 
+#include <spdlog/spdlog.h>
+
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -34,7 +36,7 @@ using namespace std;
 namespace fs=std::filesystem;
 
 void print_exception(const exception& e, int level) {
-  cerr << string(level, ' ') << "***EXCEPTION***: " << e.what() << '\n';
+  spdlog::error("{0}{1}",string(level, ' '),e.what());
   try {
     rethrow_if_nested(e);
   } catch(const exception &nestedException) {

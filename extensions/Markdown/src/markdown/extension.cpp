@@ -19,7 +19,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "debug.h"
 #include "orthodocs/bar.h"
 #include "markdown/extension.h"
 #include "markdown/graph.h"
@@ -260,7 +259,6 @@ void Extension::writeAnnotation(const Document &document, const Annotation &anno
       out << s << '\n' << endl;
   }
   } catch(...) {
-    deb(annotation);
     throw_with_nested(runtime_error(ERR_CALL()));
   }
 }
