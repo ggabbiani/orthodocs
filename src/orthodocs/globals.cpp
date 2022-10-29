@@ -25,18 +25,19 @@
 using namespace std;
 namespace fs=std::filesystem;
 
-bool            Option::_admonitions{false};
-fs::path        Option::_droot;
-FileSet         Option::_graphs;
-string          Option::_language{"scad"};
-string          Option::_pkg_deps{"text"};
-vector<string>  Option::_ignore_prefix;
-string          Option::_private_prefix{"__"};
-bool            Option::_quiet{false};
-FileSet         Option::_sources;
-fs::path        Option::_sroot;
-bool            Option::_toc{false};
-string          Option::_writer{"markdown"};
+bool              Option::_admonitions{false};
+fs::path          Option::_droot;
+FileSet           Option::_graphs;
+string            Option::_language{"scad"};
+string            Option::_pkg_deps{"text"};
+vector<string>    Option::_ignore_prefix;
+string            Option::_private_prefix{"__"};
+bool              Option::_quiet{false};
+FileSet           Option::_sources;
+fs::path          Option::_sroot;
+bool              Option::_toc{false};
+string            Option::_writer{"markdown"};
+Option::Verbosity Option::_verbosity{Option::Verbosity::err};
 
 string Option::prefix_abbreviation(const string &name) {
   // TR_FUNC;

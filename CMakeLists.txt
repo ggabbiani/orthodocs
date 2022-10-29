@@ -69,8 +69,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/p-ranav/indicators.git
   GIT_TAG        6432875ef4c866d25e324c19a787b5bb90b0ab12 # v2.2
 )
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG        v1.x
+)
 
-FetchContent_MakeAvailable(cpp-trace cli11 indicators)
+FetchContent_MakeAvailable(cpp-trace cli11 indicators spdlog)
 
 if (NOT OPTION_TRACE)
   add_compile_definitions(NTRACE)
@@ -78,7 +83,7 @@ endif()
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
 set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators trace)
+set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators trace spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)

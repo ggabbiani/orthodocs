@@ -7,9 +7,9 @@ find_package(Boost REQUIRED)
 set(WRITER_INCS
   include
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/3rd-party
+  # ${PROJECT_SOURCE_DIR}/3rd-party
 )
-set(WRITER_LIBS indicators::indicators trace)
+set(WRITER_LIBS indicators::indicators trace spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)

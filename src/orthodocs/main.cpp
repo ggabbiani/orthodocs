@@ -29,9 +29,11 @@
 
 #include <CLI/CLI.hpp>
 #include <debug/trace.h>
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 
 using namespace std;
 using namespace orthodocs;
@@ -100,6 +102,7 @@ enum {
   SOURCES,
   SRC_ROOT,
   TOC,
+  VERBOSITY,
   VERSION,
 };
 
@@ -118,6 +121,7 @@ struct {
                           " If missing all the source root will be scanned"                                             },
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
   {"-t,--toc",            "generate a Table of Contents in the document tree root"                                      },
+  {"-V,--verbosity",      "set spdlog verbosity"                                                                        },
   {"-v,--version",        "orthodocs version " ODOX_VERSION_STR                                                         },
 };
 
@@ -147,6 +151,20 @@ int main(int argc, const char *argv[]) {
     app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
     app.add_flag(opt[QUIET].name,Option::_quiet,opt[QUIET].desc);
     app.set_version_flag(opt[VERSION].name, opt[VERSION].desc);
+    app.add_option(opt[VERBOSITY].name,Option::_verbosity,opt[VERBOSITY].desc)
+      ->transform(
+        CLI::Transformer(
+          map<string, spdlog::level::level_enum, std::less<> >(
+            {
+              {"trace",     spdlog::level::trace    }, 
+              {"debug",     spdlog::level::debug    },
+              {"info",      spdlog::level::info     },
+              {"warn",      spdlog::level::warn     },
+              {"error",     spdlog::level::err      },
+              {"critical",  spdlog::level::critical },
+              {"off",       spdlog::level::off      }
+            }
+          )));
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);
@@ -154,6 +172,8 @@ int main(int argc, const char *argv[]) {
     app.parse(argc, argv);
     assert(Option::_droot.is_absolute());
     assert(Option::_sroot.is_absolute());
+
+    spdlog::set_level(Option::verbosity());
 
     // get desired language extension for source analysis
     auto language = language::Extension::factory(Option::language());

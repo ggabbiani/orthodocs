@@ -24,6 +24,7 @@
 #include "markdown/extension.h"
 #include "markdown/graph.h"
 
+#include <spdlog/spdlog.h>
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <cassert>
@@ -251,9 +252,8 @@ void Extension::writeAnnotation(const Document &document, const Annotation &anno
             string link = "["+res.token+"]("+ref+")";
             s.replace(res.position,res.length,link);
           } else {
-            // TODO: write a warning API
             // FIXME: it would help to have also an indication of the item for which the warn was emitted
-            cerr << "***WARN*** item '" << res.token << "' not present in dictionary" << endl;
+            spdlog::warn("Item '{}' not present in dictionary",res.token);
           }
         }
       );

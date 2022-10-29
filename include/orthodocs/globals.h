@@ -22,6 +22,7 @@
 
 #include "utils.h"
 
+#include <spdlog/spdlog.h>
 #include <filesystem>
 #include <string>
 
@@ -35,6 +36,8 @@
 class Option {
   friend int main(int argc,const char *argv[]);
 public:
+  using Verbosity = spdlog::level::level_enum;
+
   /**
    * when true, adminitions emoji are enabled for the annotation.
    */
@@ -91,6 +94,10 @@ public:
    * For now only "markdown" is supported.
    */
   static const std::string &writer() {return _writer;}
+  /**
+   * enables warnings
+   */
+  static Verbosity verbosity() {return _verbosity;}
 private:
   static bool                     _admonitions;
   static std::filesystem::path    _droot;
@@ -104,4 +111,5 @@ private:
   static std::filesystem::path    _sroot;
   static bool                     _toc;
   static std::string              _writer;
+  static Verbosity                _verbosity;
 };
