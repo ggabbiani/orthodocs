@@ -1,6 +1,6 @@
 #pragma once
 /*
- * console wrapper facilities
+ * Progress indicator bar.
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -22,8 +22,10 @@
 
 #include "orthodocs/globals.h"
 
-#include "indicators/block_progress_bar.hpp"
-#include "indicators/cursor_control.hpp"
+#include <spdlog/spdlog.h>
+
+#include <indicators/block_progress_bar.hpp>
+#include <indicators/cursor_control.hpp>
 
 namespace orthodocs {
 
@@ -31,7 +33,7 @@ template <class T>
 class Bar {
 public:
   Bar(const T &container,const char *type,size_t width=50) : _end{"✔ "+std::to_string(std::size(container))+" "+type} {
-    if (!Option::quiet()) {
+    if (Option::verbosity()<=LEVEL) {
       indicators::show_console_cursor(false);
       _bar.set_option(indicators::option::BarWidth{width});
       _bar.set_option(indicators::option::MaxProgress{container.size()});
@@ -44,20 +46,20 @@ public:
   Bar & operator = (Bar &&) = delete;
   // set text as postfix
   void status([[maybe_unused]] const std::string_view &text) {
-    if (!Option::quiet()) {
+    if (Option::verbosity()<=LEVEL) {
       _bar.set_option(indicators::option::PostfixText{text});
       _bar.print_progress();
     }
   }
   // update progress bar
   void operator ++(int) {
-    if (!Option::quiet()) {
+    if (Option::verbosity()<=LEVEL) {
       _bar.tick();
     }
   }
   ~Bar() {
     try {
-      if (!Option::quiet()) {
+      if (Option::verbosity()<=LEVEL) {
         if (!std::uncaught_exceptions())
           status(_end);
         _bar.mark_as_completed();
@@ -67,9 +69,12 @@ public:
     }
     indicators::show_console_cursor(true);
   }
+
+  static constexpr Option::Verbosity  LEVEL = spdlog::level::info;
+
 private:
-  indicators::BlockProgressBar _bar;
-  std::string _end;
+  indicators::BlockProgressBar        _bar;
+  std::string                         _end;
 };
 
 } // namespace orthodocs

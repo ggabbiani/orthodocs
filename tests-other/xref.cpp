@@ -22,6 +22,7 @@
 #include "scad/document.h"
 
 #include <debug/trace.h>
+#include <spdlog/spdlog.h>
 
 #include <iostream> 
 #include <regex> 
@@ -98,7 +99,7 @@ public:
   static string apply(const Analysis::Results &results, string s) {
     TR_FUNC;
     for_each(results.rbegin(), results.rend(),
-      [&s] (Analysis::Results::value_type value) {
+      [&s] (const Analysis::Results::value_type &value) {
         TR_MSG(underlying(value.second.type),value.second.token,"matched","position",value.second.position,"length",value.second.length);
         const auto &res = value.second;
         if (auto i=dictionary.find(res.token); i!=dictionary.end()) {
@@ -106,7 +107,7 @@ public:
           s.replace(res.position,res.length,ref);
         } else {
           // FIXME: it would help to have also an indication of the item for which the warn was emitted
-          cerr << "***WARN*** item " << res.token << " not present in dictionary" << endl;
+          spdlog::warn("item {} not present in dictionary",res.token);
         }
       }
     );

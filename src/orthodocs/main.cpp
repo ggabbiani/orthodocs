@@ -98,7 +98,6 @@ enum {
   IGNORE,
   PRIVATE,
   DEPS,
-  QUIET,
   SOURCES,
   SRC_ROOT,
   TOC,
@@ -116,13 +115,32 @@ struct {
   {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
   {"-p,--private",        "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
   {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
-  {"-q,--quiet",          "quiet mode"                                                                                  },
   {"sources",             "source root sub-trees and/or files - either as absolute or «source tree root» relative path."
                           " If missing all the source root will be scanned"                                             },
   {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
   {"-t,--toc",            "generate a Table of Contents in the document tree root"                                      },
   {"-V,--verbosity",      "set spdlog verbosity"                                                                        },
   {"-v,--version",        "orthodocs version " ODOX_VERSION_STR                                                         },
+};
+
+std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s) {
+  if      (s=="trace")    return std::to_underlying(spdlog::level::trace);
+  else if (s=="debug")    return std::to_underlying(spdlog::level::debug);
+  else if (s=="info")     return std::to_underlying(spdlog::level::info);
+  else if (s=="warn")     return std::to_underlying(spdlog::level::warn);
+  else if (s=="error")    return std::to_underlying(spdlog::level::err);
+  else if (s=="critical") return std::to_underlying(spdlog::level::critical);
+  else if (s=="off")      return std::to_underlying(spdlog::level::off);
+  else throw(domain_error(ERR_INFO+"unknown spdlog::level enumeration '"+string(s)+'\''));
+}
+
+/**
+ */
+struct LogLevelLess {
+  using is_transparent = void;
+  inline bool operator() (std::string_view lhs, std::string_view rhs) const {
+    return to_logLevel(lhs)<to_logLevel(rhs);
+  }
 };
 
 }
@@ -133,6 +151,8 @@ int main(int argc, const char *argv[]) {
   auto      result = EXIT_SUCCESS;
 
   try {
+    spdlog::set_pattern("%^[%l]%$ %v");
+
     app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
     auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
       ->required()
@@ -149,12 +169,11 @@ int main(int argc, const char *argv[]) {
     auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
     app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
-    app.add_flag(opt[QUIET].name,Option::_quiet,opt[QUIET].desc);
     app.set_version_flag(opt[VERSION].name, opt[VERSION].desc);
     app.add_option(opt[VERBOSITY].name,Option::_verbosity,opt[VERBOSITY].desc)
       ->transform(
-        CLI::Transformer(
-          map<string, spdlog::level::level_enum, std::less<> >(
+        CLI::CheckedTransformer(
+          map<string, spdlog::level::level_enum, LogLevelLess >(
             {
               {"trace",     spdlog::level::trace    }, 
               {"debug",     spdlog::level::debug    },
@@ -164,7 +183,8 @@ int main(int argc, const char *argv[]) {
               {"critical",  spdlog::level::critical },
               {"off",       spdlog::level::off      }
             }
-          )));
+          )))
+      ->default_val("info");
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);
@@ -172,7 +192,6 @@ int main(int argc, const char *argv[]) {
     app.parse(argc, argv);
     assert(Option::_droot.is_absolute());
     assert(Option::_sroot.is_absolute());
-
     spdlog::set_level(Option::verbosity());
 
     // get desired language extension for source analysis
