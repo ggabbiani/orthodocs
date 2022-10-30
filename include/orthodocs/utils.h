@@ -24,9 +24,10 @@
 #include <cctype>
 #include <filesystem>
 #include <string>
+#include <utility>
 #include <vector>
 
-#if __cplusplus < __cpp_lib_to_underlying
+#if (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
 namespace std {
 template <typename E>
 constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
