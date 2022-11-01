@@ -247,7 +247,7 @@ public:
       for_each(
         doc.index.begin(),
         doc.index.end(),
-        [this, &doc_path] (const typename decltype(doc.index)::value_type &value) {
+        [this] (const typename decltype(doc.index)::value_type &value) {
           if (auto element = dynamic_cast<T*>(value.get()); element) 
             items.emplace_back(element);
         }

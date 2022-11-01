@@ -50,11 +50,8 @@ public:
   explicit Analizer(language::Extension *language): _parser(language) {}
 
   /**
-   * analize a set of files / directories as specified from Option(s), 
-   * populate xref dictionary 
+   * analize a set of files / directories as specified from Option(s)
    */
-  auto process() -> Dictionary;
-
   auto buildDocuments() ->void;
   /**
    * @brief populate a dictionary with candidate items

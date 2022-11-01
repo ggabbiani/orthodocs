@@ -94,40 +94,6 @@ auto Analizer::populate() const -> Dictionary {
   }
 }
 
-auto Analizer::process() -> Dictionary {
-  try {
-    FileSet files;
-    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _parser->sourcePostfix(),files);
-    {
-      Bar bar(files,"sources analized");
-      for(const auto &file: files) {
-        bar.status(file.string());
-        document(file);
-        bar++;
-      }
-    }
-    { // populate dictionary with candidate items
-      Dictionary dict;
-      Bar bar(_toc, "xref dictionary");
-      for(auto &item: _toc) {
-        auto key = item->dictKey();
-        bar.status(key);
-        if (auto [i, success] = dict.try_emplace(key,item); !success) {
-          // TODO: eventually manage fully qualified referenced items 
-          spdlog::warn("duplicate item '{}' skipped",item->dictKey());
-        }
-        TR_MSG("inserted",item->dictKey());
-        bar++;
-      }
-      TR_MSG("dictionary/toc size",dict.size(),"/",_toc.size());
-      return dict;
-    }
-  } catch(...) {
-    indicators::show_console_cursor(true);
-    throw;
-  }
-}
-
 void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
   cwd pwd(Option::sroot());
   for(auto &path: sources) {

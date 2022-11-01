@@ -108,8 +108,8 @@ public:
   const char * const id;
 
 protected:
+  Dictionary                *_dict;
   const language::Extension *_language;
-  Dictionary *_dict;
 };
 
 } // namespace writer

@@ -122,13 +122,13 @@ struct {
 };
 
 std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s) {
-  if      (s=="trace")    return std::to_underlying(spdlog::level::trace);
-  else if (s=="debug")    return std::to_underlying(spdlog::level::debug);
-  else if (s=="info")     return std::to_underlying(spdlog::level::info);
-  else if (s=="warn")     return std::to_underlying(spdlog::level::warn);
-  else if (s=="error")    return std::to_underlying(spdlog::level::err);
-  else if (s=="critical") return std::to_underlying(spdlog::level::critical);
-  else if (s=="off")      return std::to_underlying(spdlog::level::off);
+  if      (s=="trace")    return to_underlying(spdlog::level::trace);
+  else if (s=="debug")    return to_underlying(spdlog::level::debug);
+  else if (s=="info")     return to_underlying(spdlog::level::info);
+  else if (s=="warn")     return to_underlying(spdlog::level::warn);
+  else if (s=="error")    return to_underlying(spdlog::level::err);
+  else if (s=="critical") return to_underlying(spdlog::level::critical);
+  else if (s=="off")      return to_underlying(spdlog::level::off);
   else throw(domain_error(ERR_INFO+"unknown spdlog::level enumeration '"+string(s)+'\''));
 }
 
