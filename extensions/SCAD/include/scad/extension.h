@@ -21,23 +21,22 @@
  */
 
 #include "orthodocs/extensions.h"
-#include "orthodocs/xref.h"
 
 namespace scad {
 
 class Extension : public language::Extension {
 public:
-  using XRef = orthodocs::doc::XRef;
+  using Document  = orthodocs::Document;
 
   static constexpr const char *ID = "scad";
 
   static language::Extension *builder(std::string_view language_id);
   Extension();
 
-  std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const override;
-  const char *sourcePostfix() const override;
-  XRef::Analyzer analist() override;
+  Document::Owner parse(const std::filesystem::path &source) const override;
+  Analysis::Results analize(const std::string &anno) const override;
 
+  const char *sourcePostfix() const override;
 };
 
 } // namespace scad

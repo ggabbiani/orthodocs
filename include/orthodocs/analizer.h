@@ -21,7 +21,6 @@
  */
 
 #include "orthodocs/document.h"
-#include "orthodocs/xref.h"
 
 #include <filesystem>
 #include <iostream>
@@ -46,13 +45,23 @@ namespace orthodocs {
  */
 class Analizer {
 public:
+  using Dictionary  = doc::xref::Dictionary;
+
   explicit Analizer(language::Extension *language): _parser(language) {}
 
   /**
    * analize a set of files / directories as specified from Option(s), 
    * populate xref dictionary 
    */
-  void process(doc::XRef::Dictionary &dict);
+  auto process() -> Dictionary;
+
+  auto buildDocuments() ->void;
+  /**
+   * @brief populate a dictionary with candidate items
+   * 
+   * @return Dictionary 
+   */
+  auto populate() const -> Dictionary;
 
   /**
    * 1) produce an in-memory document of the source code passed

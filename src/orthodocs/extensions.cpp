@@ -50,9 +50,9 @@ Extension *Extension::factory(const std::string &language_id) {
 
 namespace writer {
 
-Extension *Extension::factory(const string &writer_id,XRef &xref) {
+Extension *Extension::factory(const string &writer_id,Dictionary &dict, const language::Extension *lang) {
   #ifdef OPTION_WRITER_MARKDOWN
-  if (Extension *result=markdown_builder(writer_id,xref); result)
+  if (Extension *result=markdown_builder(writer_id,dict,lang); result)
     return result;
   #endif // OPTION_WRITER_MARKDOWN
 

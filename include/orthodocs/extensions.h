@@ -22,7 +22,6 @@
 
 #include "orthodocs/document.h"
 #include "orthodocs/globals.h"
-#include "orthodocs/xref.h"
 #include "singleton.h"
 
 #include <filesystem>
@@ -33,8 +32,11 @@ namespace language {
 
 class Extension {
 public:
-  using XRef    = orthodocs::doc::XRef;
-  using Builder = Extension *(*)(std::string_view language_id);
+  using Analysis    = orthodocs::doc::xref::Analysis;
+  using Annotation  = orthodocs::doc::Annotation;
+  using Builder     = Extension *(*)(std::string_view language_id);
+  using Dictionary  = orthodocs::doc::xref::Dictionary;
+  using Document    = orthodocs::Document;
 
   explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
@@ -44,15 +46,19 @@ public:
    */
   static Extension *factory(const std::string &language_id);
 
-  virtual std::unique_ptr<orthodocs::Document> parse(const std::filesystem::path &source) const = 0;
+  virtual Document::Owner parse(const std::filesystem::path &source) const = 0;
+  /**
+   * @brief analizes a string for cross-references
+   * 
+   * @param s the string eventually containing cross-references
+   * @return Analysis::Results 
+   */
+  virtual Analysis::Results analize(const std::string &anno) const = 0;
+
   /**
    * return the source postfix
    */
   virtual const char *sourcePostfix() const = 0;
-  /*
-   * return the Annotation analyzer
-   */
-  virtual XRef::Analyzer analist() = 0;
 
   const char * const id;
 };
@@ -67,16 +73,16 @@ public:
   using DocumentList  = orthodocs::DocumentList;
   using Item          = orthodocs::doc::Item;
   using ToC           = orthodocs::doc::ToC;
-  using XRef          = orthodocs::doc::XRef;
-  using Builder       = Extension *(*)(std::string_view writer_id,XRef &xref);
+  using Dictionary    = orthodocs::doc::xref::Dictionary;
+  using Builder       = Extension *(*)(std::string_view writer_id,Dictionary &dict,const language::Extension *lang);
 
-  explicit Extension(const char *writer_id,XRef &xref) : id(writer_id),_xref(&xref) {}
+  explicit Extension(const char *writer_id,Dictionary &dict, const language::Extension *lang) : id(writer_id),_dict(&dict),_language(lang) {}
   virtual ~Extension() = default;
 
   /**
    * Returns the Markdown extension instance if the passed writer_id matches, null otherwise.
    */
-  static Extension *factory(const std::string &writer_id,XRef &xref);
+  static Extension *factory(const std::string &writer_id,Dictionary &dict,const language::Extension *lang);
   /**
    * write a set of documents using the passed dictionary for annotation cross-references
    */
@@ -101,17 +107,9 @@ public:
 
   const char * const id;
 
-  void set(XRef &xref) {
-    _xref = &xref;
-  }
-
 protected:
-  XRef &xref() const {
-    return *_xref;
-  }
-
-private:
-  XRef *_xref;
+  const language::Extension *_language;
+  Dictionary *_dict;
 };
 
 } // namespace writer

@@ -137,20 +137,20 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
     mk_admonitions(value);
 
   if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent->parent->parent))   { // parameter's annotation
-    curr_parameter->annotation = value;
+    curr_parameter->annotation.data = value;
   } else if (dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent)) { // function's annotation
-    curr_item.top()->annotation = value;
+    curr_item.top()->annotation.data = value;
   } else if (dynamic_cast<scad::SCADParser::Module_defContext*>(ctx->parent->parent))   { // module's annotation
-    curr_item.top()->annotation = value;
+    curr_item.top()->annotation.data = value;
   } else if (dynamic_cast<scad::SCADParser::AssignmentContext*>(ctx->parent->parent))   { // variable's annotation
-    curr_variable.top()->annotation = value;
+    curr_variable.top()->annotation.data = value;
   } else if (dynamic_cast<scad::SCADParser::PkgContext*>(ctx->parent->parent))          { // package's annotation
     auto package = dynamic_cast<scad::doc::Package *>(curr_item.top().get());
     assert(package);
     // search and subsitute any - known - license note
     if (auto lic = doc::License::remove(value))
       package->license = lic->name;
-    package->annotation = value;
+    package->annotation.data = value;
   }
 }
 

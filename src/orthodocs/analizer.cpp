@@ -60,36 +60,71 @@ void Analizer::document(fs::path source) {
   }
 }
 
-void Analizer::process(doc::XRef::Dictionary &dict) {
-  TR_FUNC;
+auto Analizer::buildDocuments() -> void {
+  try {
+    FileSet files;
+    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _parser->sourcePostfix(),files);
+    Bar bar(files,"sources analized");
+    for(const auto &file: files) {
+      bar.status(file.string());
+      document(file);
+      bar++;
+    }
+  } catch(...) {
+    indicators::show_console_cursor(true);
+    throw;
+  }
+}
+
+auto Analizer::populate() const -> Dictionary {
+  try {
+    Dictionary dict;
+    Bar bar(_toc, "xref dictionary");
+    for(auto &item: _toc) {
+      auto key = item->dictKey();
+      bar.status(key);
+      if (auto [i, success] = dict.try_emplace(key,item); !success) {
+        // TODO: eventually manage fully qualified referenced items 
+        spdlog::warn("duplicate item '{}' skipped",item->dictKey());
+      }
+      TR_MSG("inserted",item->dictKey());
+      bar++;
+    }
+    TR_MSG("dictionary/toc size",dict.size(),"/",_toc.size());
+    return dict;
+  } catch(...) {
+    indicators::show_console_cursor(true);
+    throw;
+  }
+}
+
+auto Analizer::process() -> Dictionary {
   try {
     FileSet files;
     lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _parser->sourcePostfix(),files);
     {
       Bar bar(files,"sources analized");
       for(const auto &file: files) {
-        // TR_MSG("analizing document", file);
         bar.status(file.string());
         document(file);
         bar++;
       }
     }
     { // populate dictionary with candidate items
-      Bar bar(_toc, "cross reference dictionary");
+      Dictionary dict;
+      Bar bar(_toc, "xref dictionary");
       for(auto &item: _toc) {
         auto key = item->dictKey();
         bar.status(key);
         if (auto [i, success] = dict.try_emplace(key,item); !success) {
-          TR_MSG("****PRESENT****","dictionary key:",i->second->dictKey(),"document key:",i->second->documentKey());
-          TR_MSG("****SKIPPED****","dictionary key:",item->dictKey(),"document key:",item->documentKey());
-          // TODO: implement a global warning api()
-          // TODO: eventually implement the management in such a case of fully qualified references
-          cout << "***WARN***: duplicate item " << item->dictKey() << " skipped" << endl;
+          // TODO: eventually manage fully qualified referenced items 
+          spdlog::warn("duplicate item '{}' skipped",item->dictKey());
         }
         TR_MSG("inserted",item->dictKey());
         bar++;
       }
       TR_MSG("dictionary/toc size",dict.size(),"/",_toc.size());
+      return dict;
     }
   } catch(...) {
     indicators::show_console_cursor(true);

@@ -33,11 +33,64 @@
 
 #include <debug/trace.h>
 
+namespace language {
+
+class Extension;
+
+} // namespace language
+
 namespace orthodocs {
 
 namespace doc {
 
-using Annotation  = std::string;
+class Item;
+
+/**
+ * Simple cross-reference namespace.
+ * 
+ * The algorithm used is based on three elements:
+ * 
+ * 1. a language extension for reference analysis; 
+ * 2. one dictionary, containing all the referrable items;
+ * 3. a writer extension for references substitution during document saving.
+ */
+namespace xref {
+
+struct Analysis {
+  using Results = std::map<size_t,Analysis>;
+  using Owner   = std::unique_ptr<Results>;
+  // token position as a delta from the start of the annotation's string
+  ptrdiff_t   position;
+  // resulting token length to be substituted when resolving the reference
+  ptrdiff_t   length;
+  // to be searched to in the dictionary
+  std::string token;
+};
+
+/**
+ * CASE SENSITIVE Item comparison functor.
+ */
+struct DictLess {
+  bool operator() (const Item *lhs, const Item *rhs) const;
+};
+
+/**
+ * Through the contained doc::Items is realized a map between two domains:
+ * - language domain for the referred token (see DictLess and Item::dictKey());
+ * - writer domain for the concrete reference (see writer::Extension::reference())
+ */
+using Dictionary  = std::map< std::string, orthodocs::doc::Item* >;
+
+}
+
+struct Annotation {
+  bool empty() const {return data.empty();}
+
+  std::string data;
+  xref::Analysis::Results results;
+};
+
+
 //! Item or parameter identifier
 using Name        = std::string;
 //! used for both function and modules
@@ -246,6 +299,14 @@ SubToC filter(const std::filesystem::path &path,const ToC &toc, FUNC func) {
 }
 
 } // namespace toc
+
+namespace xref {
+
+inline bool DictLess::operator() (const Item *lhs, const Item *rhs) const {
+  return  lhs->dictKey() < rhs->dictKey();
+}
+
+}
 
 } // namespace doc
 

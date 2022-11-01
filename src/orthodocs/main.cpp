@@ -25,10 +25,8 @@
 #include "orthodocs/extensions.h"
 #include "orthodocs/globals.h"
 #include "orthodocs/utils.h"
-#include "orthodocs/xref.h"
 
 #include <CLI/CLI.hpp>
-#include <debug/trace.h>
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -146,7 +144,6 @@ struct LogLevelLess {
 }
 
 int main(int argc, const char *argv[]) {
-  TR_FUNC;
   CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
   auto      result = EXIT_SUCCESS;
 
@@ -194,15 +191,16 @@ int main(int argc, const char *argv[]) {
     assert(Option::_sroot.is_absolute());
     spdlog::set_level(Option::verbosity());
 
-    // get desired language extension for source analysis
+    // desired language extension for source analysis
     auto language = language::Extension::factory(Option::language());
-    doc::XRef  xref(language->analist());
     // language analyst setup
     Analizer analyst(language);
-    // in-memory source tree analysis prodution and cross-reference dictionary populate
-    analyst.process(xref.dictionary);
-    // get desired writer extension
-    auto writer = writer::Extension::factory(Option::writer(),xref);
+    // in-memory source tree analysis prodution
+    analyst.buildDocuments();
+    // populated cross-reference dictionary 
+    doc::xref::Dictionary  dict = analyst.populate();
+    // desired writer extension
+    auto writer = writer::Extension::factory(Option::writer(),dict,language);
     // save documents
     writer->save(analyst.documents());
     // save table of contents
@@ -211,7 +209,6 @@ int main(int argc, const char *argv[]) {
     // save graphs
     if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
-
   } catch (const CLI::Error &error) {
     result  = app.exit(error);
   } catch(const exception &error) {

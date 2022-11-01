@@ -1,5 +1,5 @@
 /*
- * markdown extention definition
+ * markdown extension definition
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -31,6 +31,7 @@
 
 using namespace std;
 namespace fs=std::filesystem;
+namespace xref=orthodocs::doc::xref;
 
 namespace {
 
@@ -226,32 +227,27 @@ void Extension::write(const Document &document, const Package *pkg,ostream &out)
     }
   }
   // write annotation contents
-  if (!pkg->annotation.empty()) {
-    writeAnnotation(document,pkg->annotation,out);
-    if (pkg->license)
-      out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
-  }
+  writeAnnotation(document,pkg->annotation,out);
+  if (pkg->license)
+    out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
 }
 
 void Extension::writeAnnotation(const Document &document, const Annotation &annotation, ostream &out) const {
   try {
-    TR_FUNC;
-    auto &xref = this->xref();
     if (!annotation.empty()) {
-      TR_MSG("*ANNOTATION*",'\''+annotation+'\'');
-      string s = annotation;
-      XRef::Analysis::Results results = xref.analize(annotation);
+      string s = annotation.data;
+      xref::Analysis::Results results = _language->analize(annotation.data);
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
-        [this,&document,&s,&xref] (const XRef::Analysis::Results::value_type &value) {
+        [this,&document,&s] (const xref::Analysis::Results::value_type &value) {
           const auto &res = value.second;
-          if (auto i=xref.dictionary.find(res.token); i!=xref.dictionary.end()) {
+          if (auto i=this->_dict->find(res.token); i!=this->_dict->end()) {
             auto ref = this->reference(i->second,&document.source);
-            TR_MSG("ref",quoted(ref));
             string link = "["+res.token+"]("+ref+")";
             s.replace(res.position,res.length,link);
           } else {
             // FIXME: it would help to have also an indication of the item for which the warn was emitted
+            // FIXME: before emitting a warning, it must be checked that the token is not present in the lexer vocabulary
             spdlog::warn("Item '{}' not present in dictionary",res.token);
           }
         }
@@ -457,8 +453,8 @@ string Extension::reference(const Item *item, const fs::path *document_source) c
   }
 }
 
-writer::Extension *Extension::builder(string_view writer_id,XRef &xref) {
-  return (writer_id==ID) ? &Singleton<Extension>::instance(xref) : nullptr;
+writer::Extension *Extension::builder(string_view writer_id,Dictionary &dict,const language::Extension *lang) {
+  return (writer_id==ID) ? &Singleton<Extension>::instance(dict,lang) : nullptr;
 }
 
 } // namespace markdown

@@ -113,7 +113,6 @@ add_executable(orthodocs
   src/orthodocs/globals.cpp
   src/orthodocs/main.cpp
   src/orthodocs/utils.cpp
-  src/orthodocs/xref.cpp
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
