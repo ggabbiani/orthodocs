@@ -240,7 +240,6 @@ public:
     using ItemList=std::vector<T*>;
     Topic(
       const Document  &doc,
-      const path      &doc_path,
       const char      *title        = nullptr,
       int              cardinality  = -1
     ) : title(title?title:""),cardinality(cardinality) {
@@ -264,8 +263,7 @@ public:
   template <class T>
   class Header : public Topic<T> {
   public:
-    Header(const Document &doc,const std::filesystem::path &doc_path) : Topic<T>(doc,doc_path,nullptr,1) {}
-    // TODO: could we render the operator implicit?
+    Header(const Document &doc) : Topic<T>(doc,nullptr,1) {}
     explicit operator T* () {return this->items[0];}
   };
 

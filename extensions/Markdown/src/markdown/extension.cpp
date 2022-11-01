@@ -142,11 +142,10 @@ void Extension::save(const Document &doc) {
     auto md = source.parent_path() / source.stem().replace_extension(".md");
     ofstream out(md);
 
-    // TODO: could we render the operator T* () implicit for Document::Header<Package>?
-    write(doc,(Package*)Document::Header<Package>(doc,md),out);
-    write(doc,Document::Topic<Variable> (doc,md,"Variables"),out);
-    write(doc,Document::Topic<Function> (doc,md,"Functions"),out);
-    write(doc,Document::Topic<Module>   (doc,md,"Modules"),out);
+    write(doc,(Package*)Document::Header<Package>(doc),out);
+    write(doc,Document::Topic<Variable> (doc,"Variables"),out);
+    write(doc,Document::Topic<Function> (doc,"Functions"),out);
+    write(doc,Document::Topic<Module>   (doc,"Modules"),out);
   } catch(...) {
     throw_with_nested(runtime_error(ERR_CALL(doc.source)));
   }
