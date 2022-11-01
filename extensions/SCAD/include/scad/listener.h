@@ -33,7 +33,7 @@ namespace scad {
  * document ownership is then passed to the calling environment through the
  * documentRelease() call.
  */
-class Listener : public scad::SCADParserBaseListener {
+class Listener : public scad::SCADParserBaseListener, orthodocs::doc::Annotation::Modifier {
 public:
   using Parser    = scad::SCADParser;
   using Document  = orthodocs::Document;

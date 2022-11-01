@@ -33,12 +33,10 @@ template <class T>
 class Bar {
 public:
   Bar(const T &container,const char *type,size_t width=50) : _end{"✔ "+std::to_string(std::size(container))+" "+type} {
-    if (Option::verbosity()<=LEVEL) {
-      indicators::show_console_cursor(false);
-      _bar.set_option(indicators::option::BarWidth{width});
-      _bar.set_option(indicators::option::MaxProgress{container.size()});
-      _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
-    }
+    indicators::show_console_cursor(false);
+    _bar.set_option(indicators::option::BarWidth{width});
+    _bar.set_option(indicators::option::MaxProgress{container.size()});
+    _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
   }
   Bar(const Bar&) = delete;
   Bar(const Bar&&) = delete;
@@ -46,31 +44,23 @@ public:
   Bar & operator = (Bar &&) = delete;
   // set text as postfix
   void status([[maybe_unused]] const std::string_view &text) {
-    if (Option::verbosity()<=LEVEL) {
-      _bar.set_option(indicators::option::PostfixText{text});
-      _bar.print_progress();
-    }
+    _bar.set_option(indicators::option::PostfixText{text});
+    _bar.print_progress();
   }
   // update progress bar
   void operator ++(int) {
-    if (Option::verbosity()<=LEVEL) {
-      _bar.tick();
-    }
+    _bar.tick();
   }
   ~Bar() {
     try {
-      if (Option::verbosity()<=LEVEL) {
-        if (!std::uncaught_exceptions())
-          status(_end);
-        _bar.mark_as_completed();
-      }
+      if (!std::uncaught_exceptions())
+        status(_end);
+      _bar.mark_as_completed();
     } catch(...) {
       indicators::show_console_cursor(true);
     }
     indicators::show_console_cursor(true);
   }
-
-  static constexpr Option::Verbosity  LEVEL = spdlog::level::info;
 
 private:
   indicators::BlockProgressBar        _bar;

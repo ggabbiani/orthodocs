@@ -44,8 +44,6 @@ class ErrorHandler : public BaseErrorListener {
 
 void ErrorHandler::syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
   ostringstream s;
-  // cout  << "Offending symbol  : " << offendingSymbol->toString() << endl
-  //       << "Grammar file name : " << recognizer->getGrammarFileName() << endl;
   s << "Grammar(" << recognizer->getGrammarFileName() << ") Line(" << line << ":" << charPositionInLine << ") Error(" << msg << ')';
   throw std::invalid_argument(s.str());
 }

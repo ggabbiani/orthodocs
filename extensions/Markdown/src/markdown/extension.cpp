@@ -227,16 +227,16 @@ void Extension::write(const Document &document, const Package *pkg,ostream &out)
     }
   }
   // write annotation contents
-  writeAnnotation(document,pkg->annotation,out);
+  write(document,pkg->annotation,out);
   if (pkg->license)
     out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
 }
 
-void Extension::writeAnnotation(const Document &document, const Annotation &annotation, ostream &out) const {
+void Extension::write(const Document &document, const Annotation &annotation, ostream &out) const {
   try {
     if (!annotation.empty()) {
-      string s = annotation.data;
-      xref::Analysis::Results results = _language->analize(annotation.data);
+      string s = annotation.data();
+      xref::Analysis::Results results = _language->analize(annotation.data());
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
         [this,&document,&s] (const xref::Analysis::Results::value_type &value) {
@@ -261,7 +261,7 @@ void Extension::writeAnnotation(const Document &document, const Annotation &anno
 
 void Extension::write(const Document &document, const Parameter *param, ostream &out) const {
   out << BOLD(param->name) << BR();
-  writeAnnotation(document,param->annotation,out);
+  write(document,param->annotation,out);
 }
 
 void Extension::write(const Document &document, const Variable *var, ostream &out) const {
@@ -274,7 +274,7 @@ void Extension::write(const Document &document, const Variable *var, ostream &ou
         << endl
         << "    " << var->defaults << endl
         << endl;
-  writeAnnotation(document, var->annotation,out);
+  write(document, var->annotation,out);
 }
 
 void Extension::write(const Document &document, const Function *func, ostream &out) const {
@@ -289,7 +289,7 @@ void Extension::write(const Document &document, const Function *func, ostream &o
       << func->signature() << '\n'
       << "```\n"
       << endl;
-  writeAnnotation(document,func->annotation,out);
+  write(document,func->annotation,out);
 
   if (func->parameters.size()) {
     // how many annotated parameters do we have in place?
@@ -327,7 +327,7 @@ void Extension::write(const Document &document, const Module *mod, ostream &out)
       // << CODE(signature(mod)) << endl
       << "    " << mod->signature() << endl
       << endl;
-  writeAnnotation(document,mod->annotation,out);
+  write(document,mod->annotation,out);
 
   if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?

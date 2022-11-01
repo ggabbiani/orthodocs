@@ -64,9 +64,8 @@ private:
 
   /*
    * Annotation(s) need a specific method for the cross-reference expansion
-   * TODO: make Annotation a real new type and rename this method as 'write(const &Annotation)'
    */
-  void writeAnnotation(const Document &document, const Annotation &annotation, std::ostream &out) const;
+  void write(const Document &document, const Annotation &annotation, std::ostream &out) const;
 
   template <class T>
   void write(const Document &document, const Document::Topic<T> &topic, std::ostream &out) const {

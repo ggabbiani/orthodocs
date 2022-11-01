@@ -46,9 +46,7 @@ namespace doc {
 class Item;
 
 /**
- * Simple cross-reference namespace.
- * 
- * The algorithm used is based on three elements:
+ * Simple cross-reference namespace based on three elements:
  * 
  * 1. a language extension for reference analysis; 
  * 2. one dictionary, containing all the referrable items;
@@ -58,7 +56,6 @@ namespace xref {
 
 struct Analysis {
   using Results = std::map<size_t,Analysis>;
-  using Owner   = std::unique_ptr<Results>;
   // token position as a delta from the start of the annotation's string
   ptrdiff_t   position;
   // resulting token length to be substituted when resolving the reference
@@ -79,15 +76,26 @@ struct DictLess {
  * - language domain for the referred token (see DictLess and Item::dictKey());
  * - writer domain for the concrete reference (see writer::Extension::reference())
  */
-using Dictionary  = std::map< std::string, orthodocs::doc::Item* >;
+using Dictionary  = std::map< std::string, orthodocs::doc::Item*, std::less<> >;
 
 }
 
-struct Annotation {
-  bool empty() const {return data.empty();}
+class Annotation {
 
-  std::string data;
-  xref::Analysis::Results results;
+public:
+  struct Modifier {
+    virtual ~Modifier() = default;
+    void set(Annotation &anno,std::string_view s) const {
+      anno._data = s;
+    }
+  };
+  friend struct Modifier;
+
+  bool empty() const {return data().empty();}
+  const std::string &data() const {return _data;}
+
+protected:
+  std::string _data;
 };
 
 
