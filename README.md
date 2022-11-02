@@ -110,17 +110,19 @@ For more complex tasks consult the full command option list:
 
 | Option             | Description
 | ------------------ | -----------
-| -a,--admonitions   | **FLAG** - when this flag is enabled any admonition found in annotations will be enriched with a corresponding emoj
-| -d,--doc-root      | **OPTION** - specifies the target document tree root either as absolute or current directory relative path. It is a **mandatory directory** parameter and - if not existing - it will be automatically created.
+| -a,--admonitions   | **FLAG** - When this flag is enabled any admonition found in annotations will be enriched with a corresponding emoj
+| -d,--doc-root      | **OPTION** - Specifies the target document tree root either as absolute or current directory relative path. It is a **mandatory directory** parameter and - if not existing - it will be automatically created.
 | -g,--graphs        | **OPTION** - List of root relative directories where placing dependency graphs. Needs --src-root.
 | -h,--help          | **FLAG** - Print the help message and exit
-| -i,--ignore-prefix | **OPTION** - ignore this prefix in the Table of Contents when sorting
-| --pd,--pkg-deps    | **OPTION** - set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
+| -i,--ignore-prefix | **OPTION** - Ignore this prefix in the Table of Contents when sorting
+| --pd,--pkg-deps    | **OPTION** - Set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
 | -p,--private       | **OPTION** - Every documentation item (variable, function or module) prefixed with this string will not be published.
-| -q,--quiet         | **FLAG** - quiet mode, no statistics will be printed after successfully execution.
-| -s,--src-root      | **OPTION** - source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
-| -t,--toc           | **FLAG** - generate a Table of Contents in the document tree root
-| positionals        | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
+| -q,--quiet         | **FLAG** - Quiet mode, no statistics will be printed after successfully execution.
+| -s,--src-root      | **OPTION** - Source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
+| -t,--toc           | **FLAG** - Generate a Table of Contents in the document tree root
+| sources            | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
+| -V,--verbosity     | **FLAG** - Set the message log verbosity
+| -v,--version       | **FLAG** - Display program version information and exit
 
 ## Project status
 
@@ -130,11 +132,19 @@ The list of features expected in the v1 release with their current status:
 | ------------------------- | ------
 | [admonitions](https://www.markdownguide.org/hacks/#admonitions)| ✔
 | comment styles            | ✔
-| cross-reference           | 🚧
+| cross-reference           | ✔
 | dependency graphs         | ✔
 | global values             | ✔
 | Linux support             | ✔
 | macOS support             | ✔
 | source license detection  | ✔
 | table of contents         | ✔
+| Windows support           | ✔
+
+## Supported OSs
+
+| OS                        | Status
+| ------------------------- | ------
+| Linux support             | ✔
+| macOS support             | ✔
 | Windows support           | ✔
