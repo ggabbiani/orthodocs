@@ -19,7 +19,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "debug/trace.h"
 #include "orthodocs/globals.h"
 
 using namespace std;

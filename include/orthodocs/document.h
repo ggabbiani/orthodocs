@@ -31,8 +31,6 @@
 #include <string>
 #include <vector>
 
-#include <debug/trace.h>
-
 namespace language {
 
 class Extension;

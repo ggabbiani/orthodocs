@@ -18,7 +18,6 @@ include(CTest)
 option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
-option(OPTION_TRACE           "Debug tracing facility"        OFF )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
 
 # compiler must be 17
@@ -55,11 +54,6 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 
 FetchContent_Declare(
-  cpp-trace
-  GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
-  GIT_TAG        c0dfa4d874e29296680c9b75d3bb833761fe813f # v1.6.2
-)
-FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
   GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
@@ -75,15 +69,11 @@ FetchContent_Declare(
   GIT_TAG        v1.x
 )
 
-FetchContent_MakeAvailable(cpp-trace cli11 indicators spdlog)
-
-if (NOT OPTION_TRACE)
-  add_compile_definitions(NTRACE)
-endif()
+FetchContent_MakeAvailable(cli11 indicators spdlog)
 
 configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
 set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators trace spdlog::spdlog)
+set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)

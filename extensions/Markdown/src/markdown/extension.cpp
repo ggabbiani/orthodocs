@@ -188,7 +188,6 @@ void Extension::save(const ToC &toc) {
 }
 
 void Extension::subToc(const std::filesystem::path &document_source, const SubToC &sub,ostream &out,char current) const {
-  TR_FUNC;
   out << H(current,2) << endl;
   for(const auto *item: sub) {
     auto title  = orthodocs::doc::toc::title(*item);
@@ -436,7 +435,6 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
 }
 
 string Extension::reference(const Item *item, const fs::path *document_source) const {
-  TR_FUNC;
   auto id       = headingId(item->type()+'-'+item->name);
   auto package  = dynamic_cast<const Package*>(item);
   if (!package)

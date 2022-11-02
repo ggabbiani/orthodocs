@@ -10,7 +10,7 @@ if (OPTION_LANGUAGE_SCAD)
       ${PROJECT_SOURCE_DIR}/extensions/SCAD/include
       ${PROJECT_SOURCE_DIR}/include
   )
-  target_link_libraries(licenses trace spdlog::spdlog)
+  target_link_libraries(licenses spdlog::spdlog)
 
   add_executable(xref
     xref.cpp
@@ -24,6 +24,6 @@ if (OPTION_LANGUAGE_SCAD)
       ${PROJECT_SOURCE_DIR}/extensions/SCAD/include
       ${PROJECT_SOURCE_DIR}/include
   )
-  target_link_libraries(xref trace spdlog::spdlog)
+  target_link_libraries(xref spdlog::spdlog)
 
 endif()

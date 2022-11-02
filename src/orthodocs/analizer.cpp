@@ -83,10 +83,8 @@ auto Analizer::populate() const -> Dictionary {
         // TODO: eventually manage fully qualified referenced items 
         spdlog::warn("duplicate item '{}' skipped",item->dictKey());
       }
-      TR_MSG("inserted",item->dictKey());
       bar++;
     }
-    TR_MSG("dictionary/toc size",dict.size(),"/",_toc.size());
     return dict;
   } catch(...) {
     indicators::show_console_cursor(true);

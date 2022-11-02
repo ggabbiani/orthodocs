@@ -43,7 +43,7 @@ target_include_directories(${LANGUAGE_LIB}
   PRIVATE
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
-target_link_libraries(${LANGUAGE_LIB} PRIVATE antlr4_static trace spdlog::spdlog)
+target_link_libraries(${LANGUAGE_LIB} PRIVATE antlr4_static spdlog::spdlog)
 # cmake_print_properties(
 #     TARGETS ${LANGUAGE_LIB}
 #     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES

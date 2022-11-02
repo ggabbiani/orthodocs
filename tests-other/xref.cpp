@@ -21,7 +21,6 @@
 
 #include "scad/document.h"
 
-#include <debug/trace.h>
 #include <spdlog/spdlog.h>
 
 #include <iostream> 
@@ -74,7 +73,6 @@ public:
    * Analize «s» searching for a known pattern. If any, register it in the cross-reference.
    */
   static void analize(const std::string &s,Analysis::Results &result) {
-    TR_FUNC;
     static CrossReference rules[]={
       {"Function",  "([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)"},
       {"Module",    "([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}"},
@@ -88,7 +86,6 @@ public:
       while(match.ready()) {
         auto offset = (t-s.c_str());
         Analysis analysis{i,match.position(0)+offset,match.length(0),s.substr(match.position(i>underlying(Type::module)?1:0)+offset,match.length(1)),static_cast<Type>(i)};
-        TR_MSG(rules[analysis.rule].name,analysis.token,"matched","position",analysis.position,"length",analysis.length);
         result.emplace(analysis.position,analysis);
         t += analysis.position+analysis.length;
         match = rules[i].match(t);
@@ -97,10 +94,8 @@ public:
   }
 
   static string apply(const Analysis::Results &results, string s) {
-    TR_FUNC;
     for_each(results.rbegin(), results.rend(),
       [&s] (const Analysis::Results::value_type &value) {
-        TR_MSG(underlying(value.second.type),value.second.token,"matched","position",value.second.position,"length",value.second.length);
         const auto &res = value.second;
         if (auto i=dictionary.find(res.token); i!=dictionary.end()) {
           string ref = "["+res.token+"]("+i->second+")";
@@ -147,15 +142,11 @@ const char *annotation=
 
 int main() { 
   try {
-    TR_FUNC;
-    TR_MSG("Got annotation:\n",annotation);
-    
     scad::doc::style::Factory factory;
     auto style  = factory(annotation);
     string anno = style->manage(annotation);
     
     anno = CrossReference::manage(anno);
-    TR_MSG("Style managed annotation:\n",anno);
 
     return EXIT_SUCCESS; 
   } catch(const exception &error) {
