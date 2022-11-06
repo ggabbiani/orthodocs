@@ -33,12 +33,12 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const fs::path &pkg_source) : _pkg_path(pkg_source), _document(make_unique<orthodocs::Document>(pkg_source)) {
+Listener::Listener(const fs::path &pkg_source) : _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source)) {
 }
 
 void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
-  curr_item.push(orthodocs::doc::Item::Owner(curr_package));
+  curr_item.push(::doc::Item::Owner(curr_package));
 }
 
 void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
@@ -155,7 +155,7 @@ void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
 }
 
 void Listener::enterParameter(scad::SCADParser::ParameterContext *ctx) {
-  curr_parameter  = make_unique<orthodocs::doc::Parameter>();
+  curr_parameter  = make_unique<::doc::Parameter>();
 }
 
 void Listener::exitParameter(scad::SCADParser::ParameterContext *ctx) {
@@ -180,7 +180,7 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
     auto variable = new doc::Variable(id,defaults,nested);
     assert(curr_package);
     variable->parent        = curr_package;
-    curr_variable.push(orthodocs::doc::Item::Owner(variable));
+    curr_variable.push(::doc::Item::Owner(variable));
   } else if (curr_parameter) {
     curr_parameter->name      = id;
     curr_parameter->defaults  = defaults;

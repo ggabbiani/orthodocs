@@ -33,7 +33,7 @@ using namespace std;
 using namespace antlr4;
 
 namespace fs=std::filesystem;
-namespace xref=orthodocs::doc::xref;
+namespace xref=::doc::xref;
 
 namespace {
 
@@ -58,7 +58,7 @@ Extension::Extension() : language::Extension(ID) {
 
 }
 
-unique_ptr<orthodocs::Document> Extension::parse(const fs::path &source) const {
+unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   // change to source root
   cwd source_root(Option::sroot());
   ifstream          is(source);

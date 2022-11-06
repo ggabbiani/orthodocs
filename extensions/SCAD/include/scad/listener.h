@@ -33,10 +33,9 @@ namespace scad {
  * document ownership is then passed to the calling environment through the
  * documentRelease() call.
  */
-class Listener : public scad::SCADParserBaseListener, orthodocs::doc::Annotation::Modifier {
+class Listener : public scad::SCADParserBaseListener, ::doc::Annotation::Modifier {
 public:
   using Parser    = scad::SCADParser;
-  using Document  = orthodocs::Document;
 
   explicit Listener(const std::filesystem::path &pkg_source);
 
@@ -61,15 +60,15 @@ public:
 private:
   // the following members represents the actual status variables for the parser
   doc::Package                    *curr_package;
-  orthodocs::doc::Item::OwnerStack   curr_item;
-  orthodocs::doc::Item::OwnerStack   curr_variable;
-  orthodocs::doc::Parameter::Ptr   curr_parameter;
+  ::doc::Item::OwnerStack   curr_item;
+  ::doc::Item::OwnerStack   curr_variable;
+  ::doc::Parameter::Ptr   curr_parameter;
   /*
    * this is a kludge: is there an official way for retrieving the current
    * language source file from antlr4?
    */
   const std::filesystem::path &_pkg_path;
-  orthodocs::Document::Owner   _document;
+  ::Document::Owner   _document;
 };
 
 }

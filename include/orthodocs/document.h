@@ -37,8 +37,6 @@ class Extension;
 
 } // namespace language
 
-namespace orthodocs {
-
 namespace doc {
 
 class Item;
@@ -74,7 +72,7 @@ struct DictLess {
  * - language domain for the referred token (see DictLess and Item::dictKey());
  * - writer domain for the concrete reference (see writer::Extension::reference())
  */
-using Dictionary  = std::map< std::string, orthodocs::doc::Item*, std::less<> >;
+using Dictionary  = std::map< std::string, ::doc::Item*, std::less<> >;
 
 }
 
@@ -313,5 +311,3 @@ inline bool DictLess::operator() (const Item *lhs, const Item *rhs) const {
 }
 
 } // namespace doc
-
-} // namespace orthodocs

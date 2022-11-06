@@ -30,8 +30,6 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
-namespace orthodocs {
-
 std::filesystem::path subpath(const std::filesystem::path &path, std::filesystem::path::iterator from) {
   std::filesystem::path result;
   for(auto &i=from; i!=path.end(); ++i) {
@@ -111,6 +109,4 @@ void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &re
     } else
       throw domain_error(ERR_INFO+"what is this '"+path.string()+"'?");
   }
-}
-
 }

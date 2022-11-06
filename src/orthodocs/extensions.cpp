@@ -59,9 +59,9 @@ Extension *Extension::factory(const string &writer_id,Dictionary &dict, const la
   throw domain_error("No writer extension found for '"+Option::writer()+"' id");
 }
 
-void Extension::save(const orthodocs::DocumentList &docs) {
+void Extension::save(const ::DocumentList &docs) {
   try {
-    orthodocs::Bar bar(docs,"documents saved");
+    ::Bar bar(docs,"documents saved");
     for(const auto &doc: docs) {
       bar.status(doc->source.string());
       save(*doc);

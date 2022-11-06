@@ -31,11 +31,11 @@
 
 using namespace std;
 namespace fs=std::filesystem;
-namespace xref=orthodocs::doc::xref;
+namespace xref=::doc::xref;
 
 namespace {
 
-/*
+/*!
  * returns the passed string as a markdown id.
  *
  * Implementation of [GitLab Flavored Markdown (GLFM) | GitLab](https://docs.gitlab.com/ee/user/markdown.html#header-ids-and-links)
@@ -134,7 +134,7 @@ void Extension::save(const Document &doc) {
     cwd doc_root(Option::droot());
 
     if (source.has_parent_path()) {
-      orthodocs::doc::URI directory  = source.parent_path();
+      ::doc::URI directory  = source.parent_path();
       if (!fs::exists(directory))
         fs::create_directory(directory);
     }
@@ -155,12 +155,12 @@ void Extension::save(const ToC &toc) {
   assert(Option::droot().is_absolute());
 
   try {
-    orthodocs::Bar bar(toc,"items in ToC");
+    ::Bar bar(toc,"items in ToC");
     cwd pwd(Option::droot());
     fs::path document_source("toc.md");
     ofstream out(document_source);
     out << H("Table of Contents",1) << endl;
-    orthodocs::doc::SubToC sub;
+    ::doc::SubToC sub;
     char current = 0;
     for(auto item: toc) {
       bar.status(item->tocKey());
@@ -190,7 +190,7 @@ void Extension::save(const ToC &toc) {
 void Extension::subToc(const std::filesystem::path &document_source, const SubToC &sub,ostream &out,char current) const {
   out << H(current,2) << endl;
   for(const auto *item: sub) {
-    auto title  = orthodocs::doc::toc::title(*item);
+    auto title  = ::doc::toc::title(*item);
     out << "- [" << title << "](" << reference(item,&document_source) << ")" << endl;
   }
 }
@@ -330,7 +330,7 @@ void Extension::write(const Document &document, const Module *mod, ostream &out)
   if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?
     auto annotations = count_if(mod->parameters.begin(),mod->parameters.end(),
-      [] (const orthodocs::doc::Parameter::Ptr &p) {
+      [] (const ::doc::Parameter::Ptr &p) {
         return !p->annotation.empty();
       }
     );
@@ -338,7 +338,7 @@ void Extension::write(const Document &document, const Module *mod, ostream &out)
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(mod->parameters.begin(),mod->parameters.end(),
-        [this,&document,&out] (const orthodocs::doc::Parameter::Ptr &param) {
+        [this,&document,&out] (const ::doc::Parameter::Ptr &param) {
           if (!param->annotation.empty())
             write(document,param.get(),out);
         }
@@ -388,7 +388,7 @@ void Extension::graph(const Package &pkg, ostream &out) const {
 
 void Extension::graphs(const ToC &toc, const FileSet &dirs) {
   try {
-    orthodocs::Bar bar(dirs,"graphs created");
+    ::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
     cwd document_root(Option::droot());
     // from here we move on each directory passed in the FileSet «dirs»
@@ -396,7 +396,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
       bar.status(dir.string());
       assert(dir.is_relative());
       // select only doc::Package items
-      auto packages = orthodocs::doc::toc::filter(dir,toc,[dir] (const fs::path &,const orthodocs::doc::Item *item) {
+      auto packages = ::doc::toc::filter(dir,toc,[dir] (const fs::path &,const ::doc::Item *item) {
         if (auto package = dynamic_cast<const Package*>(item); package)
           return dir=="." ? true : is_sub_of(package->path.parent_path(),dir);
         else

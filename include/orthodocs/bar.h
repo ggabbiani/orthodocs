@@ -27,8 +27,6 @@
 #include <indicators/block_progress_bar.hpp>
 #include <indicators/cursor_control.hpp>
 
-namespace orthodocs {
-
 template <class T>
 class Bar {
 public:
@@ -66,5 +64,3 @@ private:
   indicators::BlockProgressBar        _bar;
   std::string                         _end;
 };
-
-} // namespace orthodocs

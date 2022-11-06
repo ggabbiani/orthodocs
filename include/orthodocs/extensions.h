@@ -32,11 +32,10 @@ namespace language {
 
 class Extension {
 public:
-  using Analysis    = orthodocs::doc::xref::Analysis;
-  using Annotation  = orthodocs::doc::Annotation;
+  using Analysis    = ::doc::xref::Analysis;
+  using Annotation  = ::doc::Annotation;
   using Builder     = Extension *(*)(std::string_view language_id);
-  using Dictionary  = orthodocs::doc::xref::Dictionary;
-  using Document    = orthodocs::Document;
+  using Dictionary  = ::doc::xref::Dictionary;
 
   explicit Extension(const char *id) : id(id) {}
   virtual ~Extension() = default;
@@ -69,11 +68,11 @@ namespace writer {
 
 class Extension {
 public:
-  using Document      = orthodocs::Document;
-  using DocumentList  = orthodocs::DocumentList;
-  using Item          = orthodocs::doc::Item;
-  using ToC           = orthodocs::doc::ToC;
-  using Dictionary    = orthodocs::doc::xref::Dictionary;
+  using Document      = ::Document;
+  using DocumentList  = ::DocumentList;
+  using Item          = ::doc::Item;
+  using ToC           = ::doc::ToC;
+  using Dictionary    = ::doc::xref::Dictionary;
   using Builder       = Extension *(*)(std::string_view writer_id,Dictionary &dict,const language::Extension *lang);
 
   explicit Extension(const char *writer_id,Dictionary &dict, const language::Extension *lang) : id(writer_id),_dict(&dict),_language(lang) {}

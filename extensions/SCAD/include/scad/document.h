@@ -37,9 +37,9 @@ class Index;
 
 namespace scad::doc {
 
-class Variable : public orthodocs::doc::Item {
+class Variable : public ::doc::Item {
 public:
-  Variable(const orthodocs::doc::Name &name,const orthodocs::doc::Value &defaults,bool nested=false) : orthodocs::doc::Item(name,&defaults,nested) {}
+  Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested=false) : ::doc::Item(name,&defaults,nested) {}
   std::string type() const override {return "variable";}
   /**
    * return the dictionary key formatted as: «variable name»
@@ -47,10 +47,10 @@ public:
   std::string dictKey() const override;
 };
 
-class Function : public orthodocs::doc::Item {
+class Function : public ::doc::Item {
 public:
-  Function(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
-  orthodocs::doc::Signature signature() const {return _signature();}
+  Function(const ::doc::Name &name,bool nested=false) : ::doc::Item(name,nullptr,nested) {}
+  ::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "function";}
   /**
    * return the dictionary key formatted as: «function name»
@@ -58,10 +58,10 @@ public:
   std::string dictKey() const override;
 };
 
-class Module : public orthodocs::doc::Item {
+class Module : public ::doc::Item {
 public:
-  Module(const orthodocs::doc::Name &name,bool nested=false) : orthodocs::doc::Item(name,nullptr,nested) {}
-  orthodocs::doc::Signature signature() const {return _signature();}
+  Module(const ::doc::Name &name,bool nested=false) : ::doc::Item(name,nullptr,nested) {}
+  ::doc::Signature signature() const {return _signature();}
   std::string type() const override {return "module";}
   /**
    * return the dictionary key formatted as: «module name»
@@ -75,14 +75,14 @@ public:
  * NOTE: Item::name is set to the abstract package path, i.e. the relative
  * path of the package from the source or document root without extension.
  */
-class Package : public orthodocs::doc::Item {
+class Package : public ::doc::Item {
 public:
   static constexpr const char *ID = "package";
   /**
    * Construct a new Package object
    *
    */
-  explicit Package(const std::filesystem::path &path) : orthodocs::doc::Item((path.parent_path()/path.stem()).string(),nullptr,false), path(path) {}
+  explicit Package(const std::filesystem::path &path) : ::doc::Item((path.parent_path()/path.stem()).string(),nullptr,false), path(path) {}
   /**
    * always return "package"
    */

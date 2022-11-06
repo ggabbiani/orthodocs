@@ -27,16 +27,15 @@ namespace markdown {
 
 class Extension : public writer::Extension {
 public:
-  using Annotation  = orthodocs::doc::Annotation;
-  using Dictionary  = orthodocs::doc::xref::Dictionary;
-  using Document    = orthodocs::Document;
+  using Annotation  = ::doc::Annotation;
+  using Dictionary  = ::doc::xref::Dictionary;
   using Function    = scad::doc::Function;
-  using Item        = orthodocs::doc::Item;
+  using Item        = ::doc::Item;
   using Module      = scad::doc::Module;
   using Package     = scad::doc::Package;
-  using Parameter   = orthodocs::doc::Parameter;
-  using SubToC      = orthodocs::doc::SubToC;
-  using ToC         = orthodocs::doc::ToC;
+  using Parameter   = ::doc::Parameter;
+  using SubToC      = ::doc::SubToC;
+  using ToC         = ::doc::ToC;
   using Variable    = scad::doc::Variable;
 
   static constexpr const char * const ID = "markdown";

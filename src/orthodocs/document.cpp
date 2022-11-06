@@ -25,7 +25,7 @@
 using namespace std;
 namespace fs=std::filesystem;
 
-namespace orthodocs::doc {
+namespace doc {
 
 string Item::documentKey() const {
   return type()+' '+name;
@@ -54,4 +54,4 @@ Signature Item::_signature() const {
   return ss.str();
 }
 
-} // namespace orthodocs::doc
+} // namespace doc

@@ -26,7 +26,6 @@ namespace scad {
 
 class Extension : public language::Extension {
 public:
-  using Document  = orthodocs::Document;
 
   static constexpr const char *ID = "scad";
 

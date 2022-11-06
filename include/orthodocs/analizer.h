@@ -38,8 +38,6 @@ class Extension;
 
 } // namespace writer
 
-namespace orthodocs {
-
 /**
  * Analize sources producing the Document through a language parser listener
  */
@@ -91,5 +89,3 @@ private:
   doc::ToC               _toc;
   language::Extension   *_parser;
 };
-
-}
