@@ -20,7 +20,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/utils.h"
+#include <utils.h>
 
 #include <filesystem>
 #include <map>

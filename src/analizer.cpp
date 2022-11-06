@@ -19,12 +19,12 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/analizer.h"
-#include "orthodocs/bar.h"
-#include "orthodocs/error_info.h"
-#include "orthodocs/extensions.h"
-#include "orthodocs/globals.h"
-#include "orthodocs/utils.h"
+#include "analizer.h"
+#include "bar.h"
+#include "error_info.h"
+#include "extensions.h"
+#include "globals.h"
+#include "utils.h"
 
 using namespace std;
 

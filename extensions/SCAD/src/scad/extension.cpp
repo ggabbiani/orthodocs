@@ -19,10 +19,11 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/extension.h"
-#include "scad/listener.h"
-#include "orthodocs/globals.h"
-#include "orthodocs/utils.h"
+#include "extension.h"
+#include "listener.h"
+
+#include <globals.h>
+#include <utils.h>
 
 #include "SCADLexer.h"
 #include "SCADParser.h"

@@ -1,6 +1,6 @@
 #pragma once
 /*
- * language extension declarations
+ * configurations
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -20,22 +20,15 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/extensions.h"
+#define ODOX_XSTR(x)    ODOX_STR(x)
+#define ODOX_STR(x)     #x
 
-namespace scad {
+#define ODOX_VERSION_MAJOR  0
+#define ODOX_VERSION_MINOR  6
+#define ODOX_VERSION_PATCH  1
+#define ODOX_VERSION        ((ODOX_VERSION_MAJOR << 16) | (ODOX_VERSION_MINOR << 8) | ODOX_VERSION_PATCH)
+#define ODOX_VERSION_STR    ODOX_XSTR(ODOX_VERSION_MAJOR) "." ODOX_XSTR(ODOX_VERSION_MINOR) "." ODOX_XSTR(ODOX_VERSION_PATCH)
 
-class Extension : public language::Extension {
-public:
+#define OPTION_LANGUAGE_SCAD
 
-  static constexpr const char *ID = "scad";
-
-  static language::Extension *builder(std::string_view language_id);
-  Extension();
-
-  Document::Owner parse(const std::filesystem::path &source) const override;
-  Analysis::Results analize(const std::string &anno) const override;
-
-  const char *sourcePostfix() const override;
-};
-
-} // namespace scad
+#define OPTION_WRITER_MARKDOWN

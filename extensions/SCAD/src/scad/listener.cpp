@@ -19,11 +19,12 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/annotations.h"
-#include "scad/listener.h"
-#include "orthodocs/error_info.h"
-#include "orthodocs/globals.h"
-#include "orthodocs/utils.h"
+#include "doc/annotations.h"
+#include "listener.h"
+
+#include <error_info.h>
+#include <globals.h>
+#include <utils.h>
 
 #include <regex>
 

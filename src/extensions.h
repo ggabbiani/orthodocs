@@ -20,8 +20,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/document.h"
-#include "orthodocs/globals.h"
+#include "document.h"
+#include "globals.h"
 #include "singleton.h"
 
 #include <filesystem>

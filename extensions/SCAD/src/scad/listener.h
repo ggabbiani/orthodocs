@@ -20,9 +20,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/document.h"
+#include "document.h"
 
-#include "SCADParserBaseListener.h"
+#include <SCADParserBaseListener.h>
 
 #include <memory>
 

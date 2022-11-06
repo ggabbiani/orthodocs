@@ -19,9 +19,10 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/bar.h"
-#include "markdown/extension.h"
-#include "markdown/graph.h"
+#include "extension.h"
+#include "graph.h"
+
+#include <bar.h>
 
 #include <spdlog/spdlog.h>
 #include <boost/algorithm/string/predicate.hpp>

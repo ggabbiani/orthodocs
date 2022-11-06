@@ -5,13 +5,13 @@ find_package(Boost REQUIRED)
 #cmake_print_variables(Boost_INCLUDE_DIRS)
 
 set(WRITER_INCS
-  include
-  ${PROJECT_SOURCE_DIR}/include
+  src
+  ${PROJECT_SOURCE_DIR}/src
 )
 set(WRITER_LIBS indicators::indicators spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
-  list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
+  list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/src)
 endif()
 
 cmake_print_variables(WRITER_INCS WRITER_LIBS)
@@ -21,7 +21,10 @@ add_library(${WRITER_LIB} STATIC
   src/markdown/extension.cpp
 )
 target_include_directories(${WRITER_LIB}
-  PUBLIC
+  PRIVATE # library dependencies
     ${WRITER_INCS}
     ${Boost_INCLUDE_DIRS})
-target_link_libraries(${WRITER_LIB} ${WRITER_LIBS})
+target_link_libraries(${WRITER_LIB}
+  PUBLIC # clients and library dependencies
+    indicators::indicators spdlog::spdlog
+)

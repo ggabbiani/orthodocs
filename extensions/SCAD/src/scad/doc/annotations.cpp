@@ -19,8 +19,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/annotations.h"
-#include "orthodocs/utils.h"
+#include "annotations.h"
+
+#include <utils.h>
 
 #include <array>
 #include <cstring>

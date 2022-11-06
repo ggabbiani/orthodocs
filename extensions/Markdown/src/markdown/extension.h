@@ -20,8 +20,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/extensions.h"
-#include "scad/document.h"
+#include <scad/document.h>
+#include <extensions.h>
 
 namespace markdown {
 

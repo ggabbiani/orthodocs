@@ -71,8 +71,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(cli11 indicators spdlog)
 
-configure_file(include/orthodocs/config.h.in ${PROJECT_SOURCE_DIR}/include/orthodocs/config.h @ONLY)
-set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+configure_file(src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h @ONLY)
+set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
@@ -97,12 +97,12 @@ endif()
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
 
 add_executable(orthodocs
-  src/orthodocs/analizer.cpp
-  src/orthodocs/document.cpp
-  src/orthodocs/extensions.cpp
-  src/orthodocs/globals.cpp
-  src/orthodocs/main.cpp
-  src/orthodocs/utils.cpp
+  src/analizer.cpp
+  src/document.cpp
+  src/extensions.cpp
+  src/globals.cpp
+  src/main.cpp
+  src/utils.cpp
 )
 target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
 target_link_libraries(orthodocs ${ORTHODOCS_LIBS})

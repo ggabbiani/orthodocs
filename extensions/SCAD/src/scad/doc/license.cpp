@@ -1,4 +1,4 @@
-#include "scad/doc/license.h"
+#include "license.h"
 
 using namespace std;
 

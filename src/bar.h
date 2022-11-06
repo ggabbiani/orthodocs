@@ -20,7 +20,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/globals.h"
+#include "globals.h"
 
 #include <spdlog/spdlog.h>
 

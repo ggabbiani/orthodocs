@@ -20,9 +20,9 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/globals.h"
-#include "orthodocs/utils.h"
-#include "scad/document.h"
+#include <globals.h>
+#include <utils.h>
+#include <scad/document.h>
 
 #include <CLI/CLI.hpp>
 

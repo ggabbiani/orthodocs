@@ -1,5 +1,7 @@
-#pragma once
-/*
+// #pragma once
+#ifndef SCAD_DOCUMENT_H
+#define SCAD_DOCUMENT_H
+/*!
  * Abstract document declarations
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
@@ -20,9 +22,10 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/doc/license.h"
-#include "orthodocs/document.h"
-#include "orthodocs/utils.h"
+#include "doc/license.h"
+
+#include <document.h>
+#include <utils.h>
 
 #include <functional>
 #include <filesystem>
@@ -176,3 +179,4 @@ class Fine : public AbstractStyle {
 } // namespace style
 
 } // namespace scad::doc
+#endif // SCAD_DOCUMENT_H

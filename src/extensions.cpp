@@ -19,10 +19,10 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/bar.h"
-#include "orthodocs/config.h"
-#include "orthodocs/extensions.h"
-#include "orthodocs/globals.h"
+#include "bar.h"
+#include "config.h"
+#include "extensions.h"
+#include "globals.h"
 #include "singleton.h"
 
 using namespace std;

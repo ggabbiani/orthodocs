@@ -19,7 +19,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/document.h"
+#include <scad/document.h>
 
 #include <spdlog/spdlog.h>
 

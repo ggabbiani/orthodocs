@@ -1,4 +1,7 @@
-#pragma once
+// #pragma once
+#ifndef DOCUMENT_H
+#define DOCUMENT_H
+
 /*
  * synthetic document
  *
@@ -20,8 +23,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/error_info.h"
-#include "orthodocs/utils.h"
+#include "error_info.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <functional>
@@ -311,3 +314,5 @@ inline bool DictLess::operator() (const Item *lhs, const Item *rhs) const {
 }
 
 } // namespace doc
+
+#endif // DOCUMENT_H

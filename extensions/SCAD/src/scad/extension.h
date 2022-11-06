@@ -1,5 +1,6 @@
+#pragma once
 /*
- * mermaid graph definition file
+ * language extension declarations
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -19,32 +20,22 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "markdown/graph.h"
-#include "error_info.h"
+#include <extensions.h>
 
-using namespace std;
+namespace scad {
 
-namespace graph {
+class Extension : public language::Extension {
+public:
 
-ostream &Connection::write(ostream &os,Node::Map &nodemap) {
-  os << "    ";
-  source.write(os,nodemap);
-  os << " --o|" << (type==Type::inc ? "include" : "use") << "| ";
-  destination.write(os,nodemap);
-  os << endl;
-  return os;
-}
+  static constexpr const char *ID = "scad";
 
-ostream &Node::write(ostream &os,Node::Map &nodemap) {
-  if (!defined) {
-    label = (++(*labeller)).string();
-    os << label << '[' << name() << "]";
-    defined = true;
-    if (auto [i,success] = nodemap.try_emplace(name(),*this); !success)
-      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same nodemap");
-  } else
-    os << label;
-  return os;
-}
+  static language::Extension *builder(std::string_view language_id);
+  Extension();
 
-}
+  Document::Owner parse(const std::filesystem::path &source) const override;
+  Analysis::Results analize(const std::string &anno) const override;
+
+  const char *sourcePostfix() const override;
+};
+
+} // namespace scad

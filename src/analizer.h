@@ -20,7 +20,7 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "orthodocs/document.h"
+#include "document.h"
 
 #include <filesystem>
 #include <iostream>

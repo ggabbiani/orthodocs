@@ -19,9 +19,10 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scad/document.h"
-#include "orthodocs/globals.h"
-#include "orthodocs/utils.h"
+#include "document.h"
+
+#include <globals.h>
+#include <utils.h>
 
 #include <algorithm>
 #include <array>

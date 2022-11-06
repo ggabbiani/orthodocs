@@ -58,12 +58,14 @@ endfunction(style_recon_test)
 
 add_executable(style-factory-test
   style-factory-test.cpp
-  ${PROJECT_SOURCE_DIR}/src/orthodocs/globals.cpp
-  ${PROJECT_SOURCE_DIR}/src/orthodocs/utils.cpp
-  ${PROJECT_SOURCE_DIR}/src/orthodocs/document.cpp
+  ${PROJECT_SOURCE_DIR}/src/globals.cpp
+  ${PROJECT_SOURCE_DIR}/src/utils.cpp
+  ${PROJECT_SOURCE_DIR}/src/document.cpp
 )
-target_include_directories(style-factory-test PUBLIC ${ORTHODOCS_INCS})
+target_include_directories(style-factory-test PUBLIC ${ORTHODOCS_INCS} ../src)
 target_link_libraries(style-factory-test ${LANGUAGE_LIB} CLI11::CLI11 spdlog::spdlog)
+cmake_print_variables(LANGUAGE_LIB)
+cmake_print_properties(TARGETS style-factory-test PROPERTIES INCLUDE_DIRECTORIES)
 
 parse_test(NAME all           RULE pkg  FILE all.scad           FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME assert        RULE pkg  FILE assert.scad        FAIL_REGULAR_EXPRESSION DEFAULT)

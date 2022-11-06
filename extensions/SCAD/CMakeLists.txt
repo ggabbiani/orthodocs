@@ -29,7 +29,7 @@ antlr_target(${PARSER}
 ###############################################################################
 # C++ client application libs
 add_library(${LANGUAGE_LIB} STATIC
-  src/scad/annotations.cpp
+  src/scad/doc/annotations.cpp
   src/scad/doc/license.cpp
   src/scad/document.cpp
   src/scad/extension.cpp
@@ -37,17 +37,20 @@ add_library(${LANGUAGE_LIB} STATIC
   ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
 target_include_directories(${LANGUAGE_LIB}
-  PUBLIC
-    include
-    ${PROJECT_SOURCE_DIR}/include
-  PRIVATE
+  PRIVATE # no client includes
+    ${PROJECT_SOURCE_DIR}/src
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
-target_link_libraries(${LANGUAGE_LIB} PRIVATE antlr4_static spdlog::spdlog)
-# cmake_print_properties(
-#     TARGETS ${LANGUAGE_LIB}
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-# )
+target_link_libraries(${LANGUAGE_LIB} 
+  PUBLIC # clients and library dependencies
+    spdlog::spdlog
+  PRIVATE # library dependencies
+    antlr4_static 
+)
+cmake_print_properties(
+    TARGETS ${LANGUAGE_LIB}
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES PUBLIC_INCLUDE_DIRECTORIES PRIVATE_INCLUDE_DIRECTORIES
+)
 
 ###############################################################################
 # Java split parser for testing grammars via grun
