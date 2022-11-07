@@ -1,6 +1,4 @@
-// #pragma once
-#ifndef DOCUMENT_H
-#define DOCUMENT_H
+#pragma once
 
 /*
  * synthetic document
@@ -46,8 +44,8 @@ class Item;
 
 /**
  * Simple cross-reference namespace based on three elements:
- * 
- * 1. a language extension for reference analysis; 
+ *
+ * 1. a language extension for reference analysis;
  * 2. one dictionary, containing all the referrable items;
  * 3. a writer extension for references substitution during document saving.
  */
@@ -154,11 +152,11 @@ public:
 
   /**
    * builds a key usable by Document::Index in the following format:
-   * 
+   *
    * «item type» «item name»
-   * 
+   *
    * examples:
-   * 
+   *
    * "package artifacts/spacer"
    * "module fl_spacer"
    * "function fl_bb_spacer"
@@ -194,7 +192,7 @@ protected:
 
 /**
  * Table of Contents with no ownership on represented items.
- * 
+ *
  * NOTE: the key is possibly abbreviated, in this case a collision is accepted
  */
 using ToC = std::multiset<Item*,doc::Item::LessNoCase>;
@@ -241,7 +239,7 @@ public:
         doc.index.begin(),
         doc.index.end(),
         [this] (const typename decltype(doc.index)::value_type &value) {
-          if (auto element = dynamic_cast<T*>(value.get()); element) 
+          if (auto element = dynamic_cast<T*>(value.get()); element)
             items.emplace_back(element);
         }
       );
@@ -309,5 +307,3 @@ inline bool DictLess::operator() (const Item *lhs, const Item *rhs) const {
 }
 
 } // namespace doc
-
-#endif // DOCUMENT_H
