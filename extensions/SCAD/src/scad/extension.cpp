@@ -28,8 +28,6 @@
 #include "SCADLexer.h"
 #include "SCADParser.h"
 
-#include <regex>
-
 using namespace std;
 using namespace antlr4;
 
@@ -55,8 +53,14 @@ ErrorHandler handler;
 
 namespace scad {
 
-Extension::Extension() : language::Extension(ID) {
+const array<Extension::Slot,4> Extension::slot{{
+  {"function",  [](const ::doc::Item *item) {return item->name+"()";},            regex("([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)"    )},
+  {"module",    [](const ::doc::Item *item) {return item->name+"{}";},            regex("([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}"    )},
+  {"package",   [](const ::doc::Item *item) {return item->type+' '+item->name;},  regex("package ([a-zA-Z_][a-zA-Z0-9_]*)"  )},
+  {"variable",  [](const ::doc::Item *item) {return item->type+' '+item->name;},  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)" )}
+}};
 
+Extension::Extension() : language::Extension(ID) {
 }
 
 unique_ptr<::Document> Extension::parse(const fs::path &source) const {
@@ -91,17 +95,11 @@ language::Extension *Extension::builder(string_view language_id) {
 }
 
 auto Extension::analize(const string &anno) const -> Analysis::Results {
-  static pair<string,regex> rules[]={
-    {"Function",  regex("([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)"    )},
-    {"Module",    regex("([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}"    )},
-    {"Variable",  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)" )},
-    {"Package",   regex("package ([a-zA-Z_][a-zA-Z0-9_]*)"  )},
-  };
   Analysis::Results results;
-  for (auto rule = cbegin(rules); rule!=cend(rules); ++rule) {
+  for_each(slot.begin(),slot.end(),[&anno,&results](const Slot &sl) {
     const char *t = anno.c_str();
     cmatch match;
-    while (regex_search(t, match, rule->second)) {
+    while (regex_search(t, match, sl.regularExpression)) {
       auto offset = (t-anno.c_str());
       xref::Analysis analysis {
         match.position(0)+offset,
@@ -113,7 +111,7 @@ auto Extension::analize(const string &anno) const -> Analysis::Results {
       results.try_emplace(analysis.position,analysis);
       t += analysis.position+analysis.length;
     }
-  }
+  });
   return results;
 }
 

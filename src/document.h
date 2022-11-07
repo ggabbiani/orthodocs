@@ -146,8 +146,6 @@ public:
 
   virtual ~Item() = default;
 
-  virtual std::string type() const = 0;
-
   /**
    * return wether the item identifier is private or not.
    * NOTE: it uses the global option private_prefix.
@@ -175,16 +173,13 @@ public:
    */
   virtual std::string tocKey() const;
 
-  /**
-   * see the concrete language implementation for the actual format
-   */
-  virtual std::string dictKey() const = 0;
-
-  Name            name;
-  Annotation      annotation;
-  Parameter::Vec  parameters;
-  const Value     defaults;
-  const bool      nested;
+  Name              name;
+  Annotation        annotation;
+  Parameter::Vec    parameters;
+  const Value       defaults;
+  const bool        nested;
+  const std::string &type;
+  std::string dictKey;
 
   /**
    * this field is filled by the language extension
@@ -192,7 +187,7 @@ public:
   Item          *parent = nullptr;
 
 protected:
-  Item(const Name &name,const Value *defaults=nullptr,bool nested=false) : name(name),defaults(defaults?*defaults:""),nested(nested) {}
+  Item(const Name &name,const std::string &type, const Value *defaults=nullptr,bool nested=false);
   Signature _signature() const;
 
 };
@@ -281,7 +276,7 @@ namespace toc {
  * "«item name» («item type»)"
  */
 inline std::string title(const Item &item) {
-  return item.name+" ("+item.type()+')';
+  return item.name+" ("+item.type+')';
 }
 
 // copy Document items into the Table of Contents
@@ -308,7 +303,7 @@ SubToC filter(const std::filesystem::path &path,const ToC &toc, FUNC func) {
 namespace xref {
 
 inline bool DictLess::operator() (const Item *lhs, const Item *rhs) const {
-  return  lhs->dictKey() < rhs->dictKey();
+  return  lhs->dictKey < rhs->dictKey;
 }
 
 }

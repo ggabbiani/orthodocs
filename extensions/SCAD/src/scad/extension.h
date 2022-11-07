@@ -1,5 +1,5 @@
 #pragma once
-/*
+/**
  * language extension declarations
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
@@ -22,6 +22,8 @@
 
 #include <extensions.h>
 
+#include <regex>
+
 namespace scad {
 
 class Extension : public language::Extension {
@@ -36,6 +38,21 @@ public:
   Analysis::Results analize(const std::string &anno) const override;
 
   const char *sourcePostfix() const override;
+
+  enum Type {
+    TYPE_FUNCTION,
+    TYPE_MODULE,
+    TYPE_PACKAGE,
+    TYPE_VARIABLE
+  };
+
+  struct Slot { 
+    std::string type;
+    std::string (*dictionaryKey)(const ::doc::Item*);
+    std::regex  regularExpression;
+  };
+
+  static const std::array<Slot,4> slot;
 };
 
 } // namespace scad

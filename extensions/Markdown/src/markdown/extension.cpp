@@ -252,7 +252,7 @@ void Extension::write(const Document &document, const Annotation &annotation, os
         }
       );
       out << s << '\n' << endl;
-  }
+    }
   } catch(...) {
     throw_with_nested(runtime_error(ERR_CALL()));
   }
@@ -436,7 +436,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
 }
 
 string Extension::reference(const Item *item, const fs::path *document_source) const {
-  auto id       = headingId(item->type()+'-'+item->name);
+  auto id       = headingId(item->type+'-'+item->name);
   auto package  = dynamic_cast<const Package*>(item);
   if (!package)
     package = dynamic_cast<const Package*>(item->parent);

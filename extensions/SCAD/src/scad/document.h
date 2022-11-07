@@ -1,7 +1,5 @@
-// #pragma once
-#ifndef SCAD_DOCUMENT_H
-#define SCAD_DOCUMENT_H
-/*!
+#pragma once
+/*
  * Abstract document declarations
  *
  * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
@@ -36,40 +34,20 @@
 #include <string>
 #include <vector>
 
-class Index;
-
 namespace scad::doc {
-
-class Variable : public ::doc::Item {
-public:
-  Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested=false) : ::doc::Item(name,&defaults,nested) {}
-  std::string type() const override {return "variable";}
-  /**
-   * return the dictionary key formatted as: «variable name»
-   */
-  std::string dictKey() const override;
-};
 
 class Function : public ::doc::Item {
 public:
-  Function(const ::doc::Name &name,bool nested=false) : ::doc::Item(name,nullptr,nested) {}
+  static const std::string &ID;
+  Function(const ::doc::Name &name,bool nested=false);
   ::doc::Signature signature() const {return _signature();}
-  std::string type() const override {return "function";}
-  /**
-   * return the dictionary key formatted as: «function name»
-   */
-  std::string dictKey() const override;
 };
 
 class Module : public ::doc::Item {
 public:
-  Module(const ::doc::Name &name,bool nested=false) : ::doc::Item(name,nullptr,nested) {}
+  static const std::string &ID;
+  Module(const ::doc::Name &name,bool nested=false);
   ::doc::Signature signature() const {return _signature();}
-  std::string type() const override {return "module";}
-  /**
-   * return the dictionary key formatted as: «module name»
-   */
-  std::string dictKey() const override;
 };
 
 /**
@@ -80,16 +58,8 @@ public:
  */
 class Package : public ::doc::Item {
 public:
-  static constexpr const char *ID = "package";
-  /**
-   * Construct a new Package object
-   *
-   */
-  explicit Package(const std::filesystem::path &path) : ::doc::Item((path.parent_path()/path.stem()).string(),nullptr,false), path(path) {}
-  /**
-   * always return "package"
-   */
-  std::string type() const override {return ID;}
+  static const std::string &ID;
+  explicit Package(const std::filesystem::path &path);
 
   /**
    * return the Packages Index key from its path.
@@ -97,11 +67,6 @@ public:
    * «package stem» (package)
    */
   std::string tocKey() const override;
-
-  /**
-   * return the dictionary key formatted as: «qualified package stem»
-   */
-  std::string dictKey() const override;
 
   /**
    * return the Package Index key from a path.
@@ -120,6 +85,12 @@ public:
   std::set<std::string,std::less<>> includes;
   // eventual license
   const char *license = nullptr;
+};
+
+class Variable : public ::doc::Item {
+public:
+  static const std::string &ID;
+  Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested=false);
 };
 
 /**
@@ -179,4 +150,3 @@ class Fine : public AbstractStyle {
 } // namespace style
 
 } // namespace scad::doc
-#endif // SCAD_DOCUMENT_H

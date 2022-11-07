@@ -74,6 +74,7 @@ FetchContent_MakeAvailable(cli11 indicators spdlog)
 configure_file(src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h @ONLY)
 set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators spdlog::spdlog)
+set(ORTHODOCS_LIB odox)
 
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)

@@ -27,8 +27,12 @@ namespace fs=std::filesystem;
 
 namespace doc {
 
+Item::Item(const Name &name,const std::string &type, const Value *defaults,bool nested)
+  : name(name),defaults(defaults?*defaults:""),nested(nested),type(type) {
+}
+
 string Item::documentKey() const {
-  return type()+' '+name;
+  return type+' '+name;
 }
 
 bool Item::privateId() const {
@@ -36,7 +40,7 @@ bool Item::privateId() const {
 }
 
 string Item::tocKey() const {
-  return Option::prefix_abbreviation(name)+" ("+type()+')';
+  return Option::prefix_abbreviation(name)+" ("+type+')';
 }
 
 Signature Item::_signature() const {

@@ -75,11 +75,11 @@ auto Analizer::populate() const -> Dictionary {
     Dictionary dict;
     Bar bar(_toc, "xref dictionary");
     for(auto &item: _toc) {
-      auto key = item->dictKey();
+      auto key = item->dictKey;
       bar.status(key);
       if (auto [i, success] = dict.try_emplace(key,item); !success) {
         // TODO: eventually manage fully qualified referenced items 
-        spdlog::warn("duplicate item '{}' skipped",item->dictKey());
+        spdlog::warn("duplicate item '{}' skipped",key);
       }
       bar++;
     }

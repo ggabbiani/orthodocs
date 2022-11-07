@@ -27,7 +27,7 @@ antlr_target(${PARSER}
 # )
 
 ###############################################################################
-# C++ client application libs
+# C++ client application lib
 add_library(${LANGUAGE_LIB} STATIC
   src/scad/doc/annotations.cpp
   src/scad/doc/license.cpp

@@ -20,6 +20,7 @@
  */
 
 #include "document.h"
+#include "extension.h"
 
 #include <globals.h>
 #include <utils.h>
@@ -37,30 +38,50 @@ namespace fs = std::filesystem;
 
 namespace scad::doc {
 
+/******************************************************************************
+ * Function
+ *****************************************************************************/
+const string &Function::ID  = ::scad::Extension::slot[::scad::Extension::TYPE_FUNCTION].type;
+
+Function::Function(const ::doc::Name &name,bool nested) : ::doc::Item(name,ID,nullptr,nested) {
+  dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_FUNCTION].dictionaryKey(this);
+}
+
+/******************************************************************************
+ * Module
+ *****************************************************************************/
+const string &Module::ID    = ::scad::Extension::slot[::scad::Extension::TYPE_MODULE].type;
+
+Module::Module(const ::doc::Name &name,bool nested) : ::doc::Item(name,ID,nullptr,nested) {
+  dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_MODULE].dictionaryKey(this);
+}
+
+/******************************************************************************
+ * Package
+ *****************************************************************************/
+const string &Package::ID   = ::scad::Extension::slot[::scad::Extension::TYPE_PACKAGE].type;
+
+Package::Package(const std::filesystem::path &path) 
+  : ::doc::Item((path.parent_path()/path.stem()).string(),ID,nullptr,false), path(path) {
+  dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_PACKAGE].dictionaryKey(this);
+}
+
 string Package::tocKey(const string &s) {
   return fs::path(s).stem().string()+" ("+ID+")";
 }
 
 string Package::tocKey() const {
-  return Option::prefix_abbreviation(path.stem().string())+" ("+type()+')';
+  return Option::prefix_abbreviation(path.stem().string())+" ("+type+')';
 }
 
-string Package::dictKey() const {
-  auto parent = dynamic_cast<doc::Package*>(this->parent);
-  assert(!parent);
-  return type()+' '+name;
-}
+/******************************************************************************
+ * Variable
+ *****************************************************************************/
+const string &Variable::ID  = ::scad::Extension::slot[::scad::Extension::TYPE_VARIABLE].type;
 
-string Variable::dictKey() const {
-  return this->type()+' '+name;
-}
-
-string Function::dictKey() const {
-  return name+"()";
-}
-
-string Module::dictKey() const {
-  return name+"{}";
+Variable::Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested) 
+: ::doc::Item(name,ID,&defaults,nested) {
+  dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_VARIABLE].dictionaryKey(this);
 }
 
 namespace style {
