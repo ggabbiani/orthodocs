@@ -22,6 +22,7 @@
 
 #include <extensions.h>
 
+#include <array>
 #include <regex>
 
 namespace scad {
@@ -46,7 +47,7 @@ public:
     TYPE_VARIABLE
   };
 
-  struct Slot { 
+  struct Slot {
     std::string type;
     std::string (*dictionaryKey)(const ::doc::Item*);
     std::regex  regularExpression;
