@@ -126,6 +126,10 @@ void saveme(
 
 namespace markdown {
 
+Extension::Extension(Dictionary &dict,const language::Extension *lang) 
+  : writer::Extension(ID,dict,lang->vocabulary(),lang) {
+}
+
 void Extension::save(const Document &doc) {
   auto &source = doc.source;
   assert(source.is_relative());
@@ -244,9 +248,8 @@ void Extension::write(const Document &document, const Annotation &annotation, os
             auto ref = this->reference(i->second,&document.source);
             string link = "["+res.token+"]("+ref+")";
             s.replace(res.position,res.length,link);
-          } else {
+          } else if (const auto &i=_vocabulary.find(res.literal);i==_vocabulary.end()) {
             // FIXME: it would help to have also an indication of the item for which the warn was emitted
-            // FIXME: before emitting a warning, it must be checked that the token is not present in the lexer vocabulary
             spdlog::warn("Item '{}' not present in dictionary",res.token);
           }
         }

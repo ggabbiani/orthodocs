@@ -59,6 +59,8 @@ struct Analysis {
   ptrdiff_t   length;
   // to be searched to in the dictionary
   std::string token;
+  // to be searched for in the vocabulary
+  std::string literal;
 };
 
 /**
@@ -74,6 +76,7 @@ struct DictLess {
  * - writer domain for the concrete reference (see writer::Extension::reference())
  */
 using Dictionary  = std::map< std::string, ::doc::Item*, std::less<> >;
+using Vocabulary  = std::set< std::string, std::less<> >;
 
 }
 

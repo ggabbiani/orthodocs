@@ -41,7 +41,7 @@ public:
   static constexpr const char * const ID = "markdown";
 
   static writer::Extension *builder(std::string_view writer_id,Dictionary &dict,const language::Extension *lang);
-  explicit Extension(Dictionary &dict,const language::Extension *lang) : writer::Extension(ID,dict,lang) {}
+  Extension(Dictionary &dict,const language::Extension *lang);
 
   void save(const Document &doc) override;
   void save(const ToC &toc) override;

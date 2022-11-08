@@ -60,7 +60,37 @@ const array<Extension::Slot,4> Extension::slot{{
   {"variable",  [](const ::doc::Item *item) {return item->type+' '+item->name;},  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)" )}
 }};
 
+auto Extension::analize(const string &anno) const -> Analysis::Results {
+  Analysis::Results results;
+  for_each(slot.begin(),slot.end(),[&anno,&results](const Slot &sl) {
+    const char *t = anno.c_str();
+    cmatch match;
+    while (regex_search(t, match, sl.regularExpression)) {
+      auto offset = (t-anno.c_str());
+      xref::Analysis analysis {
+        match.position(0)+offset,                               // position
+        match.length(0),                                        // length
+        anno.substr(match.position(0)+offset,match.length(0)),  // token to be substituted with reference
+        anno.substr(match.position(1)+offset,match.length(1))   // internal literal to be skipped
+      };
+      // Analysis::Results::key_type uses the regex matching position, no
+      // collision is possible, hence no need for checking try_emplace() result.
+      results.try_emplace(analysis.position,analysis);
+      t += analysis.position+analysis.length;
+    }
+  });
+  return results;
+}
+
 Extension::Extension() : language::Extension(ID) {
+  ANTLRInputStream  in;
+  SCADLexer         lexer(&in);
+  auto              &vocabulary = lexer.getVocabulary();
+  for(auto i=1;i<=vocabulary.getMaxTokenType();++i) {
+    auto literal = vocabulary.getLiteralName(i);
+    if (literal.size())
+      _vocabulary.emplace(literal.substr(1,literal.length()-2));
+  }
 }
 
 unique_ptr<::Document> Extension::parse(const fs::path &source) const {
@@ -69,6 +99,7 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   ifstream          is(source);
   ANTLRInputStream  in(is);
   SCADLexer         lexer(&in);
+
   CommonTokenStream tokens(&lexer);
   SCADParser        parser(&tokens);
 
@@ -81,6 +112,7 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   tree::ParseTreeWalker  walker;
   // parsing
   tree::ParseTree       *tree = parser.pkg();
+
   // creation of the document
   walker.walk(&listener,tree);
   return listener.releaseDocument();
@@ -92,27 +124,6 @@ const char *Extension::sourcePostfix() const {
 
 language::Extension *Extension::builder(string_view language_id) {
   return (language_id==ID) ? &Singleton<Extension>::instance() : nullptr;
-}
-
-auto Extension::analize(const string &anno) const -> Analysis::Results {
-  Analysis::Results results;
-  for_each(slot.begin(),slot.end(),[&anno,&results](const Slot &sl) {
-    const char *t = anno.c_str();
-    cmatch match;
-    while (regex_search(t, match, sl.regularExpression)) {
-      auto offset = (t-anno.c_str());
-      xref::Analysis analysis {
-        match.position(0)+offset,
-        match.length(0),
-        anno.substr(match.position(0)+offset,match.length(0))
-      };
-      // Analysis::Results::key_type uses the regex matching position, no
-      // collision is possible, hence no need for checking try_emplace() result.
-      results.try_emplace(analysis.position,analysis);
-      t += analysis.position+analysis.length;
-    }
-  });
-  return results;
 }
 
 } // namespace scad

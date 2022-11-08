@@ -111,3 +111,8 @@ fragment UNICODE: '\\u' H H H H;
 
 fragment PATH_COMPONENT: (ALPHA | D | MINUS | UNDERSCORE | DOT)+;
 FILE: LESS PATH_COMPONENT (DIV PATH_COMPONENT)* GREATER;
+
+// these definition MUST be kept at bottom because unused
+CHILDREN:	'children';
+PROJECTION:	'projection';
+RESIZE:		'resize';
