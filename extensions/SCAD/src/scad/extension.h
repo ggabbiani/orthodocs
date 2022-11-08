@@ -29,7 +29,6 @@ namespace scad {
 
 class Extension : public language::Extension {
 public:
-
   static constexpr const char *ID = "scad";
 
   static language::Extension *builder(std::string_view language_id);
@@ -54,6 +53,7 @@ public:
   };
 
   static const std::array<Slot,4> slot;
+
 };
 
 } // namespace scad

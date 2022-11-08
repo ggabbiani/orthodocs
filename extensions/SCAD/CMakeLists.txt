@@ -47,10 +47,14 @@ target_link_libraries(${LANGUAGE_LIB}
   PRIVATE # library dependencies
     antlr4_static 
 )
-cmake_print_properties(
-    TARGETS ${LANGUAGE_LIB}
-    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES PUBLIC_INCLUDE_DIRECTORIES PRIVATE_INCLUDE_DIRECTORIES
-)
+# cmake_print_variables(
+#   ANTLR_${LEXER}_CXX_OUTPUTS
+#   ANTLR_${PARSER}_CXX_OUTPUTS
+# )
+# cmake_print_properties(
+#     TARGETS ${LANGUAGE_LIB}
+#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES PUBLIC_INCLUDE_DIRECTORIES PRIVATE_INCLUDE_DIRECTORIES
+# )
 
 ###############################################################################
 # Java split parser for testing grammars via grun
