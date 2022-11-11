@@ -35,6 +35,9 @@ namespace scad {
  */
 class Listener : public scad::SCADParserBaseListener, ::doc::Annotation::Modifier {
 public:
+  using Item      = ::doc::Item;
+  using Package   = doc::Package;
+  using Parameter = ::doc::Parameter;
   using Parser    = scad::SCADParser;
 
   explicit Listener(const std::filesystem::path &pkg_source);
@@ -59,16 +62,16 @@ public:
 
 private:
   // the following members represents the actual status variables for the parser
-  doc::Package                    *curr_package;
-  ::doc::Item::OwnerStack   curr_item;
-  ::doc::Item::OwnerStack   curr_variable;
-  ::doc::Parameter::Ptr   curr_parameter;
+  Package          *curr_package;
+  Item::OwnerStack  curr_item;
+  Item::OwnerStack  curr_variable;
+  Parameter::Ptr    curr_parameter;
   /*
    * this is a kludge: is there an official way for retrieving the current
    * language source file from antlr4?
    */
   const std::filesystem::path &_pkg_path;
-  ::Document::Owner   _document;
+  Document::Owner   _document;
 };
 
 }

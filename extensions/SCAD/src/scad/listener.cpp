@@ -89,7 +89,7 @@ void Listener::enterUse(SCADParser::UseContext *ctx) {
 
 void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
   auto identifier = ctx->ID()->getText();
-  auto nested     = is<doc::Module>(*curr_item.top());
+  bool nested     = dynamic_cast<doc::Module*>(curr_item.top().get())!=nullptr;
   auto item       = new doc::Function(identifier,nested);
   item->parent    = curr_package;
   assert(curr_package);
@@ -109,7 +109,7 @@ void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
 
 void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   auto identifier = ctx->ID()->getText();
-  auto nested     = is<doc::Module>(*curr_item.top());
+  bool nested     = dynamic_cast<doc::Module*>(curr_item.top().get());
   auto item       = make_unique<doc::Module>(identifier,nested);
   assert(curr_package);
   item->parent    = curr_package;
