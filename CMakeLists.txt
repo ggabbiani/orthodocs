@@ -18,6 +18,7 @@ include(CTest)
 option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
+option(OPTION_UNIT_TESTS      "Unit tests"                    ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
 
 # compiler must be 17
@@ -27,7 +28,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ###############################################################################
-# global propedeutics for antrl4cpp
+# propedeutics for antrl4cpp
 ###############################################################################
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
@@ -50,13 +51,18 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 
 ###############################################################################
-# global propedeutics for orthodocs
+# propedeutics for orthodocs
 ###############################################################################
 
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
   GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
+)
+FetchContent_Declare(
+  dtl
+  GIT_REPOSITORY https://github.com/cubicdaiya/dtl.git
+  GIT_TAG        v1.20
 )
 FetchContent_Declare(
   indicators
@@ -69,13 +75,33 @@ FetchContent_Declare(
   GIT_TAG        v1.x
 )
 
-FetchContent_MakeAvailable(cli11 indicators spdlog)
+find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+#cmake_print_variables(Boost_INCLUDE_DIRS)
 
-configure_file(src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h @ONLY)
-set(ORTHODOCS_INCS ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(ORTHODOCS_LIBS antlr4_static CLI11::CLI11 indicators::indicators spdlog::spdlog)
-set(ORTHODOCS_LIB odox)
+FetchContent_MakeAvailable(cli11 dtl indicators spdlog)
 
+###############################################################################
+# commons
+###############################################################################
+add_library(commons
+  src/analizer.cpp
+  src/document.cpp
+  src/globals.cpp
+  src/utils.cpp
+)
+target_include_directories(commons PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(commons
+  spdlog::spdlog
+  indicators::indicators
+)
+# cmake_print_properties(
+#     TARGETS orthodocs
+#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+# )
+
+###############################################################################
+# SCAD language extension
+###############################################################################
 if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)
   set(LEXER         ${LANGUAGE}Lexer)
@@ -88,6 +114,9 @@ if (OPTION_LANGUAGE_SCAD)
   list(APPEND ORTHODOCS_LIBS ${LANGUAGE_LIB})
 endif()
 
+###############################################################################
+# Markdown writer extension
+###############################################################################
 if (OPTION_WRITER_MARKDOWN)
   set(WRITER      Markdown)
   set(WRITER_LIB  Markdown)
@@ -95,27 +124,50 @@ if (OPTION_WRITER_MARKDOWN)
   add_subdirectory(extensions/${WRITER})
   list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
 endif()
-# cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
 
-add_executable(orthodocs
-  src/analizer.cpp
-  src/document.cpp
-  src/extensions.cpp
-  src/globals.cpp
-  src/main.cpp
-  src/utils.cpp
+###############################################################################
+# factories
+###############################################################################
+add_library(factories
+  src/factories.cpp
 )
-target_include_directories(orthodocs PUBLIC ${ORTHODOCS_INCS})
-target_link_libraries(orthodocs ${ORTHODOCS_LIBS})
+target_link_libraries(factories
+  PUBLIC
+    spdlog::spdlog
+)
+list(PREPEND ORTHODOCS_LIBS factories)
+
+###############################################################################
+# main program
+###############################################################################
+# cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
+configure_file(src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h @ONLY)
+add_executable(orthodocs
+  src/extensions.cpp
+  src/main.cpp
+)
+target_include_directories(orthodocs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(orthodocs 
+  PRIVATE
+    CLI11::CLI11
+    ${ORTHODOCS_LIBS}
+)
 # cmake_print_properties(
 #     TARGETS orthodocs
 #     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
 # )
 
+###############################################################################
+# tests
+###############################################################################
 if (OPTION_OTHER_TESTS)
   add_subdirectory(tests-other)
 endif()
 
 if (OPTION_FUNC_TESTS)
   add_subdirectory(tests-func)
+endif()
+
+if (OPTION_UNIT_TESTS)
+  add_subdirectory(unit-tests)
 endif()

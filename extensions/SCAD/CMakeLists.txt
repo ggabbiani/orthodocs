@@ -37,13 +37,16 @@ add_library(${LANGUAGE_LIB} STATIC
   ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
 target_include_directories(${LANGUAGE_LIB}
-  PRIVATE # no client includes
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PRIVATE
     ${PROJECT_SOURCE_DIR}/src
     ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
 target_link_libraries(${LANGUAGE_LIB} 
   PUBLIC # clients and library dependencies
-    spdlog::spdlog
+    # spdlog::spdlog
+    commons
   PRIVATE # library dependencies
     antlr4_static 
 )

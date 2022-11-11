@@ -34,7 +34,11 @@
  * of the world.
  */
 class Option {
-  friend int main(int argc,const char *argv[]);
+  #ifdef BOOST_TEST_MODULE
+  friend int main(int argc, char *argv[]);
+  #else
+  friend int main(int argc, const char *argv[]);
+  #endif
 public:
   using Verbosity = spdlog::level::level_enum;
 

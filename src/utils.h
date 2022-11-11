@@ -34,13 +34,15 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
 }
 #endif  // (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
 
+/**
+ * @brief removes spaces from string head / tail 
+ */
 inline std::string trim(std::string str) {
   const char* ws = " \t\n\r\f\v";
-  str.erase(str.find_last_not_of(ws) + 1);
-  str.erase(0,str.find_first_not_of(ws));
-  return str;
+  return str.erase(str.find_last_not_of(ws) + 1).erase(0,str.find_first_not_of(ws));
 }
 
+// TODO: move elsewhere
 using FileSet = std::vector<std::filesystem::path>;
 
 /*!
@@ -60,11 +62,6 @@ public:
 private:
   std::filesystem::path _old = std::filesystem::current_path();
 };
-
-template <class A,class B>
-bool is(B &b) {
-  return dynamic_cast<A*>(&b)!=nullptr;
-}
 
 /**
  * check if «sub» is a subdirectory of «base».
