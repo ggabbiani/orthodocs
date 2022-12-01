@@ -22,7 +22,7 @@
 #define BOOST_TEST_MODULE orthodocs unit tests
 #include <boost/test/unit_test.hpp>
 
-#include <scad/extension.h>
+#include "scad/extension.h"
 
 using namespace boost::unit_test;
 using namespace std;

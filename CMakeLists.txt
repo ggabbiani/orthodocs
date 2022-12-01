@@ -54,31 +54,23 @@ include(ExternalAntlr4Cpp)
 # propedeutics for orthodocs
 ###############################################################################
 
-FetchContent_Declare(
-  cli11
+FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
   GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
 )
-FetchContent_Declare(
-  dtl
-  GIT_REPOSITORY https://github.com/cubicdaiya/dtl.git
-  GIT_TAG        v1.20
-)
-FetchContent_Declare(
-  indicators
+FetchContent_Declare(indicators
   GIT_REPOSITORY https://github.com/p-ranav/indicators.git
   GIT_TAG        6432875ef4c866d25e324c19a787b5bb90b0ab12 # v2.2
 )
-FetchContent_Declare(
-  spdlog
+FetchContent_Declare(spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
   GIT_TAG        v1.x
 )
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-#cmake_print_variables(Boost_INCLUDE_DIRS)
+# cmake_print_variables(Boost_INCLUDE_DIRS dtl_SOURCE_DIR)
 
-FetchContent_MakeAvailable(cli11 dtl indicators spdlog)
+FetchContent_MakeAvailable(cli11 indicators spdlog)
 
 ###############################################################################
 # commons

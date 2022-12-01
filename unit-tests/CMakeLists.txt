@@ -47,5 +47,5 @@ test_unit(NAME UnitTests
   SOURCES 
     ut-tests.cpp 
   LIBS 
-    ${ORTHODOCS_LIBS} 
+    ${ORTHODOCS_LIBS}
 )
