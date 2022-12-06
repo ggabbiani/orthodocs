@@ -17,6 +17,9 @@
 - [x] connect to sonarcloud
 - [x] finalize input sources management from CLI
 - [x] set -i,--ignore-prefix cli option as multiple option
+- [ ] adopt SPDX License schema
+- [x] implement boost unit tests
+- [ ] move bin(s) from bash to python
 
 ## Others
 
@@ -24,6 +27,5 @@
 - [ ] implement reverse comment annotation;
 - [ ] improve ToC with a first line referring indexed paragraphs;
 - [ ] set -i,--ignore-prefix cli option as a regex
-- [ ] implement boost unit tests
 - [ ] fix heading id bug on items containing dollar ('$') character inside
-- [ ] adopt SPDX License schema
+- [ ] implementing code coverage

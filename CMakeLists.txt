@@ -15,7 +15,6 @@ project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
 
 include(CTest)
 
-option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                    ON  )
@@ -139,7 +138,7 @@ add_executable(orthodocs
   src/main.cpp
 )
 target_include_directories(orthodocs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(orthodocs 
+target_link_libraries(orthodocs
   PRIVATE
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
@@ -154,10 +153,6 @@ target_link_libraries(orthodocs
 ###############################################################################
 if (OPTION_OTHER_TESTS)
   add_subdirectory(tests-other)
-endif()
-
-if (OPTION_FUNC_TESTS)
-  add_subdirectory(tests-func)
 endif()
 
 if (OPTION_UNIT_TESTS)

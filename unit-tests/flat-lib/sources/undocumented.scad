@@ -23,7 +23,7 @@
 include <isolated.scad>
 
 /*!
- * private variable not included 
+ * private variable not included
  */
 __var__ = 10;
 
