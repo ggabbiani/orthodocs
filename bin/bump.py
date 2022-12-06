@@ -97,7 +97,7 @@ try:
     input('press «RETURN» to continue or «CTRL-C» to exit')
 
     if args.dry_run:
-        print(['git'])
+        print(['git', 'tag', '-m', 'Version {0} bumped'.format(BUMPED_VERSION), TAG, PROJECT_BRANCH])
     else:
         print('boom!')
 
