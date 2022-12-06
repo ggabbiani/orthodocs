@@ -1,4 +1,4 @@
 build
 extensions/SCAD/.antlr
 *.bkp
-include/orthodocs/config.h
+src/config.h
