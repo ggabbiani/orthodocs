@@ -15,6 +15,7 @@ project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
 
 include(CTest)
 
+option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
 option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                    ON  )
