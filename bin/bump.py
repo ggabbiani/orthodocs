@@ -57,7 +57,7 @@ signal.signal(signal.SIGINT, handler)
 parser = argparse.ArgumentParser(description='Bump version on remote git origin.')
 # switch
 parser.add_argument('-v', '--verbose',action='store_true', help='guess what ...')
-parser.add_argument('-d', '--dry-run',action='store_true', help='no concrete modification performed on GIT repo. (default false)')
+parser.add_argument('-d', '--dry-run',action='store_true', help='no concrete modification performed on GIT repo. (default false)', default=False)
 parser.add_argument('-M', '--major',  action='store_true', help='auto increment current major release number')
 parser.add_argument('-m', '--minor',  action='store_true', help='auto increment current minor release number')
 parser.add_argument('-p', '--patch',  action='store_true', help='auto increment current patch release number', default=True)
