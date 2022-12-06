@@ -98,6 +98,7 @@ try:
 
     if args.dry_run:
         print(['git', 'tag', '-m', 'Version {0} bumped'.format(BUMPED_VERSION), TAG, PROJECT_BRANCH])
+        print(['git', 'push', '--follow-tags'])
     else:
         print('boom!')
 
