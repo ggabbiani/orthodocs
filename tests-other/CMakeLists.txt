@@ -25,4 +25,5 @@ if (OPTION_LANGUAGE_SCAD)
   )
   target_link_libraries(xref spdlog::spdlog ${LANGUAGE_LIB})
 
+  add_subdirectory(spdx)
 endif()
