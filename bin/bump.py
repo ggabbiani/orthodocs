@@ -100,10 +100,8 @@ try:
         print(['git', 'tag', '-m', 'Version {0} bumped'.format(BUMPED_VERSION), TAG, PROJECT_BRANCH])
         print(['git', 'push', '--follow-tags'])
     else:
-        print('boom!')
-
-    # subprocess.run(['git', 'tag', '-m', 'Version {0} bumped'.format(BUMPED_VERSION), TAG, PROJECT_BRANCH], check=True)
-    # subprocess.run(['git', 'push', '--follow-tags'], check=True)
+        subprocess.run(['git', 'tag', '-m', 'Version {0} bumped'.format(BUMPED_VERSION), TAG, PROJECT_BRANCH], check=True)
+        subprocess.run(['git', 'push', '--follow-tags'], check=True)
 
 except RuntimeError as error:
     print(error)
