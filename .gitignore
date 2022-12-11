@@ -2,3 +2,9 @@ build
 extensions/SCAD/.antlr
 *.bkp
 src/config.h
+tests-other/spdx/.antlr/SPDXLexer.interp
+tests-other/spdx/.antlr/SPDXLexer.java
+tests-other/spdx/.antlr/SPDXLexer.tokens
+tests-other/spdx/.antlr/SPDXParser.interp
+tests-other/spdx/.antlr/SPDXParser.java
+tests-other/spdx/.antlr/SPDXParser.tokens

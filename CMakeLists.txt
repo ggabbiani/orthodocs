@@ -67,6 +67,8 @@ FetchContent_Declare(spdlog
   GIT_TAG        v1.x
 )
 
+# We don't want json library's tests
+set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG        v3.11.2
