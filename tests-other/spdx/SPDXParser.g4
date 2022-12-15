@@ -29,7 +29,7 @@ simple_expression
 
 compound_expression
     : simple_expression                                 # exprSimple
-    | simple_expression     op=WITH ID                  # exprWithException
+    | simple_expression     op=WITH xid=ID              # exprWithException
     | compound_expression   op=AND  compound_expression # exprAndExpr
     | compound_expression   op=OR   compound_expression # exprOrExpr
     | LEFT_PAREN compound_expression RIGHT_PAREN        # parenthesisedExpr

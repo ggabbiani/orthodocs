@@ -79,11 +79,13 @@ endif()
 # C++ split parser
 
 # add lexer and grammar to the build dependencies.
-antlr_target(${LEXER} ${LEXER}.g4 LEXER PACKAGE scad)
+antlr_target(${LEXER} ${LEXER}.g4 
+  LEXER
+  PACKAGE spdx)
 antlr_target(${PARSER}
   ${PARSER}.g4
   PARSER LISTENER
-  PACKAGE scad
+  PACKAGE spdx
   DEPENDS_ANTLR ${LEXER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
 )
@@ -108,14 +110,15 @@ add_library(${LANGUAGE_LIB} STATIC
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    # to be make private?
+    ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
-    ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
 target_link_libraries(${LANGUAGE_LIB} 
-  PUBLIC # clients and library dependencies
+  # PUBLIC # clients and library dependencies
     # spdlog::spdlog
-    commons
+    # commons
   PRIVATE # library dependencies
     antlr4_static 
 )
@@ -138,4 +141,11 @@ file(DOWNLOAD
 add_executable(json_test json_test.cpp)
 target_link_libraries(json_test
   nlohmann_json::nlohmann_json
+)
+
+add_executable(parse parse.cpp)
+target_link_libraries(parse
+  CLI11::CLI11
+  nlohmann_json::nlohmann_json
+  ${LANGUAGE_LIB}
 )
