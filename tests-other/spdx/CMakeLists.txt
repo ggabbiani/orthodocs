@@ -133,17 +133,28 @@ target_link_libraries(${LANGUAGE_LIB}
 
 ###############################################################################
 # Jason resources from github spdx
+set(SPDX_LICENSES_JSON "${CMAKE_CURRENT_SOURCE_DIR}/licenses.json")
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json
-  ${CMAKE_CURRENT_SOURCE_DIR}/licenses.json
+  ${SPDX_LICENSES_JSON}
+)
+set(SPDX_EXCEPTIONS_JSON "${CMAKE_CURRENT_SOURCE_DIR}/exceptions.json")
+file(DOWNLOAD
+  https://raw.githubusercontent.com/spdx/license-list-data/main/json/exceptions.json
+  ${SPDX_EXCEPTIONS_JSON}
 )
 
+configure_file(spdx_config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/spdx_config.h" @ONLY)
+              
 add_executable(json_test json_test.cpp)
 target_link_libraries(json_test
   nlohmann_json::nlohmann_json
 )
 
-add_executable(parse parse.cpp)
+add_executable(parse
+  parse.cpp
+  spdx.cpp
+)
 target_link_libraries(parse
   CLI11::CLI11
   nlohmann_json::nlohmann_json
