@@ -89,12 +89,11 @@ public:
       anno._data = s;
     }
   };
-  friend struct Modifier;
 
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
 
-protected:
+private:
   std::string _data;
 };
 
