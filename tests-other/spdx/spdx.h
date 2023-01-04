@@ -21,6 +21,8 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "spdx_config.h"
+
 #include <SPDXParserBaseListener.h>
 
 #include <nlohmann/json.hpp>
@@ -29,6 +31,9 @@
 #include <iomanip>
 #include <stdexcept>
 
+/**
+ * this tool must be removed when importing SPDX code in the OrthoDocs sources.
+ */
 #if (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
 template <typename E>
 constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
@@ -38,14 +43,20 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
 
 namespace spdx {
 
+/**
+ * SPDX lists in JSON format share same semantic but different labels.
+ */
 enum class LabelType {
-  name,
-  id,
-  list,
-  version,
-  date
+  name,     // extended name
+  id,       // compact id
+  list,     // item list
+  version,  // global DB version
+  date      // global DB release date
 };
 
+/**
+ * Error raised during JSON parse of the license and exception DBs
+ */
 struct StatusError : public std::logic_error {
   // inherit parent class constructors
   using std::logic_error::logic_error;
@@ -53,6 +64,9 @@ struct StatusError : public std::logic_error {
 
 namespace license {
 
+/**
+ * this interface provides a JSON label for SPDX license DB.
+ */
 struct LabelSet {
   const std::string& operator [] (LabelType type) const;
 };
@@ -61,12 +75,20 @@ struct LabelSet {
 
 namespace exception {
 
+/**
+ * this interface provides a JSON label for SPDX license exception DB.
+ */
 struct LabelSet {
   const std::string& operator [] (LabelType type) const;
 };
 
 }
 
+/**
+ * One parametric class both the license and exception DBs.
+ * 
+ * @tparam LABELSET defines the LabelSet to be used.
+ */
 template <typename LABELSET>
 class List {
 public:
@@ -79,10 +101,10 @@ public:
      * 
      * Returns true if the key is recognized, false otherwise.
      * 
-     * Currently recognized keys:
+     * Currently recognized key types:
      * 
-     * - "licenseId"
-     * - "name"
+     * - LabelType::id
+     * - LabelType::name
      */
     bool set(const std::string_view &key, std::string &value) {
       if (key==label(LabelType::name)) {
@@ -103,7 +125,7 @@ public:
   /**
    * returns the release date of the license list
    */
-  inline const std::tm &date() const {return _date;}
+  inline const std::tm *date() const {return &_date;}
   /**
    * returns the number of licenses in the list
    */
@@ -129,10 +151,10 @@ public:
    * 
    * Returns true if the key is recognized, false otherwise.
    * 
-   * Currently recognized keys:
+   * Currently recognized key types:
    * 
-   * - "licenseListVersion"
-   * - "releaseDate"
+   * - LabelType::date
+   * - LabelType::version
    */
   inline bool set(const std::string_view &key, std::string &value) {
     if (key==label(LabelType::version)) {
@@ -154,7 +176,13 @@ private:
   Map         _map;
 };
 
+/**
+ * SPDX license list
+ */
 using LicenseList   = List<license::LabelSet>;
+/**
+ * SPDX license exception list
+ */
 using ExceptionList = List<exception::LabelSet>;
 
 /**
@@ -290,6 +318,22 @@ private:
   typename T::Item  _item;
 };
 
+template <typename T>
+class db {
+public:
+  explicit db(const std::string &db_name=SPDX_LICENSES_JSON) : _consumer(_db) {
+    nlohmann::json::sax_parse(std::ifstream(db_name),&_consumer);
+  }
+  inline size_t size() const {return _db.size();}
+  inline const std::string &version() const {return _db.version();}
+  inline const std::tm *date() const {return _db.date();}
+  operator const T & () const {return _db;}
+
+private:
+  SAXConsumer<T>  _consumer;
+  T               _db;
+};
+
 /**
  * This listener is triggered during the parse-tree walk.
  */
@@ -314,6 +358,12 @@ private:
   std::stack<std::string> _op;
 };
 
-std::string parse(const std::string &annotation,const LicenseList &licenses, const ExceptionList &exceptions);
+/**
+ * Filter annotation text separating SPDX meta data from the rest.
+ * 
+ * Returns a std::pair with the extracted license information in the 'first' 
+ * string, the stripped annotation in the 'second'.
+ */
+std::pair<std::string,std::string> filter(const std::string &annotation,const LicenseList &licenses, const ExceptionList &exceptions);
 
 }

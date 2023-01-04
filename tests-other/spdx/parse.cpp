@@ -1,5 +1,4 @@
 #include "spdx.h"
-#include "spdx_config.h"
 
 #include <CLI/CLI.hpp>
 
@@ -12,19 +11,6 @@ namespace fs=std::filesystem;
 using json=nlohmann::json;
 using namespace std;
 
-
-namespace exception {
-
-struct MissingArgument : public std::runtime_error {
-  explicit MissingArgument(const std::string &argument) : runtime_error(std::string("Expecting <")+argument+">.") {}
-};
-
-struct FileNotFound : public std::runtime_error {
-  explicit FileNotFound(const std::filesystem::path &fname) : runtime_error(std::string("File not found ")+fname.string()+".") {}
-};
-
-}
-
 int main(int argc, const char *argv[]) {
   CLI::App  app{"spdx test"};
   auto      result = EXIT_SUCCESS;
@@ -36,26 +22,23 @@ int main(int argc, const char *argv[]) {
       ->required();
     app.parse(argc,argv);
     
-    spdx::LicenseList licenses;
-    spdx::SAXConsumer lic_consumer(licenses);
-    json::sax_parse(ifstream(SPDX_LICENSES_JSON),&lic_consumer);
-    
-    spdx::ExceptionList exceptions;
-    spdx::SAXConsumer xcp_consumer(exceptions);
-    json::sax_parse(ifstream(SPDX_EXCEPTIONS_JSON),&xcp_consumer);
+    spdx::db<spdx::LicenseList>   licenses{SPDX_LICENSES_JSON};
+    spdx::db<spdx::ExceptionList> exceptions{SPDX_EXCEPTIONS_JSON};
     
     cout  << licenses.size() << " SPDX Licenses:\n"
           << "version: " << licenses.version() << '\n'
-          << "date: " << std::put_time(&licenses.date(),"%Y/%m/%d") << '\n'
+          << "date: " << std::put_time(licenses.date(),"%Y/%m/%d") << '\n'
           << endl;
 
     cout  << exceptions.size() << " SPDX License Exceptions:\n"
           << "version: " << exceptions.version() << '\n'
-          << "date: " << std::put_time(&exceptions.date(),"%Y/%m/%d") << '\n'
+          << "date: " << std::put_time(exceptions.date(),"%Y/%m/%d") << '\n'
           << endl;
 
-    auto licensing = spdx::parse(annotation,licenses,exceptions);
-    cout << licensing << endl;
+    auto [licensing,filtered] = spdx::filter(annotation,licenses,exceptions);
+    cout  << "Licensing: " << licensing << "\n\n"
+          << "Remaining annotation:\n" 
+          << filtered << endl;
 
   } catch (const CLI::Error &error) {
     result  = app.exit(error);

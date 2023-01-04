@@ -60,22 +60,29 @@ const string& LabelSet::operator [] (LabelType type) const {
 
 }
 
-string parse(const string &annotation,const LicenseList &licenses, const ExceptionList &exceptions) {
+std::pair<std::string,std::string> filter(const string &annotation,const LicenseList &licenses, const ExceptionList &exceptions) {
   ANTLRInputStream  in(annotation);
   SPDXLexer         lexer(&in);
   CommonTokenStream tokens(&lexer);
   SPDXParser        parser(&tokens);
 
-  // source parse listener
-  Listener listener(licenses,exceptions);
-  // parse tree depth-first traverse
-  tree::ParseTreeWalker  walker;
   // parsing
   tree::ParseTree       *tree = parser.all();
 
+  // parse tree depth-first traverse
+  tree::ParseTreeWalker  walker;
+  // source parse listener
+  Listener listener(licenses,exceptions);
   // creation of the document
   walker.walk(&listener,tree);
-  return listener.license();
+
+  stringstream  ss;
+  auto result = tokens.getTokens();
+  for(const auto *token: result)
+    if (token->getChannel()==lexer.ANNOTATION)
+      ss << token->getText();
+
+  return make_pair(listener.license(),ss.str());
 }
 
 void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
