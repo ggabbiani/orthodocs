@@ -27,15 +27,17 @@
 
 namespace scad {
 
-class Extension : public language::Extension {
+class Extension : public language::Extension, private ::doc::Annotation::Modifier {
 public:
+  using Annotation = ::doc::Annotation;
+  
   static constexpr const char *ID = "scad";
 
   static language::Extension *builder(std::string_view language_id);
   Extension();
 
   Document::Owner parse(const std::filesystem::path &source) const override;
-  Analysis::Results analize(const std::string &anno) const override;
+  void analize(Annotation &anno) const override;
 
   const char *sourcePostfix() const override;
 

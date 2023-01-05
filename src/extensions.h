@@ -48,12 +48,10 @@ public:
 
   virtual Document::Owner parse(const std::filesystem::path &source) const = 0;
   /**
-   * @brief analizes a string for cross-references
-   * 
-   * @param s the string eventually containing cross-references
-   * @return Analysis::Results 
+   * Analizes a document annotation for cross-references and enrich the 
+   * annotation with the analysis results.
    */
-  virtual Analysis::Results analize(const std::string &anno) const = 0;
+  virtual void analize(Annotation &anno) const = 0;
 
   /**
    * returns the Lexer Vocabulary

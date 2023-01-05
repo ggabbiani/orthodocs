@@ -44,7 +44,7 @@ void Analizer::document(fs::path source) {
   if (source.begin()!=source.end() && *source.begin()==".")
     source = subpath(source,++source.begin());
   try {
-    auto document = _parser->parse(source);
+    auto document = _language->parse(source);
     // copy document contents to the Table of Contents
     doc::toc::add(document.get(),_toc);
     // move document in the documents list
@@ -57,7 +57,7 @@ void Analizer::document(fs::path source) {
 auto Analizer::buildDocuments() -> void {
   try {
     FileSet files;
-    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _parser->sourcePostfix(),files);
+    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _language->sourcePostfix(),files);
     Bar bar(files,"sources analized");
     for(const auto &file: files) {
       bar.status(file.string());
@@ -73,7 +73,7 @@ auto Analizer::buildDocuments() -> void {
 auto Analizer::populate() const -> Dictionary {
   try {
     Dictionary dict;
-    Bar bar(_toc, "xref dictionary");
+    Bar bar(_toc, "item(s) in the xref dictionary");
     for(auto &item: _toc) {
       auto key = item->dictKey;
       bar.status(key);
@@ -84,6 +84,31 @@ auto Analizer::populate() const -> Dictionary {
       bar++;
     }
     return dict;
+  } catch(...) {
+    indicators::show_console_cursor(true);
+    throw;
+  }
+}
+
+void Analizer::xref() const {
+  // setup array of non empty annotations
+  vector<doc::Annotation*> annos;
+  for(const auto& document: _docs) {
+    for(auto &item: document->index) {
+      if (!item->annotation.empty())
+        annos.push_back(&item->annotation);
+      for_each(item->parameters.begin(),item->parameters.end(),[&annos](const doc::Parameter::Ptr &p) {
+        if (!p->annotation.empty())
+          annos.push_back(&p->annotation);
+      });
+    }
+  }
+  try {
+    Bar bar(annos, "annotations analized");
+    for_each(annos.begin(),annos.end(),[&bar,this] (doc::Annotation *a) {
+      _language->analize(*a);
+      bar++;
+    });
   } catch(...) {
     indicators::show_console_cursor(true);
     throw;

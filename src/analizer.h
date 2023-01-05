@@ -45,7 +45,7 @@ class Analizer {
 public:
   using Dictionary  = doc::xref::Dictionary;
 
-  explicit Analizer(language::Extension *language): _parser(language) {}
+  explicit Analizer(language::Extension *language): _language(language) {}
 
   /**
    * analize a set of files / directories as specified from Option(s)
@@ -75,6 +75,11 @@ public:
   // ToC getter
   const doc::ToC &toc() const {return _toc;}
 
+  /**
+   * collect cross-reference data in the documents
+   */
+  void xref() const;
+
 private:
   // return a FileSet made of files matching «extension»
   void lookup(
@@ -87,5 +92,5 @@ private:
   );
   DocumentList           _docs;
   doc::ToC               _toc;
-  language::Extension   *_parser;
+  language::Extension   *_language;
 };

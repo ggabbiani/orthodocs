@@ -60,18 +60,19 @@ const array<Extension::Slot,4> Extension::slot{{
   {"variable",  [](const ::doc::Item *item) {return item->type+' '+item->name;},  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)" )}
 }};
 
-auto Extension::analize(const string &anno) const -> Analysis::Results {
+void Extension::analize(Annotation &anno) const {
   Analysis::Results results;
-  for_each(slot.begin(),slot.end(),[&anno,&results](const Slot &sl) {
-    const char *t = anno.c_str();
+  auto& data  = anno.data();
+  for_each(slot.begin(),slot.end(),[&data,&results](const Slot &sl) {
+    const char *t = data.c_str();
     cmatch match;
     while (regex_search(t, match, sl.regularExpression)) {
-      auto offset = (t-anno.c_str());
+      auto offset = (t-data.c_str());
       xref::Analysis analysis {
-        match.position(0)+offset,                               // position
-        match.length(0),                                        // length
-        anno.substr(match.position(0)+offset,match.length(0)),  // token to be substituted with reference
-        anno.substr(match.position(1)+offset,match.length(1))   // internal literal to be skipped
+        match.position(0)+offset,                              // position
+        match.length(0),                                       // length
+        data.substr(match.position(0)+offset,match.length(0)), // token to be substituted with reference
+        data.substr(match.position(1)+offset,match.length(1))  // literal to be searched for in the exclusion vocabulary
       };
       // Analysis::Results::key_type uses the regex matching position, no
       // collision is possible, hence no need for checking try_emplace() result.
@@ -79,7 +80,7 @@ auto Extension::analize(const string &anno) const -> Analysis::Results {
       t += analysis.position+analysis.length;
     }
   });
-  return results;
+  set(anno,std::move(results));
 }
 
 Extension::Extension() : language::Extension(ID) {

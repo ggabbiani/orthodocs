@@ -57,9 +57,9 @@ struct Analysis {
   ptrdiff_t   position;
   // resulting token length to be substituted when resolving the reference
   ptrdiff_t   length;
-  // to be searched to in the dictionary
+  // token to be searched for in the inclusion dictionary
   std::string token;
-  // to be searched for in the vocabulary
+  // literal to be searched for in the exclusion vocabulary
   std::string literal;
 };
 
@@ -81,20 +81,29 @@ using Vocabulary  = std::set< std::string, std::less<> >;
 }
 
 class Annotation {
-
 public:
+  using XResults = xref::Analysis::Results;
+
   struct Modifier {
     virtual ~Modifier() = default;
     void set(Annotation &anno,std::string_view s) const {
       anno._data = s;
     }
+    /**
+     * moves the cross-reference analysis results into the annotation
+     */
+    void set(Annotation &anno,XResults &&results) const {
+      anno._xresults  = results;
+    }
   };
 
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
+  const XResults  &xresults() const {return _xresults;}
 
 private:
   std::string _data;
+  XResults    _xresults;
 };
 
 

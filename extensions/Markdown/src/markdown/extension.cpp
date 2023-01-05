@@ -239,8 +239,7 @@ void Extension::write(const Document &document, const Annotation &annotation, os
   try {
     if (!annotation.empty()) {
       string s = annotation.data();
-      // FIXME: this part should be moved in the language domain and the results attached to the annotation
-      xref::Analysis::Results results = _language->analize(annotation.data());
+      auto &results = annotation.xresults();
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
         [this,&document,&s] (const xref::Analysis::Results::value_type &value) {

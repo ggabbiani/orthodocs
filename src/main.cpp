@@ -198,6 +198,8 @@ int main(int argc, const char *argv[]) {
     analyst.buildDocuments();
     // populated cross-reference dictionary 
     doc::xref::Dictionary  dict = analyst.populate();
+    // gather cross-reference data from all the annotations
+    analyst.xref();
     // desired writer extension
     auto writer = writer::Extension::factory(Option::writer(),dict,language);
     // save documents
