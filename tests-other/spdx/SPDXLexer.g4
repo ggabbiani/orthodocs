@@ -1,7 +1,7 @@
 /*
  * SPDX lexer grammar build from [Annex D: SPDX License Expressions](https://spdx.github.io/spdx-spec/v2-draft/SPDX-license-expressions/)
  *
- * SPDX-FileCopyrightText: © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+ * SPDX-FileCopyrightText: Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
