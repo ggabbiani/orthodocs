@@ -249,8 +249,7 @@ void Extension::write(const Document &document, const Annotation &annotation, os
             string link = "["+res.token+"]("+ref+")";
             s.replace(res.position,res.length,link);
           } else if (const auto &i=_vocabulary.find(res.literal);i==_vocabulary.end()) {
-            // FIXME: it would help to have also an indication of the item for which the warn was emitted
-            spdlog::warn("Item '{}' not present in dictionary",res.token);
+            spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary",res.token,document.source.string());
           }
         }
       );

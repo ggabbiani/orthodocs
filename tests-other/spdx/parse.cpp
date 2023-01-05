@@ -22,8 +22,8 @@ int main(int argc, const char *argv[]) {
       ->required();
     app.parse(argc,argv);
     
-    spdx::db<spdx::LicenseList>   licenses{SPDX_LICENSES_JSON};
-    spdx::db<spdx::ExceptionList> exceptions{SPDX_EXCEPTIONS_JSON};
+    const spdx::db<spdx::LicenseList>   licenses{SPDX_LICENSES_JSON};
+    const spdx::db<spdx::ExceptionList> exceptions{SPDX_EXCEPTIONS_JSON};
     
     cout  << licenses.size() << " SPDX Licenses:\n"
           << "version: " << licenses.version() << '\n'
