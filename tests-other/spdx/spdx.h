@@ -51,7 +51,8 @@ enum class LabelType {
   id,       // compact id
   list,     // item list
   version,  // global DB version
-  date      // global DB release date
+  date,     // global DB release date
+  details   // details url
 };
 
 /**
@@ -111,12 +112,15 @@ public:
         _name = std::move(value);
       } else if (key==label(LabelType::id)) {
         _id   = std::move(value);
+      } else if (key==label(LabelType::details)) {
+        _url  = std::move(value);
       }
       return true;
     }
   private:
-    std::string     _name;
-    std::string     _id;
+    std::string _name;
+    std::string _id;
+    std::string _url;
   };
 
   using Map   = std::map< std::string,Item,std::less<> >;

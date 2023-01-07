@@ -33,12 +33,13 @@ namespace spdx {
 namespace license {
 
 const string& LabelSet::operator [] (LabelType type) const {
-  static const array< string, 5> label = {
+  static const array< string, 6> label = {
     "name",
     "licenseId",
     "licenses",
     "licenseListVersion",
     "releaseDate",
+    "detailsUrl",
   };
   return label[to_underlying(type)]; 
 }
@@ -48,12 +49,13 @@ const string& LabelSet::operator [] (LabelType type) const {
 namespace exception {
 
 const string& LabelSet::operator [] (LabelType type) const {
-  static const array< string, 5> label = {
+  static const array< string, 6> label = {
     "name",
     "licenseExceptionId",
     "exceptions",
     "licenseListVersion",
     "releaseDate",
+    "detailsUrl",
   };
   return label[to_underlying(type)]; 
 }
@@ -87,7 +89,9 @@ std::pair<std::string,std::string> filter(const string &annotation,const License
 
 void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
   string text;
-  auto id   = ctx->id->getText();
+  auto id   = ctx->ID()->getText();
+  auto position = ctx->ID()->getSymbol()->getStartIndex();
+  cout << "ID position: " << position << endl;
   if (ctx->PLUS()) {
     if (auto lic=_licenses.find(id+'+'); lic)
       text  = lic ? lic->name() : id;
@@ -118,8 +122,10 @@ void Listener::enterCompound_expression(Compound_expressionContext *ctx) {
 void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
   if (ctx->RIGHT_PAREN())
     append(')',_licensing);
-  else if (ctx->WITH() && ctx->op) {
+  else if (ctx->WITH()) {
     auto xid  = ctx->xid->getText();
+    auto position = ctx->xid->getStartIndex();
+    cout << "xid position: " << position << endl;
     auto xcp  = _exceptions.find(xid);
     auto text = "with " + (xcp ? xcp->name() : xid);
     append(text, _licensing);
