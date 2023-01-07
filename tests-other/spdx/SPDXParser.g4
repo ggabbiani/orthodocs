@@ -25,10 +25,10 @@ simple_expression
 
 compound_expression
     : simple_expression                                 
-    | simple_expression     op=WITH xid=ID              
-    | compound_expression   op=AND  compound_expression 
-    | compound_expression   op=OR   compound_expression 
+    | simple_expression     WITH xid=ID              
+    | compound_expression   AND  compound_expression 
+    | compound_expression   OR   compound_expression 
     | LEFT_PAREN compound_expression RIGHT_PAREN
     ;
 
-license_and_beyond  : id=ID op=PLUS?;
+license_and_beyond  : ID PLUS?;
