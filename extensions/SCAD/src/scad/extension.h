@@ -27,7 +27,7 @@
 
 namespace scad {
 
-class Extension : public language::Extension, private ::doc::Annotation::Modifier {
+class Extension : public language::Extension, private ::doc::Annotation::Editor {
 public:
   using Annotation = ::doc::Annotation;
   

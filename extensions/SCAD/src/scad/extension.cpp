@@ -80,7 +80,7 @@ void Extension::analize(Annotation &anno) const {
       t += analysis.position+analysis.length;
     }
   });
-  set(anno,std::move(results));
+  set(anno,results);
 }
 
 Extension::Extension() : language::Extension(ID) {

@@ -84,18 +84,26 @@ class Annotation {
 public:
   using XResults = xref::Analysis::Results;
 
-  struct Modifier {
-    virtual ~Modifier() = default;
+  /**
+   * Edit Annotation properties
+   */
+  struct Editor {
+    virtual ~Editor() = default;
+    /**
+     * modifies the Annotation's data
+     */
     void set(Annotation &anno,std::string_view s) const {
       anno._data = s;
     }
     /**
-     * moves the cross-reference analysis results into the annotation
+     * move()s the cross-reference analysis results into the annotation
      */
-    void set(Annotation &anno,XResults &&results) const {
-      anno._xresults  = results;
+    void set(Annotation &anno,XResults &results) const {
+      anno._xresults  = std::move(results);
     }
   };
+
+  
 
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
