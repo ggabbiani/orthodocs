@@ -1,7 +1,8 @@
 /*
  * SPDX lexer grammar build from [Annex D: SPDX License Expressions](https://spdx.github.io/spdx-spec/v2-draft/SPDX-license-expressions/)
  *
- * SPDX-FileCopyrightText: Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -11,9 +12,10 @@ channels {
     ANNOTATION
 }
 
+fragment SPDX           : 'SPDX-';
+
 // rules in DEFAULT_MODE
-LICENSE_TAG : 'SPDX-License-Identifier' COLON   -> more, pushMode(MODE_SPDX);
-// COPY_TAG    : 'SPDX-FileCopyrightText'  COLON   -> more, pushMode(MODE_SPDX);
+LICENSE_TAG : SPDX 'License-Identifier' COLON   -> more, pushMode(MODE_SPDX);
 ANYTHING    : .+? -> channel(ANNOTATION);
 
 mode MODE_SPDX;

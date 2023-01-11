@@ -1,7 +1,8 @@
 /*
  * SPDX parser grammar build from [Annex D: SPDX License Expressions](https://spdx.github.io/spdx-spec/v2-draft/SPDX-license-expressions/)
  *
- * SPDX-FileCopyrightText: Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -11,7 +12,7 @@ options {
     tokenVocab = SPDXLexer;
 }
 
-all     : license_expression? EOF;
+all: license_expression? EOF;
 
 license_expression  
     : simple_expression

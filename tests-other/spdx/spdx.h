@@ -1,24 +1,12 @@
 #pragma once
-
 /*
- * insert a brief description here
- *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ * spdx definition file
  *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2023, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include "spdx_config.h"
@@ -40,6 +28,57 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
   return static_cast<typename std::underlying_type<E>::type>(e);
 }
 #endif  // (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
+
+namespace analitic {
+
+struct Data {
+  virtual ~Data() = default;
+  // source token position in annotation text
+  size_t      position;
+  // source token length
+  size_t      length;
+};
+
+using DataOwner = std::unique_ptr<Data>;
+
+}
+
+/**
+ * analysis results data ordered by character position
+ */
+using Analitics = std::map<size_t,analitic::DataOwner>;
+
+class Annotation {
+public:
+  explicit Annotation(std::string &&s) : _data{std::move(s)} {}
+  explicit Annotation(const std::string &s) : _data{s} {}
+  /**
+   * move string s in the Annotation's data
+   */
+  void set(Annotation &anno,std::string &&s) const {
+    anno._data = std::move(s);
+  }
+  /**
+   * add analysis results
+   */
+  void add(analitic::DataOwner &data) {
+    auto [i,success] = _analitics.try_emplace(data->position,data.release());
+    assert(success);
+  }
+
+  bool empty() const {return data().empty();}
+  const std::string &data() const {return _data;}
+  Analitics &analitics() {return _analitics;}
+
+  std::string token(const analitic::Data *item) const {
+    return _data.substr(item->position,item->length);
+  }
+
+private:
+  // source text
+  std::string _data;
+  Analitics   _analitics;
+};
 
 namespace spdx {
 
@@ -97,6 +136,7 @@ public:
   public:
     const std::string &name() const {return _name;}
     const std::string &id() const {return _id;}
+    const std::string &url() const {return _url;}
     /**
      * If the passed key is recognized sets the corresponding attribute to value.
      * 
@@ -339,35 +379,45 @@ private:
 };
 
 /**
+ * spdx analysis data
+ */
+struct Data : public analitic::Data {
+  // full license name
+  std::string name;
+  // license details url
+  std::string url;
+};
+
+/**
  * This listener is triggered during the parse-tree walk.
  */
 class Listener : public spdx::SPDXParserBaseListener {
 public:
 
-  Listener(const LicenseList &licenses, const ExceptionList &exceptions) : _licenses(licenses),_exceptions(exceptions) {}
+  Listener(const LicenseList &licenses, const ExceptionList &exceptions, Analitics &analitics) 
+    : _licenses(licenses),_exceptions(exceptions),_analitics(analitics) {}
 
   using License_and_beyondContext   = SPDXParser::License_and_beyondContext;
   using Compound_expressionContext  = SPDXParser::Compound_expressionContext;
 
-  void enterCompound_expression(Compound_expressionContext *ctx) override;
   void exitCompound_expression(Compound_expressionContext *ctx) override;
   void exitLicense_and_beyond(License_and_beyondContext *ctx) override;
 
-  const std::string &license() const {return _licensing;}
+  const Analitics &analitics() const {return _analitics;}
 
 private:
-  std::string             _licensing;
   const LicenseList&      _licenses;
   const ExceptionList&    _exceptions;
-  std::stack<std::string> _op;
+  // overall analysis results
+  Analitics&              _analitics;
 };
 
 /**
  * Filter annotation text separating SPDX meta data from the rest.
  * 
- * Returns a std::pair with the extracted license information in the 'first' 
+ * Returns a std::pair with the extracted spdx information in the 'first' 
  * string, the stripped annotation in the 'second'.
  */
-std::pair<std::string,std::string> filter(const std::string &annotation,const LicenseList &licenses, const ExceptionList &exceptions);
+void analize(Annotation &annotation,const LicenseList &licenses, const ExceptionList &exceptions);
 
 }

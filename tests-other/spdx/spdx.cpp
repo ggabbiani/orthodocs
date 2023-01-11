@@ -1,12 +1,25 @@
+/*
+ * spdx implementation file
+ *
+ * This file is part of the 'OrthoDocs' (ODOX) project.
+ *
+ * Copyright © 2023, Giampiero Gabbiani (giampiero@gabbiani.org)
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include "spdx.h"
 
 #include "SPDXLexer.h"
 #include "SPDXParser.h"
 
+#include <filesystem>
 #include <iostream>
 
 using namespace std;
 using namespace antlr4;
+
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -62,8 +75,46 @@ const string& LabelSet::operator [] (LabelType type) const {
 
 }
 
-std::pair<std::string,std::string> filter(const string &annotation,const LicenseList &licenses, const ExceptionList &exceptions) {
-  ANTLRInputStream  in(annotation);
+void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
+  auto id   = ctx->ID()->getText();
+  auto data = make_unique<spdx::Data>();
+
+  data->position  = ctx->ID()->getSymbol()->getStartIndex();
+  data->length    = ctx->ID()->getSymbol()->getStopIndex() - data->position + 1;
+  const spdx::LicenseList::Item *lic  = nullptr;
+  if (ctx->PLUS()) {
+    lic = _licenses.find(id+'+');
+    if (lic)
+      data->name  = lic->name();
+    else {
+      lic         = _licenses.find(id);
+      data->name  = lic ? lic->name()+" or later" : id+" or later";
+    }
+  } else {
+    lic         = _licenses.find(id);
+    data->name  = lic ? lic->name() : id;
+  }
+  data->url         = lic ? fs::path(lic->url()).replace_extension(".html").string() : "";
+  auto [i,success] = _analitics.try_emplace(data->position,move(data));
+  assert(success);
+}
+
+void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
+  if (ctx->WITH()) {
+    auto xid          = ctx->xid->getText();
+    auto data         = make_unique<spdx::Data>();
+    data->position    = ctx->xid->getStartIndex();
+    data->length      = ctx->xid->getStopIndex() - data->position + 1;
+    auto xcp          = _exceptions.find(xid);
+    data->name        = (xcp ? xcp->name() : xid);
+    data->url         = (xcp ? (fs::path("https://spdx.org/licenses") / fs::path(xcp->url()).filename()).string() : "");
+    auto [i,success]  = _analitics.try_emplace(data->position,move(data));
+    assert(success);
+  }
+}
+
+void analize(Annotation &annotation,const LicenseList &licenses, const ExceptionList &exceptions) {
+  ANTLRInputStream  in(annotation.data());
   SPDXLexer         lexer(&in);
   CommonTokenStream tokens(&lexer);
   SPDXParser        parser(&tokens);
@@ -74,62 +125,9 @@ std::pair<std::string,std::string> filter(const string &annotation,const License
   // parse tree depth-first traverse
   tree::ParseTreeWalker  walker;
   // source parse listener
-  Listener listener(licenses,exceptions);
+  Listener listener(licenses,exceptions,annotation.analitics());
   // creation of the document
   walker.walk(&listener,tree);
-
-  stringstream  ss;
-  auto result = tokens.getTokens();
-  for(const auto *token: result)
-    if (token->getChannel()==lexer.ANNOTATION)
-      ss << token->getText();
-
-  return make_pair(listener.license(),ss.str());
-}
-
-void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
-  string text;
-  auto id   = ctx->ID()->getText();
-  auto position = ctx->ID()->getSymbol()->getStartIndex();
-  cout << "ID position: " << position << endl;
-  if (ctx->PLUS()) {
-    if (auto lic=_licenses.find(id+'+'); lic)
-      text  = lic ? lic->name() : id;
-    else {
-      lic   = _licenses.find(id);
-      text  = lic ? lic->name()+" or later": id+" or later";
-    }
-  } else {
-    auto lic  = _licenses.find(id);
-    text      = lic ? lic->name() : id;
-  }
-  append(text,_licensing);
-  if (_op.size()) {
-    append(_op.top(),_licensing);
-    _op.pop();
-  }
-}
-
-void Listener::enterCompound_expression(Compound_expressionContext *ctx) {
-  if (ctx->LEFT_PAREN())
-    append('(',_licensing);
-  else if (ctx->OR())
-    _op.emplace("or");
-  else if (ctx->AND())
-    _op.emplace("and");
-}
-
-void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
-  if (ctx->RIGHT_PAREN())
-    append(')',_licensing);
-  else if (ctx->WITH()) {
-    auto xid  = ctx->xid->getText();
-    auto position = ctx->xid->getStartIndex();
-    cout << "xid position: " << position << endl;
-    auto xcp  = _exceptions.find(xid);
-    auto text = "with " + (xcp ? xcp->name() : xid);
-    append(text, _licensing);
-  }
 }
 
 }
