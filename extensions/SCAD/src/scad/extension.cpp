@@ -61,26 +61,25 @@ const array<Extension::Slot,4> Extension::slot{{
 }};
 
 void Extension::analize(Annotation &anno) const {
-  Analysis::Results results;
-  auto& data  = anno.data();
-  for_each(slot.begin(),slot.end(),[&data,&results](const Slot &sl) {
-    const char *t = data.c_str();
+  for_each(slot.begin(),slot.end(),[&anno,this](const Slot &sl) {
+    auto &data  = anno.data();
+    auto t      = data.c_str();
     cmatch match;
     while (regex_search(t, match, sl.regularExpression)) {
-      auto offset = (t-data.c_str());
-      xref::Analysis analysis {
-        match.position(0)+offset,                              // position
-        match.length(0),                                       // length
-        data.substr(match.position(0)+offset,match.length(0)), // token to be substituted with reference
-        data.substr(match.position(1)+offset,match.length(1))  // literal to be searched for in the exclusion vocabulary
-      };
-      // Analysis::Results::key_type uses the regex matching position, no
-      // collision is possible, hence no need for checking try_emplace() result.
-      results.try_emplace(analysis.position,analysis);
-      t += analysis.position+analysis.length;
+      auto offset   = (t-data.c_str());
+      auto pos      = match.position(0)+offset;
+      auto len      = (analitic::Data::Size)match.length(0);
+      auto analysis = make_unique<xref::Analysis>(
+        pos,                                                    // position
+        len,                                                    // length
+        data.substr(pos,match.length(0)),                       // token to be substituted with reference
+        data.substr(match.position(1)+offset,match.length(1))   // literal to be searched for in the exclusion vocabulary
+      );
+      spdlog::trace("Adding analitic data token {}",analysis->token);
+      add(anno,analysis.release());
+      t += pos+len;
     }
   });
-  set(anno,results);
 }
 
 Extension::Extension() : language::Extension(ID) {

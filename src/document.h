@@ -3,27 +3,18 @@
 /*
  * synthetic document
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include "annotation.h"
 #include "error_info.h"
 #include "utils.h"
 
+#include <cassert>
 #include <filesystem>
 #include <functional>
 #include <map>
@@ -51,12 +42,10 @@ class Item;
  */
 namespace xref {
 
-struct Analysis {
-  using Results = std::map<size_t,Analysis>;
-  // token position as a delta from the start of the annotation's string
-  ptrdiff_t   position;
-  // resulting token length to be substituted when resolving the reference
-  ptrdiff_t   length;
+struct Analysis : public analitic::Data {
+  Analysis(Position pos, Size len,const std::string &tok, const std::string &lit) 
+  : analitic::Data{pos,len}, token{tok}, literal{lit} {}
+
   // token to be searched for in the inclusion dictionary
   std::string token;
   // literal to be searched for in the exclusion vocabulary
@@ -79,41 +68,6 @@ using Dictionary  = std::map< std::string, ::doc::Item*, std::less<> >;
 using Vocabulary  = std::set< std::string, std::less<> >;
 
 }
-
-class Annotation {
-public:
-  using XResults = xref::Analysis::Results;
-
-  /**
-   * Edit Annotation properties
-   */
-  struct Editor {
-    virtual ~Editor() = default;
-    /**
-     * modifies the Annotation's data
-     */
-    void set(Annotation &anno,std::string_view s) const {
-      anno._data = s;
-    }
-    /**
-     * move()s the cross-reference analysis results into the annotation
-     */
-    void set(Annotation &anno,XResults &results) const {
-      anno._xresults  = std::move(results);
-    }
-  };
-
-  
-
-  bool empty() const {return data().empty();}
-  const std::string &data() const {return _data;}
-  const XResults  &xresults() const {return _xresults;}
-
-private:
-  std::string _data;
-  XResults    _xresults;
-};
-
 
 //! Item or parameter identifier
 using Name        = std::string;

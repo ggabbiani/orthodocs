@@ -239,17 +239,19 @@ void Extension::write(const Document &document, const Annotation &annotation, os
   try {
     if (!annotation.empty()) {
       string s = annotation.data();
-      auto &results = annotation.xresults();
+      auto &results = annotation.analitics();
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
-        [this,&document,&s] (const xref::Analysis::Results::value_type &value) {
-          const auto &res = value.second;
-          if (auto i=this->_dict->find(res.token); i!=this->_dict->end()) {
-            auto ref = this->reference(i->second,&document.source);
-            string link = "["+res.token+"]("+ref+")";
-            s.replace(res.position,res.length,link);
-          } else if (const auto &i=_vocabulary.find(res.literal);i==_vocabulary.end()) {
-            spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary",res.token,document.source.string());
+        [this,&document,&s] (const Analitics::value_type &value) {
+          // check if the analitic result is an xref result
+          if (auto res = dynamic_cast<const xref::Analysis*>(value.second.get()); res) {
+            if (auto i=this->_dict->find(res->token); i!=this->_dict->end()) {
+              auto ref = this->reference(i->second,&document.source);
+              string link = "["+res->token+"]("+ref+")";
+              s.replace(res->position,res->length,link);
+            } else if (const auto &l=_vocabulary.find(res->literal);l==_vocabulary.end()) {
+              spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary", res->token, document.source.string());
+            }
           }
         }
       );
