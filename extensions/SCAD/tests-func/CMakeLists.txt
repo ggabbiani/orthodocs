@@ -58,12 +58,9 @@ endfunction(style_recon_test)
 
 add_executable(style-factory-test
   style-factory-test.cpp
-  ${PROJECT_SOURCE_DIR}/src/globals.cpp
-  ${PROJECT_SOURCE_DIR}/src/utils.cpp
-  ${PROJECT_SOURCE_DIR}/src/document.cpp
 )
-target_include_directories(style-factory-test PUBLIC ${ORTHODOCS_INCS} ../src)
-target_link_libraries(style-factory-test ${LANGUAGE_LIB} CLI11::CLI11 spdlog::spdlog)
+target_include_directories(style-factory-test PRIVATE ../src)
+target_link_libraries(style-factory-test commons ${LANGUAGE_LIB} CLI11::CLI11 spdlog::spdlog)
 # cmake_print_variables(LANGUAGE_LIB)
 # cmake_print_properties(TARGETS style-factory-test PROPERTIES INCLUDE_DIRECTORIES)
 

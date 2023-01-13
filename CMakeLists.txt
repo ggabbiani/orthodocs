@@ -43,6 +43,10 @@ add_definitions(-DANTLR4CPP_STATIC)
 # set(ANTLR4_TAG 4.10.1)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
 set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
+# set variable pointing to the antlr tool that supports C++
+# this is not required if the jar file can be found under PATH environment
+# set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
+set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -88,21 +92,13 @@ FetchContent_MakeAvailable(cli11 json indicators spdlog)
 ###############################################################################
 # commons
 ###############################################################################
-add_library(commons
-  src/analizer.cpp
-  src/document.cpp
-  src/globals.cpp
-  src/utils.cpp
-)
-target_include_directories(commons PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(commons
-  spdlog::spdlog
-  indicators::indicators
-)
-# cmake_print_properties(
-#     TARGETS orthodocs
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-# )
+add_subdirectory(commons)
+
+###############################################################################
+# factories
+###############################################################################
+add_subdirectory(factories)
+list(PREPEND ORTHODOCS_LIBS factories)
 
 ###############################################################################
 # SCAD language extension
@@ -131,27 +127,17 @@ if (OPTION_WRITER_MARKDOWN)
 endif()
 
 ###############################################################################
-# factories
-###############################################################################
-add_library(factories
-  src/factories.cpp
-)
-target_link_libraries(factories
-  PUBLIC
-    spdlog::spdlog
-)
-list(PREPEND ORTHODOCS_LIBS factories)
-
-###############################################################################
 # main program
 ###############################################################################
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
-configure_file(src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h @ONLY)
 add_executable(orthodocs
-  src/extensions.cpp
+  src/analizer.cpp
   src/main.cpp
 )
-target_include_directories(orthodocs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(orthodocs
+  PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 target_link_libraries(orthodocs
   PRIVATE
     CLI11::CLI11
@@ -172,3 +158,4 @@ endif()
 if (OPTION_UNIT_TESTS)
   add_subdirectory(unit-tests)
 endif()
+

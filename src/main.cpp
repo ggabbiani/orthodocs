@@ -1,33 +1,22 @@
 /*
  * orthodocs: API documentation and static analysis tool
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include "analizer.h"
-#include "config.h"
-#include "error_info.h"
-#include "extensions.h"
-#include "globals.h"
-#include "utils.h"
+
+#include <config.h>
+#include <error_info.h>
+#include <extensions.h>
+#include <globals.h>
+#include <utils.h>
 
 #include <CLI/CLI.hpp>
-#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <cassert>
