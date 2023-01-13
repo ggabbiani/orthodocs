@@ -82,7 +82,7 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 # cmake_print_variables(Boost_INCLUDE_DIRS dtl_SOURCE_DIR)
 
 find_package(Python3 3.10)
-cmake_print_variables(Python3_FOUND)
+# cmake_print_variables(Python3_FOUND)
 if (NOT Python3_FOUND)
   message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
 endif()
