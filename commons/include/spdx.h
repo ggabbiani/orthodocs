@@ -4,12 +4,14 @@
  *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * Copyright © 2023, Giampiero Gabbiani (giampiero@gabbiani.org)
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include "annotation.h"
 #include "spdx_config.h"
+#include "utils.h"
 
 #include <SPDXParserBaseListener.h>
 
@@ -18,67 +20,6 @@
 #include <ctime>
 #include <iomanip>
 #include <stdexcept>
-
-/**
- * this tool must be removed when importing SPDX code in the OrthoDocs sources.
- */
-#if (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
-template <typename E>
-constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
-  return static_cast<typename std::underlying_type<E>::type>(e);
-}
-#endif  // (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
-
-namespace analitic {
-
-struct Data {
-  virtual ~Data() = default;
-  // source token position in annotation text
-  size_t      position;
-  // source token length
-  size_t      length;
-};
-
-using DataOwner = std::unique_ptr<Data>;
-
-}
-
-/**
- * analysis results data ordered by character position
- */
-using Analitics = std::map<size_t,analitic::DataOwner>;
-
-class Annotation {
-public:
-  explicit Annotation(std::string &&s) : _data{std::move(s)} {}
-  explicit Annotation(const std::string &s) : _data{s} {}
-  /**
-   * move string s in the Annotation's data
-   */
-  void set(Annotation &anno,std::string &&s) const {
-    anno._data = std::move(s);
-  }
-  /**
-   * add analysis results
-   */
-  void add(analitic::DataOwner &data) {
-    auto [i,success] = _analitics.try_emplace(data->position,data.release());
-    assert(success);
-  }
-
-  bool empty() const {return data().empty();}
-  const std::string &data() const {return _data;}
-  Analitics &analitics() {return _analitics;}
-
-  std::string token(const analitic::Data *item) const {
-    return _data.substr(item->position,item->length);
-  }
-
-private:
-  // source text
-  std::string _data;
-  Analitics   _analitics;
-};
 
 namespace spdx {
 
@@ -382,6 +323,7 @@ private:
  * spdx analysis data
  */
 struct Data : public analitic::Data {
+  Data() = default;
   // full license name
   std::string name;
   // license details url
@@ -391,11 +333,11 @@ struct Data : public analitic::Data {
 /**
  * This listener is triggered during the parse-tree walk.
  */
-class Listener : public spdx::SPDXParserBaseListener {
+class Listener : public spdx::SPDXParserBaseListener, doc::Annotation::Setter {
 public:
 
-  Listener(const LicenseList &licenses, const ExceptionList &exceptions, Analitics &analitics) 
-    : _licenses(licenses),_exceptions(exceptions),_analitics(analitics) {}
+  Listener(const LicenseList &licenses, const ExceptionList &exceptions, doc::Annotation &anno) 
+    : _licenses(licenses),_exceptions(exceptions),_analitics(doc::Annotation::Setter::analitics(anno)),_annotation(_annotation) {}
 
   using License_and_beyondContext   = SPDXParser::License_and_beyondContext;
   using Compound_expressionContext  = SPDXParser::Compound_expressionContext;
@@ -410,6 +352,7 @@ private:
   const ExceptionList&    _exceptions;
   // overall analysis results
   Analitics&              _analitics;
+  const doc::Annotation&       _annotation;
 };
 
 /**
@@ -418,6 +361,6 @@ private:
  * Returns a std::pair with the extracted spdx information in the 'first' 
  * string, the stripped annotation in the 'second'.
  */
-void analize(Annotation &annotation,const LicenseList &licenses, const ExceptionList &exceptions);
+void analize(doc::Annotation &annotation);
 
 }

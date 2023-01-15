@@ -88,38 +88,18 @@ antlr_target(${PARSER}
 )
 
 ###############################################################################
-# C++ client application lib
+# C++ parser for spdx
 add_library(${LANGUAGE_LIB} STATIC
-  src/spdx.cpp
   ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
-add_library(orthodocs::spdx ALIAS ${LANGUAGE_LIB})
+add_library(spdx::parser ALIAS ${LANGUAGE_LIB})
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC
-    include
     ${ANTLR_${LEXER}_OUTPUT_DIR} 
     ${ANTLR_${PARSER}_OUTPUT_DIR}
     ${ANTLR4_INCLUDE_DIRS}
-  PRIVATE
-    src
 )
 target_link_libraries(${LANGUAGE_LIB} 
-  PUBLIC # clients and library dependencies
+  PUBLIC
     antlr4_static 
-    nlohmann_json::nlohmann_json
 )
-
-###############################################################################
-# Jason resources from github spdx
-set(SPDX_LICENSES_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/licenses.json")
-file(DOWNLOAD
-  https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json
-  ${SPDX_LICENSES_JSON}
-)
-set(SPDX_EXCEPTIONS_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/exceptions.json")
-file(DOWNLOAD
-  https://raw.githubusercontent.com/spdx/license-list-data/main/json/exceptions.json
-  ${SPDX_EXCEPTIONS_JSON}
-)
-
-configure_file(spdx_config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/include/spdx_config.h" @ONLY)

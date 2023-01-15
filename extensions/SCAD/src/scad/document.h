@@ -20,8 +20,6 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "doc/license.h"
-
 #include <document.h>
 #include <utils.h>
 
@@ -83,8 +81,6 @@ public:
   std::filesystem::path path;
   std::set<std::string,std::less<>> uses;
   std::set<std::string,std::less<>> includes;
-  // eventual license
-  const char *license = nullptr;
 };
 
 class Variable : public ::doc::Item {

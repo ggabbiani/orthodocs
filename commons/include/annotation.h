@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+#include "utils.h"
 
 #include <cassert>
 #include <map>
@@ -22,6 +23,7 @@ struct Data {
   using Owner     = std::unique_ptr<Data>;
 
   Data(Position pos, Size len) : position{pos}, length{len} {}
+  Data() = default;
   virtual ~Data() = default;
   // source token position in annotation text
   Position  position;
@@ -58,12 +60,26 @@ public:
       auto [ignored,success] = anno._analitics.try_emplace(data->position,data);
       assert(success);
     }
+    Analitics &analitics(Annotation &anno) const {
+      return anno._analitics;
+    }
   };
-  
+
+  Annotation() = default;
+  explicit Annotation(std::string &&s) : _data{std::move(s)} {}
+  explicit Annotation(const std::string &s) : _data{s} {}
+
   // property getters
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
   const Analitics &analitics() const {return _analitics;}
+  std::string token(const analitic::Data *item) const {
+    return _data.substr(item->position,item->length);
+  }
+  std::u32string token32(const analitic::Data *item) const {
+    auto s = utf8_to_utf32(_data);
+    return s.substr(item->position,item->length);
+  }
 
 private:
   std::string _data;

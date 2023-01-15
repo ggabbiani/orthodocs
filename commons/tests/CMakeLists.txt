@@ -1,5 +1,3 @@
-add_subdirectory(spdx)
-
 add_executable(json_test json_test.cpp)
 target_link_libraries(json_test 
   nlohmann_json::nlohmann_json
@@ -7,6 +5,6 @@ target_link_libraries(json_test
 
 add_executable(parse parse.cpp)
 target_link_libraries(parse
-  orthodocs::spdx
+  commons
   CLI11::CLI11
 )

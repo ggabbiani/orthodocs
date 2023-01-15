@@ -19,5 +19,5 @@
  * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define    SPDX_LICENSES_JSON      "/home/giampa/projects/orthodocs/tests-other/spdx/licenses.json"
-#define    SPDX_EXCEPTIONS_JSON    "/home/giampa/projects/orthodocs/tests-other/spdx/exceptions.json"
+#define    SPDX_LICENSES_JSON      "/home/giampa/projects/orthodocs/commons/data/licenses.json"
+#define    SPDX_EXCEPTIONS_JSON    "/home/giampa/projects/orthodocs/commons/data/exceptions.json"

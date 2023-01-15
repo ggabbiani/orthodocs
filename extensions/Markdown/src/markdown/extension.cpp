@@ -23,6 +23,7 @@
 #include "graph.h"
 
 #include <bar.h>
+#include <spdx.h>
 
 #include <spdlog/spdlog.h>
 #include <boost/algorithm/string/predicate.hpp>
@@ -231,8 +232,6 @@ void Extension::write(const Document &document, const Package *pkg,ostream &out)
   }
   // write annotation contents
   write(document,pkg->annotation,out);
-  if (pkg->license)
-    out << "*Published under " << "__" << pkg->license << "__*" << '\n' << endl;
 }
 
 void Extension::write(const Document &document, const Annotation &annotation, ostream &out) const {
@@ -242,7 +241,7 @@ void Extension::write(const Document &document, const Annotation &annotation, os
       auto &results = annotation.analitics();
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
-        [this,&document,&s] (const Analitics::value_type &value) {
+        [this,&document,&s,&annotation] (const Analitics::value_type &value) {
           // check if the analitic result is an xref result
           if (auto res = dynamic_cast<const xref::Analysis*>(value.second.get()); res) {
             if (auto i=this->_dict->find(res->token); i!=this->_dict->end()) {
@@ -252,6 +251,10 @@ void Extension::write(const Document &document, const Annotation &annotation, os
             } else if (const auto &l=_vocabulary.find(res->literal);l==_vocabulary.end()) {
               spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary", res->token, document.source.string());
             }
+          } else if (auto res = dynamic_cast<const spdx::Data*>(value.second.get()); res) {
+            spdlog::debug("token: {}",utf32_to_utf8(annotation.token32(res)));
+            auto link = U"["+annotation.token32(res)+U"]("+utf8_to_utf32(res->url)+U")";
+            s = utf32_to_utf8(utf8_to_utf32(annotation.data()).replace(res->position,res->length,link));
           }
         }
       );

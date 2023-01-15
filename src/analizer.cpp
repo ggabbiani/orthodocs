@@ -14,6 +14,7 @@
 #include <error_info.h>
 #include <extensions.h>
 #include <globals.h>
+#include <spdx.h>
 #include <utils.h>
 
 using namespace std;
@@ -97,6 +98,7 @@ void Analizer::xref() const {
     Bar bar(annos, "annotations analized");
     for_each(annos.begin(),annos.end(),[&bar,this] (doc::Annotation *a) {
       _language->analize(*a);
+      spdx::analize(*a);
       bar++;
     });
   } catch(...) {

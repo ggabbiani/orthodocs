@@ -9,3 +9,4 @@ tests-other/spdx/.antlr/SPDXParser.interp
 tests-other/spdx/.antlr/SPDXParser.java
 tests-other/spdx/.antlr/SPDXParser.tokens
 commons/include/config.h
+tests-other/spdx/spdx/include/spdx_config.h

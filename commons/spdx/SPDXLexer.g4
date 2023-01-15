@@ -15,7 +15,7 @@ channels {
 fragment SPDX           : 'SPDX-';
 
 // rules in DEFAULT_MODE
-LICENSE_TAG : SPDX 'License-Identifier' COLON   -> more, pushMode(MODE_SPDX);
+LICENSE_TAG : SPDX 'License-Identifier' COLON -> more, pushMode(MODE_SPDX);
 ANYTHING    : .+? -> channel(ANNOTATION);
 
 mode MODE_SPDX;

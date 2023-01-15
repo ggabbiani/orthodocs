@@ -7,5 +7,4 @@ if (OPTION_LANGUAGE_SCAD)
   target_include_directories(xref PUBLIC ${PROJECT_SOURCE_DIR}/src)
   target_link_libraries(xref PRIVATE commons spdlog::spdlog ${LANGUAGE_LIB})
 
-  add_subdirectory(spdx)
 endif()
