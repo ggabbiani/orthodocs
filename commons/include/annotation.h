@@ -73,13 +73,6 @@ public:
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
   const Analitics &analitics() const {return _analitics;}
-  std::string token(const analitic::Data *item) const {
-    return _data.substr(item->position,item->length);
-  }
-  std::u32string token32(const analitic::Data *item) const {
-    auto s = utf8_to_utf32(_data);
-    return s.substr(item->position,item->length);
-  }
 
 private:
   std::string _data;

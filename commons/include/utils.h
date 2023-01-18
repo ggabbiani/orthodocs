@@ -43,20 +43,20 @@ inline std::string trim(std::string str) {
   return str.erase(str.find_last_not_of(ws) + 1).erase(0,str.find_first_not_of(ws));
 }
 
-inline std::string utf32_to_utf8(std::u32string const& utf32) {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cnv;
-    std::string utf8 = cnv.to_bytes(utf32);
-    if(cnv.converted() < utf32.size())
-        throw std::runtime_error("incomplete conversion");
-    return utf8;
+inline std::string utf8(std::u32string const& utf32) {
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cnv;
+  std::string utf8 = cnv.to_bytes(utf32);
+  if(cnv.converted() < utf32.size())
+    throw std::runtime_error("incomplete conversion");
+  return utf8;
 }
 
-inline std::u32string utf8_to_utf32(std::string const& utf8) {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cnv;
-    std::u32string utf32 = cnv.from_bytes(utf8);
-    if(cnv.converted() < utf8.size())
-        throw std::runtime_error("incomplete conversion");
-    return utf32;
+inline std::u32string utf32(std::string const& utf8) {
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cnv;
+  std::u32string utf32 = cnv.from_bytes(utf8);
+  if(cnv.converted() < utf8.size())
+    throw std::runtime_error("incomplete conversion");
+  return utf32;
 }
 
 // TODO: move elsewhere
