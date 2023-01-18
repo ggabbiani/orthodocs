@@ -29,7 +29,7 @@ int main(int argc, const char *argv[]) {
     for(const auto &[size,data]: anno.analitics()) {
       auto sdata = dynamic_cast<spdx::Data*>(data.get());
       assert(sdata);
-      cout  << "token     : " << anno.token(sdata) << '\n'
+      cout  << "token     : " << annotation.substr(sdata->position,sdata->length) << '\n'
             << "name      : " << sdata->name << '\n'
             << "position  : " << sdata->position << '\n'
             << "length    : " << sdata->length << '\n'
