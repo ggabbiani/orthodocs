@@ -4,7 +4,7 @@
  *
  * Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later or MIT
+ * SPDX-License-Identifier: GPL-3.0-or-later or MIT WITH Classpath-exception-2.0
  */
 
 /*!

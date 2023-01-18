@@ -2,9 +2,10 @@
 
 this package is referring to [package referred](referred.md#package-referred).
 
+Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
 
+SPDX-License-Identifier: [MIT](https://spdx.org/licenses/MIT.html) or [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html)
 
-*Published under __GNU General Public License v3__*
 
 ## Variables
 

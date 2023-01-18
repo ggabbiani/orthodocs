@@ -3,9 +3,10 @@
 This file is not depending on enything else, so no dependency graph or 
 list will be shown.
 
+Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
 
+SPDX-License-Identifier: [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html) or [MIT](https://spdx.org/licenses/MIT.html) WITH [Classpath-exception-2.0](https://spdx.org/licenses/Classpath-exception-2.0.html)
 
-*Published under __GNU General Public License v3__*
 
 ## Variables
 
