@@ -252,9 +252,10 @@ void Extension::write(const Document &document, const Annotation &annotation, os
               spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary", res->token, document.source.string());
             }
           } else if (auto res = dynamic_cast<const spdx::Data*>(value.second.get()); res) {
-            spdlog::debug("token: {}",utf32_to_utf8(annotation.token32(res)));
-            auto link = U"["+annotation.token32(res)+U"]("+utf8_to_utf32(res->url)+U")";
-            s = utf32_to_utf8(utf8_to_utf32(annotation.data()).replace(res->position,res->length,link));
+            auto link32 = U"["+utf32(s).substr(res->position,res->length)+U"]("+utf32(res->url)+U")";
+            auto s32  = utf32(s);
+            s32.replace(res->position,res->length,link32);
+            s = utf8(s32);
           }
         }
       );
