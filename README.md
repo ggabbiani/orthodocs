@@ -115,12 +115,11 @@ For more complex tasks consult the full command option list:
 | -g,--graphs        | **OPTION** - List of root relative directories where placing dependency graphs. Needs --src-root.
 | -h,--help          | **FLAG** - Print the help message and exit
 | -i,--ignore-prefix | **OPTION** - Ignore this prefix in the Table of Contents when sorting
-| --pd,--pkg-deps    | **OPTION** - Set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
 | -p,--private       | **OPTION** - Every documentation item (variable, function or module) prefixed with this string will not be published.
-| -q,--quiet         | **FLAG** - Quiet mode, no statistics will be printed after successfully execution.
+| --pd,--pkg-deps    | **OPTION** - Set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
 | -s,--src-root      | **OPTION** - Source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
-| -t,--toc           | **FLAG** - Generate a Table of Contents in the document tree root
-| sources            | **POSITIONAL** - source sub-trees and/or files - either as absolute or «source tree root» relative path
+| sources            | **POSITIONAL** - source sub-trees and/or files - 
+| -t,--toc           | **FLAG** - Generate a Table of Contents in the document tree root either as absolute or «source tree root» relative path
 | -V,--verbosity     | **FLAG** - Set the message log verbosity
 | -v,--version       | **FLAG** - Display program version information and exit
 
@@ -135,11 +134,8 @@ The list of features expected in the v1 release with their current status:
 | cross-reference           | ✔
 | dependency graphs         | ✔
 | global values             | ✔
-| Linux support             | ✔
-| macOS support             | ✔
 | source license detection  | ✔
 | table of contents         | ✔
-| Windows support           | ✔
 
 ## Supported OSs
 

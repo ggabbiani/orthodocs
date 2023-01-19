@@ -17,7 +17,7 @@
 - [x] connect to sonarcloud
 - [x] finalize input sources management from CLI
 - [x] set -i,--ignore-prefix cli option as multiple option
-- [ ] adopt SPDX License schema
+- [x] adopt SPDX License schema
 - [x] implement boost unit tests
 - [x] move bin(s) from bash to python
 
