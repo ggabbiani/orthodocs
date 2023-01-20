@@ -4,7 +4,7 @@
 
 # add a boost unit test
 # boost_test(NAME=<unit test name> SOURCES <source file list>  INCLUDES <include dir list> LIBS <linked lib list>)
-function (boost_test) 
+function (boost_test)
   set(options)
   set(oneValueArgs NAME)
   set(multiValueArgs INCLUDES LIBS SOURCES)
@@ -25,9 +25,10 @@ function (boost_test)
   if (DEFINED UNIT_TEST_INCLUDES)
     target_include_directories(${UNIT_TEST} PRIVATE ${UNIT_TEST_INCLUDES})
   endif()
-  set_target_properties(${UNIT_TEST} 
-    PROPERTIES 
-    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK 
+  set_target_properties(${UNIT_TEST}
+    PROPERTIES
+      LINK_OPTIONS -fstack-protector
+#    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
   )
   target_link_libraries(${UNIT_TEST}
     Boost::unit_test_framework
@@ -64,13 +65,13 @@ function(xdiff_test)
 # add a doc compare test using xdiff_test()
 #
 # NAME    - test name used for composing the generated document root
-# SOURCES - source directory, if not absolute is meant as current source 
+# SOURCES - source directory, if not absolute is meant as current source
 #           relative
 # COMPARE - document directory to be compared with, if not absolute is meant as
 #           current source relative
 # OPTIONS - orthodocs binary options. Note that by default the binary is always
 #           called with the following parameters:
-#           --src-root "${DOC_SOURCES}" 
+#           --src-root "${DOC_SOURCES}"
 #           --doc-root "${DOC_ROOT}"
 #           --verbosity off
 # SERIAL  - boolean indicating if the test will be performed serially or not.
@@ -100,8 +101,8 @@ function (doc_test)
     SERIAL  ${DOC_SERIAL}
     LEFT    "${DOC_COMPARE}"
     RIGHT   "${DOC_ROOT}"
-    CMD     $<TARGET_FILE:orthodocs> 
-      --src-root "${DOC_SOURCES}" 
+    CMD     $<TARGET_FILE:orthodocs>
+      --src-root "${DOC_SOURCES}"
       --doc-root "${DOC_ROOT}"
       --verbosity off
       ${DOC_OPTIONS}
@@ -114,10 +115,11 @@ endfunction(doc_test)
 # )
 # cmake_print_variables(ORTHODOCS_LIBS)
 boost_test(NAME UnitTests
-  SOURCES 
-    ut-tests.cpp 
-  LIBS 
+  SOURCES
+    ut-tests.cpp
+  LIBS
     ${ORTHODOCS_LIBS}
+    ${Boost_LIBRARIES}
 )
 
 doc_test(NAME xdiff-flat-lib
