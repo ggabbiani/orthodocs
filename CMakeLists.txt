@@ -1,6 +1,6 @@
 # minimum required CMAKE version
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(FetchContent)
 include(CMakePrintHelpers)
@@ -84,7 +84,7 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 # cmake_print_variables(Boost_LIBRARIES Boost_INCLUDE_DIRS)
 
 find_package(Python3 3.10)
-# cmake_print_variables(Python3_FOUND)
+cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
 if (NOT Python3_FOUND)
   message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
 endif()
