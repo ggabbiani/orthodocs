@@ -54,7 +54,7 @@ function(xdiff_test)
   # cmake_print_variables(XDIFF_NAME XDIFF_EXE XDIFF_LEFT XDIFF_RIGHT XDIFF_SOURCE_ROOT)
   add_test(
     NAME ${XDIFF_NAME}
-    COMMAND "${XDIFF_EXE}" ++left "${XDIFF_LEFT}" ++right "${XDIFF_RIGHT}" ${XDIFF_CMD}
+    COMMAND "python" "${XDIFF_EXE}" ++left "${XDIFF_LEFT}" ++right "${XDIFF_RIGHT}" ${XDIFF_CMD}
   )
   if (NOT DEFINED XDIFF_SERIAL)
     set(XDIFF_SERIAL TRUE)
