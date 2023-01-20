@@ -1,5 +1,5 @@
 # minimum required CMAKE version
-cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FetchContent)
@@ -31,7 +31,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # propedeutics for antrl4cpp
 ###############################################################################
 # required if linking to static library
-add_definitions(-DANTLR4CPP_STATIC)
+add_definitions(-DANTLR4CPP_STATIC -DNOGDI)
+#add_definitions(-DNOGDI)
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 # set(ANTLR4_WITH_STATIC_CRT OFF)
@@ -40,17 +41,17 @@ add_definitions(-DANTLR4CPP_STATIC)
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
 # to a zip file containing the libary source.
-set(ANTLR4_TAG 4.11.1)
+#set(ANTLR4_TAG 4.11.1)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
-# set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
+set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 # set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
-set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.11.1-complete.jar)
+set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
-# include_directories(${ANTLR4_INCLUDE_DIRS})
+#include_directories(${ANTLR4_INCLUDE_DIRS})
 # cmake_print_variables(ANTLR4_INCLUDE_DIRS)
 ###############################################################################
 
@@ -78,8 +79,9 @@ FetchContent_Declare(json
   GIT_TAG        v3.11.2
 )
 
+#find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-# cmake_print_variables(Boost_INCLUDE_DIRS dtl_SOURCE_DIR)
+# cmake_print_variables(Boost_LIBRARIES Boost_INCLUDE_DIRS)
 
 find_package(Python3 3.10)
 # cmake_print_variables(Python3_FOUND)
