@@ -1,5 +1,5 @@
 # minimum required CMAKE version
-cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(FetchContent)
@@ -90,11 +90,11 @@ if (NOT Python3_FOUND)
   message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
 endif()
 
-if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
+#if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
   find_program(DIFF_EXE diff)
-elseif(CMAKE_HOST_WIN32)
-  find_program(DIFF_EXE diff)
-endif()
+#elseif(CMAKE_HOST_WIN32)
+#  set(DIFF_EXE FC)
+#endif()
 cmake_print_variables(DIFF_EXE)
 
 ###############################################################################
