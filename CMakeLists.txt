@@ -1,5 +1,5 @@
 # minimum required CMAKE version
-cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(FetchContent)
@@ -79,7 +79,8 @@ FetchContent_Declare(json
   GIT_TAG        v3.11.2
 )
 
-#find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+FetchContent_MakeAvailable(cli11 json indicators spdlog)
+
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 # cmake_print_variables(Boost_LIBRARIES Boost_INCLUDE_DIRS)
 
@@ -89,7 +90,12 @@ if (NOT Python3_FOUND)
   message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
 endif()
 
-FetchContent_MakeAvailable(cli11 json indicators spdlog)
+if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
+  find_program(DIFF_EXE diff)
+elseif(CMAKE_HOST_WIN32)
+  find_program(DIFF_EXE diff)
+endif()
+cmake_print_variables(DIFF_EXE)
 
 ###############################################################################
 # commons

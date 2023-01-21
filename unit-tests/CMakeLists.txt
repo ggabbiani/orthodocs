@@ -109,6 +109,35 @@ function (doc_test)
   )
 endfunction(doc_test)
 
+# add a doc compare test using batch.py
+#
+# NAME    - test name used for composing the generated document root
+# COMMANDS - one string for each command
+# SERIAL  - boolean indicating if the test will be performed serially or not.
+#           The default is SERIAL TRUE.
+function (batch_test)
+  set(options)
+  set(oneValueArgs NAME SERIAL CMD1 CMD2)
+  set(multiValueArgs)
+  cmake_parse_arguments(BATCH "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  if (NOT DEFINED BATCH_SERIAL)
+    set(BATCH_SERIAL TRUE)
+  endif()
+  set(BATCH_EXE "${PROJECT_SOURCE_DIR}/bin/batch.py")
+  # cmake_print_variables(XDIFF_NAME XDIFF_EXE XDIFF_LEFT XDIFF_RIGHT XDIFF_SOURCE_ROOT)
+  add_test(
+    NAME ${BATCH_NAME}
+    COMMAND "python" "${BATCH_EXE}"
+      "$<$<BOOL:${BATCH_CMD1}>:${BATCH_CMD1}>"
+      "$<$<BOOL:${BATCH_CMD2}>:${BATCH_CMD2}>"
+    )
+  set_tests_properties(${BATCH_NAME}
+    PROPERTIES RUN_SERIAL ${BATCH_SERIAL}
+    LABELS BATCH
+  )
+endfunction(batch_test)
+
 # cmake_print_properties(
 #     TARGETS orthodocs commons CppSCAD Markdown factories
 #     PROPERTIES INTERFACE_LINK_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES
@@ -122,14 +151,26 @@ boost_test(NAME UnitTests
     ${Boost_LIBRARIES}
 )
 
-doc_test(NAME xdiff-flat-lib
-  SOURCES "flat-lib/sources"
-  COMPARE "flat-lib/docs"
-  OPTIONS --toc --pkg-deps graph
+# doc_test(NAME xdiff-flat-lib
+#   SOURCES "flat-lib/sources"
+#   COMPARE "flat-lib/docs"
+#   OPTIONS --toc --pkg-deps graph
+# )
+
+# doc_test(NAME xdiff-flat-lib-ignore
+#   SOURCES "flat-lib/sources"
+#   COMPARE "flat-lib/docs-ignore"
+#   OPTIONS --toc --pkg-deps graph --ignore-prefix prefix_ $prefix_
+# )
+
+batch_test(NAME flat-lib
+  SERIAL TRUE
+  CMD1 "$<TARGET_FILE:orthodocs> --src-root ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/sources --doc-root ${CMAKE_CURRENT_BINARY_DIR}/flat-lib --verbosity off --toc --pkg-deps graph"
+  CMD2 "${DIFF_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/docs ${CMAKE_CURRENT_BINARY_DIR}/flat-lib"
 )
 
-doc_test(NAME xdiff-flat-lib-ignore
-  SOURCES "flat-lib/sources"
-  COMPARE "flat-lib/docs-ignore"
-  OPTIONS --toc --pkg-deps graph --ignore-prefix prefix_ $prefix_
+batch_test(NAME flat-lib-ignore
+  SERIAL TRUE
+  CMD1 "$<TARGET_FILE:orthodocs> --src-root ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/sources --doc-root ${CMAKE_CURRENT_BINARY_DIR}/flat-lib-ignore --verbosity off --toc --pkg-deps graph --ignore-prefix '$prefix_' prefix_"
+  CMD2 "${DIFF_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/docs-ignore ${CMAKE_CURRENT_BINARY_DIR}/flat-lib-ignore"
 )
