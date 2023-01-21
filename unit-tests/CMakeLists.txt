@@ -111,7 +111,7 @@ function (doc_test)
     NAME ${DOC_NAME}
     SERIAL ${DOC_SERIAL}
     CMD1 "$<TARGET_FILE:orthodocs> --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
-    CMD2 "diff ${DOC_COMPARE} ${DOC_ROOT}"
+    CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
 endfunction(doc_test)
 
