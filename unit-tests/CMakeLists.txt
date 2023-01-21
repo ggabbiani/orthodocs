@@ -166,7 +166,7 @@ doc_test(NAME flat-lib
 doc_test(NAME flat-lib-ignore
   SOURCES "flat-lib/sources"
   COMPARE "flat-lib/docs-ignore"
-  OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $prefix_"
+  OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$prefix',$prefix_>"
 )
 
 #batch_test(NAME flat-lib
