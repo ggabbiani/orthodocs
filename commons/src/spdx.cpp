@@ -57,7 +57,7 @@ const string& LabelSet::operator [] (LabelType type) const {
     "releaseDate",
     "detailsUrl",
   };
-  return label[to_underlying(type)]; 
+  return label[to_underlying(type)];
 }
 
 }
@@ -73,7 +73,7 @@ const string& LabelSet::operator [] (LabelType type) const {
     "releaseDate",
     "detailsUrl",
   };
-  return label[to_underlying(type)]; 
+  return label[to_underlying(type)];
 }
 
 }
@@ -112,7 +112,7 @@ void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
     data->length      = ctx->xid->getStopIndex() - data->position + 1;
     auto xcp          = _exceptions.find(xid);
     data->name        = (xcp ? xcp->name() : xid);
-    data->url         = (xcp ? (fs::path("https://spdx.org/licenses") / fs::path(xcp->url()).filename()).string() : "");
+    data->url         = (xcp ? "https://spdx.org/licenses/"+fs::path(xcp->url()).filename().string() : "");
     auto [i,success]  = _analitics.try_emplace(data->position,move(data));
     assert(success);
   }
