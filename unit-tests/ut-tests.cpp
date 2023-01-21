@@ -20,7 +20,7 @@
  */
 
 #define BOOST_TEST_MODULE orthodocs unit tests
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "scad/extension.h"
 
