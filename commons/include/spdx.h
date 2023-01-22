@@ -67,7 +67,7 @@ struct LabelSet {
 
 /**
  * One parametric class both the license and exception DBs.
- * 
+ *
  * @tparam LABELSET defines the LabelSet to be used.
  */
 template <typename LABELSET>
@@ -80,11 +80,11 @@ public:
     const std::string &url() const {return _url;}
     /**
      * If the passed key is recognized sets the corresponding attribute to value.
-     * 
+     *
      * Returns true if the key is recognized, false otherwise.
-     * 
+     *
      * Currently recognized key types:
-     * 
+     *
      * - LabelType::id
      * - LabelType::name
      */
@@ -116,8 +116,8 @@ public:
    */
   inline std::size_t size() const {return _map.size();}
   /**
-   * Tries to add an Item to the list. 
-   * 
+   * Tries to add an Item to the list.
+   *
    * Returns true if the Item id was free, false otherwise.
    */
   bool add(const Item &item) {
@@ -133,11 +133,11 @@ public:
   }
   /**
    * If the passed key is recognized sets the corresponding attribute to value.
-   * 
+   *
    * Returns true if the key is recognized, false otherwise.
-   * 
+   *
    * Currently recognized key types:
-   * 
+   *
    * - LabelType::date
    * - LabelType::version
    */
@@ -172,7 +172,7 @@ using ExceptionList = List<exception::LabelSet>;
 
 /**
  * SAX event consumer collecting string representations of the passed values.
- * 
+ *
  * NOTE: Inheriting from json::json_sax_t assures not to forget any required function.
  */
 template <class T>
@@ -336,8 +336,8 @@ struct Data : public analitic::Data {
 class Listener : public spdx::SPDXParserBaseListener, doc::Annotation::Setter {
 public:
 
-  Listener(const LicenseList &licenses, const ExceptionList &exceptions, doc::Annotation &anno) 
-    : _licenses(licenses),_exceptions(exceptions),_analitics(doc::Annotation::Setter::analitics(anno)),_annotation(_annotation) {}
+  Listener(const LicenseList &licenses, const ExceptionList &exceptions, doc::Annotation &anno)
+    : _licenses(licenses),_exceptions(exceptions),_analitics(doc::Annotation::Setter::analitics(anno)) {}
 
   using License_and_beyondContext   = SPDXParser::License_and_beyondContext;
   using Compound_expressionContext  = SPDXParser::Compound_expressionContext;
@@ -352,13 +352,12 @@ private:
   const ExceptionList&    _exceptions;
   // overall analysis results
   Analitics&              _analitics;
-  const doc::Annotation&       _annotation;
 };
 
 /**
  * Filter annotation text separating SPDX meta data from the rest.
- * 
- * Returns a std::pair with the extracted spdx information in the 'first' 
+ *
+ * Returns a std::pair with the extracted spdx information in the 'first'
  * string, the stripped annotation in the 'second'.
  */
 void analize(doc::Annotation &annotation);
