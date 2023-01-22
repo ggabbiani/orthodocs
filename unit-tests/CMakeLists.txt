@@ -1,7 +1,3 @@
-# configure_file(ut_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/ut_config.h @ONLY)
-# set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-
 # add a boost unit test
 # boost_test(NAME=<unit test name> SOURCES <source file list>  INCLUDES <include dir list> LIBS <linked lib list>)
 function (boost_test)
@@ -42,27 +38,7 @@ function (boost_test)
   # )
 endfunction(boost_test)
 
-# add a diff test
-function(xdiff_test)
-  set(options SERIAL)
-  set(oneValueArgs NAME LEFT RIGHT)
-  set(multiValueArgs CMD)
-  cmake_parse_arguments(XDIFF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  # cmake_parse_arguments(XDIFF "${options}" "${oneValueArgs}" "${multiValueArgs}")
-
-  set(XDIFF_EXE "${PROJECT_SOURCE_DIR}/bin/xdiff.py")
-  # cmake_print_variables(XDIFF_NAME XDIFF_EXE XDIFF_LEFT XDIFF_RIGHT XDIFF_SOURCE_ROOT)
-  add_test(
-    NAME ${XDIFF_NAME}
-    COMMAND "python" "${XDIFF_EXE}" ++left "${XDIFF_LEFT}" ++right "${XDIFF_RIGHT}" ${XDIFF_CMD}
-  )
-  if (NOT DEFINED XDIFF_SERIAL)
-    set(XDIFF_SERIAL TRUE)
-  endif()
-  set_tests_properties(${XDIFF_NAME} PROPERTIES RUN_SERIAL ${XDIFF_SERIAL})
-  endfunction(xdiff_test)
-
-# add a doc compare test using xdiff_test()
+# add a doc compare test using batch_test()
 #
 # NAME    - test name used for composing the generated document root
 # SOURCES - source directory, if not absolute is meant as current source
@@ -97,16 +73,6 @@ function (doc_test)
   endif()
 
   set(DOC_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${DOC_NAME}")
-#  xdiff_test(NAME ${DOC_NAME}
-#    SERIAL  ${DOC_SERIAL}
-#    LEFT    "${DOC_COMPARE}"
-#    RIGHT   "${DOC_ROOT}"
-#    CMD     $<TARGET_FILE:orthodocs>
-#      --src-root "${DOC_SOURCES}"
-#      --doc-root "${DOC_ROOT}"
-#      --verbosity off
-#      ${DOC_OPTIONS}
-#  )
   batch_test(
     NAME ${DOC_NAME}
     SERIAL ${DOC_SERIAL}
@@ -134,7 +100,7 @@ function (batch_test)
   # cmake_print_variables(XDIFF_NAME XDIFF_EXE XDIFF_LEFT XDIFF_RIGHT XDIFF_SOURCE_ROOT)
   add_test(
     NAME ${BATCH_NAME}
-    COMMAND "python" "${BATCH_EXE}"
+    COMMAND "${Python_EXECUTABLE}" "${BATCH_EXE}"
       "$<$<BOOL:${BATCH_CMD1}>:${BATCH_CMD1}>"
       "$<$<BOOL:${BATCH_CMD2}>:${BATCH_CMD2}>"
     )
@@ -144,11 +110,6 @@ function (batch_test)
   )
 endfunction(batch_test)
 
-# cmake_print_properties(
-#     TARGETS orthodocs commons CppSCAD Markdown factories
-#     PROPERTIES INTERFACE_LINK_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES
-# )
-# cmake_print_variables(ORTHODOCS_LIBS)
 boost_test(NAME UnitTests
   SOURCES
     ut-tests.cpp
@@ -157,26 +118,16 @@ boost_test(NAME UnitTests
     ${Boost_LIBRARIES}
 )
 
-doc_test(NAME flat-lib
-  SOURCES "flat-lib/sources"
-  COMPARE "flat-lib/docs"
-  OPTIONS "--toc --pkg-deps graph"
-)
+if (Python3_FOUND)
+  doc_test(NAME flat-lib
+    SOURCES "flat-lib/sources"
+    COMPARE "flat-lib/docs"
+    OPTIONS "--toc --pkg-deps graph"
+  )
 
-doc_test(NAME flat-lib-ignore
-  SOURCES "flat-lib/sources"
-  COMPARE "flat-lib/docs-ignore"
-  OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$prefix_',$prefix_>"
-)
-
-#batch_test(NAME flat-lib
-#  SERIAL TRUE
-#  CMD1 "$<TARGET_FILE:orthodocs> --src-root ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/sources --doc-root ${CMAKE_CURRENT_BINARY_DIR}/flat-lib --verbosity off --toc --pkg-deps graph"
-#  CMD2 "diff ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/docs ${CMAKE_CURRENT_BINARY_DIR}/flat-lib"
-#)
-
-#batch_test(NAME flat-lib-ignore
-#  SERIAL TRUE
-#  CMD1 "$<TARGET_FILE:orthodocs> --src-root ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/sources --doc-root ${CMAKE_CURRENT_BINARY_DIR}/flat-lib-ignore --verbosity off --toc --pkg-deps graph --ignore-prefix $prefix_ prefix_"
-#  CMD2 "diff ${CMAKE_CURRENT_SOURCE_DIR}/flat-lib/docs-ignore ${CMAKE_CURRENT_BINARY_DIR}/flat-lib-ignore"
-#)
+  doc_test(NAME flat-lib-ignore
+    SOURCES "flat-lib/sources"
+    COMPARE "flat-lib/docs-ignore"
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$prefix_',$prefix_>"
+  )
+endif()

@@ -31,8 +31,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # propedeutics for antrl4cpp
 ###############################################################################
 # required if linking to static library
-add_definitions(-DANTLR4CPP_STATIC -DNOGDI)
-#add_definitions(-DNOGDI)
+add_definitions(-DANTLR4CPP_STATIC)
+# required on Windows
+if (CMAKE_HOST_WIN32)
+  add_definitions(-DNOGDI)
+endif()
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 # set(ANTLR4_WITH_STATIC_CRT OFF)
@@ -85,9 +88,12 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 # cmake_print_variables(Boost_LIBRARIES Boost_INCLUDE_DIRS)
 
 find_package(Python3 3.10)
-cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
+# cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
 if (NOT Python3_FOUND)
   message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
+elseif(NOT Python_EXECUTABLE)
+  set(Python_EXECUTABLE python3)
+  message(VERBOSE "Python_EXECUTABLE set to 'python3'")
 endif()
 
 #if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
