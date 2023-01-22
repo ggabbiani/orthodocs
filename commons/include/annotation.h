@@ -4,7 +4,7 @@
  *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * Copyright © 2023, Giampiero Gabbiani (giampiero@gabbiani.org)
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */

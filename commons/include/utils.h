@@ -2,23 +2,11 @@
 /*
  * general utilities.
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include <algorithm>
 #include <cctype>
@@ -36,7 +24,7 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
 #endif  // (__cplusplus > 202002L && __cplusplus < __cpp_lib_to_underlying) || (__cplusplus < 202102L)
 
 /**
- * @brief removes spaces from string head / tail 
+ * @brief removes spaces from string head / tail
  */
 inline std::string trim(std::string str) {
   const char* ws = " \t\n\r\f\v";
@@ -111,9 +99,9 @@ inline size_t rfind(std::string_view str, std::string_view sub, size_t pos=0) {
 }
 
 inline bool equal(std::string str1,std::string str2) {
-  return (str1.size() == str2.size()) 
+  return (str1.size() == str2.size())
       && std::equal(
-        str1.begin(), str1.end(), 
+        str1.begin(), str1.end(),
         str2.begin(), [](const char & c1,const char & c2) {
           return (std::toupper(c1) == std::toupper(c2));
         }
@@ -121,7 +109,7 @@ inline bool equal(std::string str1,std::string str2) {
 }
 
 /**
- * case insensitive lesser to be used with STL containers 
+ * case insensitive lesser to be used with STL containers
  */
 struct Less {
   using is_transparent = void; // enables heterogeneous lookup

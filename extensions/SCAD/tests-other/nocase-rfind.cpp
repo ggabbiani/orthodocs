@@ -1,23 +1,11 @@
 /*
  * test case for a case insensitive find/rfind algo
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include <algorithm>
 #include <iostream>
@@ -30,7 +18,7 @@ namespace nocase {
 template <class InputIt1,class InputIt2>
 InputIt1 find(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
   auto it = std::search(
-    first1, last1, 
+    first1, last1,
     first2, last2,
     [](char ch1, char ch2) {return std::toupper(ch1) == std::toupper(ch2);}
   );
@@ -50,8 +38,8 @@ size_t rfind(const string &str, const string &sub, size_t pos=0) {
 }
 
 int main(int argc, const char *argv[]) {
-  string s = 
-    "blah blab albh sag òkg òqwg sa a **NOTE:** jsd lkajhvjh\n" 
+  string s =
+    "blah blab albh sag òkg òqwg sa a **NOTE:** jsd lkajhvjh\n"
     "qhal  **note:** ksjb vlhjveqih vqhjelhhal";
   string sub = "**NotE:**";
 

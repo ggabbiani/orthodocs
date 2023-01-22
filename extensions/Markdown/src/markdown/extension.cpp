@@ -1,23 +1,11 @@
 /*
  * markdown extension definition
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include "extension.h"
 #include "graph.h"
@@ -41,7 +29,7 @@ namespace {
  * returns the passed string as a markdown id.
  *
  * Implementation of [GitLab Flavored Markdown (GLFM) | GitLab](https://docs.gitlab.com/ee/user/markdown.html#header-ids-and-links)
- * 
+ *
  * The IDs generated should be conformant to the following rules:
  *
  * 1. All text is converted to lowercase.
@@ -49,7 +37,7 @@ namespace {
  * 3. All spaces are converted to hyphens.
  * 4. Two or more hyphens in a row are converted to one.
  * 5. If a header with the same ID has already been generated, a unique incrementing number is appended, starting at 1.
- * 
+ *
  * NOTE: in our case rule 5 should never occur
  */
 string headingId(string_view s) {
@@ -127,7 +115,7 @@ void saveme(
 
 namespace markdown {
 
-Extension::Extension(Dictionary &dict,const language::Extension *lang) 
+Extension::Extension(Dictionary &dict,const language::Extension *lang)
   : writer::Extension(ID,dict,lang->vocabulary(),lang) {
 }
 
@@ -241,21 +229,20 @@ void Extension::write(const Document &document, const Annotation &annotation, os
       auto &results = annotation.analitics();
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
-        [this,&document,&s,&annotation] (const Analitics::value_type &value) {
+        [this,&document,&s] (const Analitics::value_type &value) {
           // check if the analitic result is an xref result
-          if (auto res = dynamic_cast<const xref::Analysis*>(value.second.get()); res) {
-            if (auto i=this->_dict->find(res->token); i!=this->_dict->end()) {
-              auto ref = this->reference(i->second,&document.source);
-              string link = "["+res->token+"]("+ref+")";
-              s.replace(res->position,res->length,link);
-            } else if (const auto &l=_vocabulary.find(res->literal);l==_vocabulary.end()) {
-              spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary", res->token, document.source.string());
+          if (auto xref_data = dynamic_cast<const xref::Analysis*>(value.second.get()); xref_data) {
+            if (auto i=this->_dict->find(xref_data->token); i!=this->_dict->end()) {
+              auto ref    = this->reference(i->second,&document.source);
+              string link = "["+xref_data->token+"]("+ref+")";
+              s.replace(xref_data->position,xref_data->length,link);
+            } else if (const auto &l=_vocabulary.find(xref_data->literal);l==_vocabulary.end()) {
+              spdlog::warn("Item '{}' in document '{}' not present in the inclusion dictionary nor in the exclusion vocabulary", xref_data->token, document.source.string());
             }
-          } else if (auto res = dynamic_cast<const spdx::Data*>(value.second.get()); res) {
-            auto link32 = U"["+utf32(s).substr(res->position,res->length)+U"]("+utf32(res->url)+U")";
-            auto s32  = utf32(s);
-            s32.replace(res->position,res->length,link32);
-            s = utf8(s32);
+          } else if (auto lic_data = dynamic_cast<const spdx::Data*>(value.second.get()); lic_data) {
+            auto link32 = U"["+utf32(s).substr(lic_data->position,lic_data->length)+U"]("+utf32(lic_data->url)+U")";
+            auto s32    = utf32(s);
+            s           = utf8(s32.replace(lic_data->position,lic_data->length,link32));
           }
         }
       );

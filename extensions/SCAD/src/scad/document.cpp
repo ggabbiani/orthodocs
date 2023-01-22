@@ -1,23 +1,11 @@
 /*
  * Abstract document definition
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include "document.h"
 #include "extension.h"
@@ -61,7 +49,7 @@ Module::Module(const ::doc::Name &name,bool nested) : ::doc::Item(name,ID,nullpt
  *****************************************************************************/
 const string &Package::ID   = ::scad::Extension::slot[::scad::Extension::TYPE_PACKAGE].type;
 
-Package::Package(const std::filesystem::path &path) 
+Package::Package(const std::filesystem::path &path)
   : ::doc::Item((path.parent_path()/path.stem()).string(),ID,nullptr,false), path(path) {
   dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_PACKAGE].dictionaryKey(this);
 }
@@ -79,7 +67,7 @@ string Package::tocKey() const {
  *****************************************************************************/
 const string &Variable::ID  = ::scad::Extension::slot[::scad::Extension::TYPE_VARIABLE].type;
 
-Variable::Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested) 
+Variable::Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested)
 : ::doc::Item(name,ID,&defaults,nested) {
   dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_VARIABLE].dictionaryKey(this);
 }

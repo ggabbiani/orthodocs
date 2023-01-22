@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
 import re

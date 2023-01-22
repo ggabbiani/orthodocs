@@ -2,23 +2,11 @@
 /*
  * globals variables from cli.
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include "utils.h"
 
@@ -27,10 +15,10 @@
 #include <string>
 
 /**
- * Convenient namespace for command line passed program options. 
- * 
- * Actually defines the capability for main() function only to modify these 
- * values during argument parsing while providing read-only access to the rest 
+ * Convenient namespace for command line passed program options.
+ *
+ * Actually defines the capability for main() function only to modify these
+ * values during argument parsing while providing read-only access to the rest
  * of the world.
  */
 class Option {
@@ -55,7 +43,7 @@ public:
    */
   static const FileSet &graphs() {return _graphs;}
   /**
-   * defines the language processor to be used. 
+   * defines the language processor to be used.
    * For now only "scad" is supported.
    */
   static const std::string &language() {return _language;}
@@ -72,12 +60,12 @@ public:
    */
   static std::string prefix_abbreviation(const std::string &name);
   /**
-   * prefix used for private (i.e. not to be documented) IDs (variable, 
+   * prefix used for private (i.e. not to be documented) IDs (variable,
    * function, module or whatever ...)
    */
   static const std::string &private_prefix() {return _private_prefix;}
   /**
-   * directories or files in any combination: paths can be passed either as 
+   * directories or files in any combination: paths can be passed either as
    * relative to «Source root» or absolute.
    */
   static const FileSet &sources() {return _sources;}
@@ -90,7 +78,7 @@ public:
    */
   static bool toc() {return _toc;}
   /**
-   * defines the language processor to be used. 
+   * defines the language processor to be used.
    * For now only "markdown" is supported.
    */
   static const std::string &writer() {return _writer;}

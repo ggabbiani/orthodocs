@@ -1,33 +1,21 @@
 /*
  * reads an annotation from std input and search for a cross reference
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include <scad/document.h>
 
 #include <spdlog/spdlog.h>
 
-#include <iostream> 
-#include <regex> 
-#include <string> 
+#include <iostream>
+#include <regex>
+#include <string>
 
-using namespace std; 
+using namespace std;
 
 template <typename E>
 constexpr typename std::underlying_type<E>::type underlying(E e) noexcept {
@@ -140,15 +128,15 @@ const char *annotation=
 "There is also a last function_2() function.\n"
 "*/";
 
-int main() { 
+int main() {
   try {
     scad::doc::style::Factory factory;
     auto style  = factory(annotation);
     string anno = style->manage(annotation);
-    
+
     anno = CrossReference::manage(anno);
 
-    return EXIT_SUCCESS; 
+    return EXIT_SUCCESS;
   } catch(const exception &error) {
     print_exception(error);
     return  EXIT_FAILURE;

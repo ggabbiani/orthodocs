@@ -73,10 +73,10 @@ if (OPTION_FUNC_TESTS)
 endif()
 
 ###############################################################################
-# C++ split parser
+# C++ split parser sources
 
 # add lexer and grammar to the build dependencies.
-antlr_target(${LEXER} ${LEXER}.g4 
+antlr_target(${LEXER} ${LEXER}.g4
   LEXER
   PACKAGE spdx)
 antlr_target(${PARSER}
@@ -95,11 +95,11 @@ add_library(${LANGUAGE_LIB} STATIC
 add_library(spdx::parser ALIAS ${LANGUAGE_LIB})
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC
-    ${ANTLR_${LEXER}_OUTPUT_DIR} 
+    ${ANTLR_${LEXER}_OUTPUT_DIR}
     ${ANTLR_${PARSER}_OUTPUT_DIR}
     ${ANTLR4_INCLUDE_DIRS}
 )
-target_link_libraries(${LANGUAGE_LIB} 
+target_link_libraries(${LANGUAGE_LIB}
   PUBLIC
-    antlr4_static 
+    antlr4_static
 )
