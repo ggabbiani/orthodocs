@@ -1,29 +1,37 @@
 /*
- * This file contains only private items and consequently produces an empty 
- * documentation file.
+ * This package is not commented at all.
+ * It is an isolated package (i.e. it doesn't include nor use any other package),
+ * as such it will not contain any dependecy list.
  *
  * Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-3.0-or-later or MIT WITH Classpath-exception-2.0
  */
 
-include <isolated.scad>
+__undocumented_global_private__ = 10;
 
-/*!
- * private variable not included
- */
-__var__ = 10;
+undocumented_global_public = "global public variable";
 
-/*!
- * private function not included 
- */
-function __func__(param1,param2="default") = 10;
+$undocumented_global_public = "global public $variable";
 
-/*!
- * private module not included 
- */
-module __module__(param1,param2="default") {
-  echo(str("Variable = ", __var__));
+function __undocumented_global_private__(param1,param2="default value") = false;
+
+function undocumented_global_public(
+  parm1=1,
+  parm2=0
+) = true;
+
+module undocumented_global_public(param1="default value for parm1",param2) {
+  function undocumented_nested_function(
+    param1,
+    param2="default value for parm2"
+  ) = false;
+
+  module undocumented_nested_module(
+    param1,
+    param2,
+    param3="default value for parm3"
+  ) {
+  }
+
 }
-
-__module__(1,"Hi");

@@ -7,7 +7,8 @@ graph LR
     A1[referring] --o|include| A2[referred]
 ```
 
-this package is referring to [package referred](referred.md#package-referred).
+This package is commented with prologue prefixed annotations.
+It is client of the [package referred](referred.md#package-referred), so a dependecy list will be produced.
 
 Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
 
@@ -18,40 +19,64 @@ SPDX-License-Identifier: [MIT](https://spdx.org/licenses/MIT.html) or [GPL-3.0-o
 
 ---
 
-### variable test_var1
+### variable $referring_global_public
 
 __Default:__
 
-    0
+    "global public $variable"
 
-this annotation is just an example of reference to [referred()](referred.md#function-referred).
+This \$variable is global public and will be published.
+See also variable $referred_global_public.
+
+
+---
+
+### variable referring_global_public
+
+__Default:__
+
+    "global public variable"
+
+This variable is global public and will be published.
+See also [variable referred_global_public](referred.md#variable-referred_global_public).
 
 
 ## Functions
 
 ---
 
-### function test_func1
+### function referring_global_public
 
 __Syntax:__
 
 ```text
-test_func1()
+referring_global_public(parm1=1,parm2=0)
 ```
 
-this annotation is just an example of reference to [referred{}](referred.md#module-referred).
+This function is global public and will be published.
+See also function [referred_global_public()](referred.md#function-referred_global_public).
+
+
+__Parameters:__
+
+__parm1__  
+This is the first parameter
+
+__parm2__  
+This is the second parameter
 
 
 ## Modules
 
 ---
 
-### module test_mod1
+### module referring_global_public
 
 __Syntax:__
 
-    test_mod1()
+    referring_global_public(param1="default value for parm1",param2)
 
-this annotation is just an example of reference to [variable referred](referred.md#variable-referred).
+This module is global public and will be published.
+See also module [referred_global_public{}](referred.md#module-referred_global_public).
 
 

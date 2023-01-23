@@ -1,6 +1,8 @@
-# package referred
+# package legacy
 
-This package is commented with prologue prefixed annotations.
+This package is commented with standard SCAD comments: in order to get proper documentation
+orthodocs must be executed with --anno-prolog="".
+
 It is an isolated package (i.e. it doesn't include nor use any other package),
 as such it will not contain any dependecy list.
 
@@ -13,7 +15,7 @@ SPDX-License-Identifier: [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or
 
 ---
 
-### variable $referred_global_public
+### variable $legacy_global_public
 
 __Default:__
 
@@ -24,7 +26,7 @@ This $variable is global public and will be published.
 
 ---
 
-### variable referred_global_public
+### variable legacy_global_public
 
 __Default:__
 
@@ -37,12 +39,12 @@ This variable is global public and will be published.
 
 ---
 
-### function referred_global_public
+### function legacy_global_public
 
 __Syntax:__
 
 ```text
-referred_global_public(parm1=1,parm2=0)
+legacy_global_public(parm1=1,parm2=0)
 ```
 
 This function is global public and will be published.
@@ -61,11 +63,11 @@ This is the second parameter
 
 ---
 
-### module referred_global_public
+### module legacy_global_public
 
 __Syntax:__
 
-    referred_global_public(param1="default value for parm1",param2)
+    legacy_global_public(param1="default value for parm1",param2)
 
 This module is global public and will be published.
 

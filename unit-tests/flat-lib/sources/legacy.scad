@@ -1,5 +1,7 @@
-/*!
- * This package is commented with prologue prefixed annotations.
+/*
+ * This package is commented with standard SCAD comments: in order to get proper documentation
+ * orthodocs must be executed with --anno-prolog="".
+ *
  * It is an isolated package (i.e. it doesn't include nor use any other package),
  * as such it will not contain any dependecy list.
  *
@@ -8,52 +10,52 @@
  * SPDX-License-Identifier: GPL-3.0-or-later or MIT WITH Classpath-exception-2.0
  */
 
-/*!
+/*
  * This variable is global private and will not be published.
  */
-__referred_global_private__ = 10;
+__legacy_global_private__ = 10;
 
-/*!
+/*
  * This variable is global public and will be published.
  */
-referred_global_public = "global public variable";
+legacy_global_public = "global public variable";
 
-/*!
+/*
  * This $variable is global public and will be published.
  */
-$referred_global_public = "global public $variable";
+$legacy_global_public = "global public $variable";
 
-/*!
+/*
  * This function is global private and will not be published.
  */
-function __referred_global_private__(param1,param2="default value") = false;
+function __legacy_global_private__(param1,param2="default value") = false;
 
-/*!
+/*
  * This function is global public and will be published.
  */
-function referred_global_public(
-  //! This is the first parameter
+function legacy_global_public(
+  // This is the first parameter
   parm1=1,
-  //! This is the second parameter
+  // This is the second parameter
   parm2=0
 ) = true;
 
-/*!
+/*
  * This module is global public and will be published.
  */
-module referred_global_public(param1="default value for parm1",param2) {
-  /*!
+module legacy_global_public(param1="default value for parm1",param2) {
+  /*
    * This function is nested and will not be published.
    */
-  function referred_nested_function(
+  function legacy_nested_function(
     param1,
     param2="default value for parm2"
   ) = false;
 
-  /*!
+  /*
    * This module is nested and will not be published.
    */
-  module referred_nested_module(
+  module legacy_nested_module(
     param1,
     param2,
     param3="default value for parm3"

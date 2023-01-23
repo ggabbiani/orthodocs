@@ -122,12 +122,11 @@ if (Python3_FOUND)
   doc_test(NAME flat-lib
     SOURCES "flat-lib/sources"
     COMPARE "flat-lib/docs"
-    OPTIONS "--toc --pkg-deps graph"
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$>"
   )
-
-  doc_test(NAME flat-lib-ignore
+  doc_test(NAME flat-lib-legacy
     SOURCES "flat-lib/sources"
-    COMPARE "flat-lib/docs-ignore"
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$prefix_',$prefix_>"
+    COMPARE "flat-lib/docs-legacy"
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog ''"
   )
 endif()

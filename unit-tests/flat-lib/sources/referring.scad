@@ -1,5 +1,6 @@
 /*!
- * this package is referring to package referred.
+ * This package is commented with prologue prefixed annotations.
+ * It is client of the package referred, so a dependecy list will be produced.
  *
  * Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
@@ -8,19 +9,63 @@
 include <referred.scad>
 
 /*!
- * this annotation is just an example of reference to referred().
+ * This variable is global private and will not be published.
+ * See also variable __referred_global_private__.
  */
-test_var1=0;
+__referring_global_private__ = 10;
 
 /*!
- * this annotation is just an example of reference to referred{}.
+ * This variable is global public and will be published.
+ * See also variable referred_global_public.
  */
-function test_func1() = 0;
+referring_global_public = "global public variable";
 
 /*!
- * this annotation is just an example of reference to variable referred.
+ * This \$variable is global public and will be published.
+ * See also variable $referred_global_public.
  */
-module test_mod1() {
+$referring_global_public = "global public $variable";
+
+/*!
+ * This function is global private and will not be published.
+ * See also function __referred_global_private__().
+ */
+function __referring_global_private__(param1,param2="default value") = false;
+
+/*!
+ * This function is global public and will be published.
+ * See also function referred_global_public().
+ */
+function referring_global_public(
+  //! This is the first parameter
+  parm1=1,
+  //! This is the second parameter
+  parm2=0
+) = true;
+
+/*!
+ * This module is global public and will be published.
+ * See also module referred_global_public{}.
+ */
+module referring_global_public(param1="default value for parm1",param2) {
+  /*!
+   * This function is nested and will not be published.
+   * See also function referred_nested_function().
+   */
+  function referring_nested_function(
+    param1,
+    param2="default value for parm2"
+  ) = false;
+
+  /*!
+   * This module is nested and will not be published.
+   * See also module referred_nested_module{}.
+   */
+  module referring_nested_module(
+    param1,
+    param2,
+    param3="default value for parm3"
+  ) {
+  }
 
 }
-
