@@ -90,7 +90,7 @@ const char *Single::id() {
 }
 
 bool Single::check(const string &text) {
-  return (lines(text)==1 && text.length()>=3);
+  return (lines(text)==1 && text.find("//!")==0);
 }
 
 string Single::manage(const string &text) {
@@ -213,7 +213,7 @@ AbstractStyle *Factory::operator()(const string &text) {
   else if (single.check(text))
     return static_cast<AbstractStyle*>(&single);
   else
-    throw domain_error("**Unrecognized comment type**");
+    return nullptr;
 }
 
 }
