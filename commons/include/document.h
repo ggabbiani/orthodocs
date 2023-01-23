@@ -227,7 +227,7 @@ public:
   template <class T>
   class Header : public Topic<T> {
   public:
-    Header(const Document &doc) : Topic<T>(doc,nullptr,1) {}
+    explicit Header(const Document &doc) : Topic<T>(doc,nullptr,1) {}
     explicit operator T* () {return this->items[0];}
   };
 

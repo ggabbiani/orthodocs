@@ -95,13 +95,13 @@ void Listener::exitFunction_def(Parser::Function_defContext *ctx)  {
   auto key  = func->documentKey();
 #endif // NDEBUG
 
-  // annotate if any comment just before function definition
-  if (auto comment  = backLeftComment(ctx); comment)
-    annotate(func.get(), comment);
-
-  if (!func->nested && !func->privateId())
+  if (!func->nested && !func->privateId()) {
+    // annotate if any comment just before function definition
+    if (auto comment  = backLeftComment(ctx); comment)
+      annotate(func.get(), comment);
     if (auto [i,success] = _document->index.emplace(move(func)); !success)
       throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
+  }
   curr_item.pop();
 }
 
@@ -120,13 +120,13 @@ void Listener::exitModule_def(Parser::Module_defContext * ctx) {
   auto  key = mod->documentKey();
 #endif // NDEBUG
 
-  // annotate if any comment just before function definition
-  if (auto comment  = backLeftComment(ctx); comment)
-    annotate(mod.get(), comment);
-
-  if (!mod->nested && !mod->privateId())
+  if (!mod->nested && !mod->privateId()) {
+    // annotate if any comment just before function definition
+    if (auto comment  = backLeftComment(ctx); comment)
+      annotate(mod.get(), comment);
     if (auto [i,success] = _document->index.emplace(move(mod)); !success)
       throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
+  }
   curr_item.pop();
 }
 

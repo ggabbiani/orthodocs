@@ -278,7 +278,6 @@ void Extension::write(const Document &document, const Function *func, ostream &o
       << endl
       << BOLD("Syntax:") << endl
       << endl
-      // << CODE(signature(func)) << endl
       << "```text\n"
       << func->signature() << '\n'
       << "```\n"

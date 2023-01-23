@@ -9,8 +9,6 @@
 
 #include "bar.h"
 #include "extensions.h"
-// #include "globals.h"
-// #include "singleton.h"
 
 using namespace std;
 
