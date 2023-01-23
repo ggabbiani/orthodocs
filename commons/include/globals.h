@@ -39,6 +39,10 @@ public:
    */
   static const std::filesystem::path &droot() {return _droot;}
   /**
+   * defines the annotation prologue string
+   */
+  static const std::string &annotationProlog() {return _annotation_prolog;}
+  /**
    * set of directory for partial dependencies graphs
    */
   static const FileSet &graphs() {return _graphs;}
@@ -55,6 +59,10 @@ public:
    * ignore this package prefix in the Table of Contents sort
    */
   static const std::vector<std::string> &ignore_prefix() {return _ignore_prefix;}
+  /**
+   * wether to follow orthodox annotation rules or not.
+   */
+  static bool &orthodox() {return _orthodox;}
   /**
    * if name matches any of the ignored prefixes then abbreviate
    */
@@ -88,10 +96,12 @@ public:
   static Verbosity verbosity() {return _verbosity;}
 private:
   static bool                     _admonitions;
+  static std::string              _annotation_prolog;
   static std::filesystem::path    _droot;
   static FileSet                  _graphs;
   static std::vector<std::string> _ignore_prefix;
   static std::string              _language;
+  static bool                     _orthodox;
   static std::string              _pkg_deps;
   static std::string              _private_prefix;
   static FileSet                  _sources;

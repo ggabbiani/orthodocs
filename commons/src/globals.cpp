@@ -13,10 +13,12 @@ using namespace std;
 namespace fs=std::filesystem;
 
 bool              Option::_admonitions{false};
+string            Option::_annotation_prolog{"!"};
 fs::path          Option::_droot;
 FileSet           Option::_graphs;
 vector<string>    Option::_ignore_prefix;
 string            Option::_language{"scad"};
+bool              Option::_orthodox{true};
 string            Option::_pkg_deps{"text"};
 string            Option::_private_prefix{"__"};
 FileSet           Option::_sources;
