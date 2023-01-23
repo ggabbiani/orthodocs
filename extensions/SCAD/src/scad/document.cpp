@@ -90,7 +90,8 @@ const char *Single::id() {
 }
 
 bool Single::check(const string &text) {
-  return (lines(text)==1 && text.find("//!")==0);
+  string prolog = "//"+Option::annotationProlog()+" ";
+  return (lines(text)==1 && text.find(prolog)==0);
 }
 
 string Single::manage(const string &text) {
@@ -99,12 +100,12 @@ string Single::manage(const string &text) {
   return text.length()==3 ? string() : text.substr(text.find_first_not_of(' ',3));
 }
 
-const array<const char *,2> Simple::decoration{
-  "/*!",
-  "*/"
-};
-
 bool Simple::check(const string &text) {
+  const array<string,2> decoration {
+    "/*"+Option::annotationProlog(),
+    "*/"
+  };
+
   auto len = lines(text);
   if (len<3)
     return false;
@@ -114,9 +115,9 @@ bool Simple::check(const string &text) {
   bool goon     = true;
   this->column  = -1;
   while (goon && ss.getline(buffer,sizeof buffer)) {
-    if (const char *m = i==1 ? decoration[start] : i==len ? decoration[end] : nullptr; m) {
+    if (const char *m = i==1 ? decoration[start].c_str() : i==len ? decoration[end].c_str() : nullptr; m) {
       auto p = strstr(buffer, m);
-      goon = (i==1 ? p==buffer : p==buffer+strnlen(buffer,sizeof buffer)-strlen(m));
+      goon = (i==1 ? p==buffer && strlen(buffer)==decoration[start].length() : p==buffer+strnlen(buffer,sizeof buffer)-strlen(m));
     } else {
       this->column  = this->column==-1 ? (int)strspn(buffer," ") : min((int)strspn(buffer," "),this->column);
     }
@@ -146,13 +147,13 @@ const char *Simple::id() {
   return Simple::ID;
 }
 
-const array<const char *,3> Fine::decoration{
-  "/*!",
-  " */",
-  " *"
-};
-
 bool Fine::check(const string &text) {
+  const array<string,3> decoration{
+    "/*"+Option::annotationProlog(),
+    " */",
+    " *"
+  };
+
   auto len = lines(text);
   if (len<3)
     return false;
@@ -162,10 +163,10 @@ bool Fine::check(const string &text) {
   bool goon     = true;
   this->column  = -1;
   while (goon && ss.getline(buffer,sizeof buffer)) {
-    const char * const m = row==1 ? decoration[start] : row==len ? decoration[end] : decoration[body];
+    const char * const m = row==1 ? decoration[start].c_str() : row==len ? decoration[end].c_str() : decoration[body].c_str();
     auto pos = strstr(buffer, m);
     if (row==1) {         // parser strip any trailing space on first row
-      goon  = pos==buffer;
+      goon  = pos==buffer && strlen(buffer)==decoration[start].length();
     } else if (row==2) {       // we take the column number of the '*'
       goon  = pos!=nullptr;
       if (goon)

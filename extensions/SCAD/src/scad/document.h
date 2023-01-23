@@ -79,8 +79,6 @@ public:
 
 /**
  * base for comment styles.
- * FIXME: comment style management work on parsed text, as such it should be
- * outside source specific coding.
  */
 struct AbstractStyle {
   virtual ~AbstractStyle() = default;
@@ -118,7 +116,6 @@ class Simple : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static const std::array<const char *,2> decoration;
 };
 
 class Fine : public AbstractStyle {
@@ -131,7 +128,6 @@ class Fine : public AbstractStyle {
   const char *id() override;
 
   int column;
-  static const std::array<const char *,3> decoration;
 };
 
 } // namespace style

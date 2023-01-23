@@ -79,6 +79,7 @@ string sroot_relative(string &sub) {
 
 enum {
   ADMONITIONS,
+  ANNO_PROLOG,
   DOC_ROOT,
   GRAPHS,
   IGNORE,
@@ -96,6 +97,10 @@ struct {
   const char *desc;
 } const opt[] = {
   {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
+  {"--anno-prolog",
+    "defines the prefix used inside comments for the annotation (default \"!\")."
+    "When empty (\"\") all the comments are interpreted as annotations."
+  },
   {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",         "list of root relative directories where placing graphs"                                      },
   {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
@@ -142,6 +147,7 @@ int main(int argc, const char *argv[]) {
     auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
+    app.add_option(opt[ANNO_PROLOG].name, Option::_annotation_prolog, opt[ANNO_PROLOG].desc);
     app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(canonical_dir,"DIR"));
@@ -160,7 +166,7 @@ int main(int argc, const char *argv[]) {
         CLI::CheckedTransformer(
           map<string, spdlog::level::level_enum, LogLevelLess >(
             {
-              {"trace",     spdlog::level::trace    }, 
+              {"trace",     spdlog::level::trace    },
               {"debug",     spdlog::level::debug    },
               {"info",      spdlog::level::info     },
               {"warn",      spdlog::level::warn     },
@@ -185,7 +191,7 @@ int main(int argc, const char *argv[]) {
     Analizer analyst(language);
     // in-memory source tree analysis prodution
     analyst.buildDocuments();
-    // populated cross-reference dictionary 
+    // populated cross-reference dictionary
     doc::xref::Dictionary  dict = analyst.populate();
     // gather cross-reference data from all the annotations
     analyst.xref();
