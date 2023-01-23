@@ -95,7 +95,7 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   parser.removeErrorListeners();
   parser.addErrorListener(&handler);
   // source parse listener
-  Listener  listener(source);
+  Listener  listener(source,&tokens);
   // parse tree depth-first traverse
   tree::ParseTreeWalker  walker;
   // parsing

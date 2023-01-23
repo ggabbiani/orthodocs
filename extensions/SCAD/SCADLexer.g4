@@ -21,6 +21,11 @@
 
 lexer grammar SCADLexer;
 
+channels {
+	SPACES,
+	COMMENTS
+}
+
 DOT					: '.';
 COLON           	: ':';
 SEMI       			: ';';
@@ -71,14 +76,12 @@ AND					: '&&';
 OR					: '||';
 
 MODIFIER		: '%'| '#'| '!'| '*';
-BLOCK_ANNO		: '/*!' .*? '*/';
-LINE_ANNO		: '//!' ~[\r\n]*;
 
-BLOCK_COMMENT	: '/*' .*? '*/' -> skip;
-LINE_COMMENT	: '//' ~[\r\n]*	-> skip;
+BLOCK_COMMENT	: '/*' .*? '*/' 	-> channel(COMMENTS);
+LINE_COMMENT	: '//' ~[\r\n]*		-> channel(COMMENTS);
 
-WS: [ \t]+ -> skip;
-NL: ( '\r' '\n'? | '\n') -> skip;
+WS: [ \t]+ 							-> channel(SPACES);
+NL: ( '\r' '\n'? | '\n') 			-> channel(SPACES);
 
 ID: SPECIAL? [a-zA-Z0-9_]+;
 

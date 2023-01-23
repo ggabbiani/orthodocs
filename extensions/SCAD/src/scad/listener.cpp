@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later */
 
-#include "doc/annotations.h"
 #include "listener.h"
 
+#include "SCADLexer.h"
+
 #include <error_info.h>
-#include <globals.h>
 #include <utils.h>
 
 #include <regex>
@@ -22,26 +22,31 @@ namespace fs=std::filesystem;
 
 namespace scad {
 
-Listener::Listener(const fs::path &pkg_source) : _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source)) {
+Listener::Listener(const fs::path &pkg_source,antlr4::BufferedTokenStream *s) : _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source)),_tokens(s) {
 }
 
-void Listener::enterPkg(scad::SCADParser::PkgContext *ctx) {
+void Listener::enterPkg(Parser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
   curr_item.push(::doc::Item::Owner(curr_package));
 }
 
-void Listener::exitPkg(scad::SCADParser::PkgContext *ctx) {
+void Listener::exitPkg(Parser::PkgContext *ctx) {
   auto &pkg  = curr_item.top();
 #ifndef NDEBUG
   auto key  = pkg->documentKey();
 #endif // NDEBUG
+
+  // annotate if any comment at source' beginning
+  if (auto comment  = frontLeftComment(ctx); comment)
+    annotate(pkg.get(), comment);
+
   if (auto [i,success] = _document->index.emplace(move(pkg)); !success)
     throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
   curr_item.pop();
   curr_package  = nullptr;
 }
 
-void Listener::enterIncl(scad::SCADParser::InclContext *ctx) {
+void Listener::enterIncl(Parser::InclContext *ctx) {
   try {
     // change into directory of the current package
     cwd pwd(_pkg_path.parent_path());
@@ -75,7 +80,7 @@ void Listener::enterUse(SCADParser::UseContext *ctx) {
   }
 }
 
-void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
+void Listener::enterFunction_def(Parser::Function_defContext *ctx) {
   auto identifier = ctx->ID()->getText();
   bool nested     = dynamic_cast<doc::Module*>(curr_item.top().get())!=nullptr;
   auto item       = new doc::Function(identifier,nested);
@@ -84,18 +89,23 @@ void Listener::enterFunction_def(scad::SCADParser::Function_defContext *ctx) {
   curr_item.emplace(item);
 }
 
-void Listener::exitFunction_def(scad::SCADParser::Function_defContext *ctx)  {
+void Listener::exitFunction_def(Parser::Function_defContext *ctx)  {
   auto &func = curr_item.top();
 #ifndef NDEBUG
   auto key  = func->documentKey();
 #endif // NDEBUG
+
+  // annotate if any comment just before function definition
+  if (auto comment  = backLeftComment(ctx); comment)
+    annotate(func.get(), comment);
+
   if (!func->nested && !func->privateId())
     if (auto [i,success] = _document->index.emplace(move(func)); !success)
       throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
   curr_item.pop();
 }
 
-void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
+void Listener::enterModule_def(Parser::Module_defContext * ctx) {
   auto identifier = ctx->ID()->getText();
   bool nested     = dynamic_cast<doc::Module*>(curr_item.top().get());
   auto item       = make_unique<doc::Module>(identifier,nested);
@@ -104,64 +114,52 @@ void Listener::enterModule_def(scad::SCADParser::Module_defContext * ctx) {
   curr_item.emplace(item.release());
 }
 
-void Listener::exitModule_def(scad::SCADParser::Module_defContext * ctx) {
+void Listener::exitModule_def(Parser::Module_defContext * ctx) {
   auto &mod = curr_item.top();
 #ifndef NDEBUG
   auto  key = mod->documentKey();
 #endif // NDEBUG
+
+  // annotate if any comment just before function definition
+  if (auto comment  = backLeftComment(ctx); comment)
+    annotate(mod.get(), comment);
+
   if (!mod->nested && !mod->privateId())
     if (auto [i,success] = _document->index.emplace(move(mod)); !success)
       throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
   curr_item.pop();
 }
 
-void Listener::enterAnnotation(scad::SCADParser::AnnotationContext *ctx) {
-  static doc::style::Factory factory;
 
-  auto anno   = ctx->getText();
-  auto style  = factory(anno);
-  auto value  = style->manage(anno);
-
-  if (Option::admonitions())
-    mk_admonitions(value);
-
-  if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent->parent->parent))   { // parameter's annotation
-    set(curr_parameter->annotation,value);
-  } else if (dynamic_cast<scad::SCADParser::Function_defContext*>(ctx->parent->parent)) { // function's annotation
-    set(curr_item.top()->annotation, value);
-  } else if (dynamic_cast<scad::SCADParser::Module_defContext*>(ctx->parent->parent))   { // module's annotation
-    set(curr_item.top()->annotation, value);
-  } else if (dynamic_cast<scad::SCADParser::AssignmentContext*>(ctx->parent->parent))   { // variable's annotation
-    set(curr_variable.top()->annotation, value);
-  } else if (dynamic_cast<scad::SCADParser::PkgContext*>(ctx->parent->parent))          { // package's annotation
-    auto package = dynamic_cast<scad::doc::Package *>(curr_item.top().get());
-    assert(package);
-    set(package->annotation, value);
-  }
-}
-
-void Listener::enterParameter(scad::SCADParser::ParameterContext *ctx) {
+void Listener::enterParameter(Parser::ParameterContext *ctx) {
   curr_parameter  = make_unique<::doc::Parameter>();
 }
 
-void Listener::exitParameter(scad::SCADParser::ParameterContext *ctx) {
+void Listener::exitParameter(Parser::ParameterContext *ctx) {
+#ifndef NDEBUG
+  auto package  = curr_package->name;
+  auto func     = curr_item.top()->name;
+  auto param    = curr_parameter->name;
+#endif // NDEBUG
   if (!curr_item.empty()) {
+    if (auto comment = backLeftComment(ctx))
+      annotate(curr_parameter.get(),comment);
     curr_item.top()->parameters.push_back(move(curr_parameter));
   }
 }
 
-void Listener::enterLookup(scad::SCADParser::LookupContext *ctx) {
+void Listener::enterLookup(Parser::LookupContext *ctx) {
   auto value = ctx->ID()->getText();
   if (curr_parameter) {
-    if (dynamic_cast<scad::SCADParser::ParameterContext*>(ctx->parent))
+    if (dynamic_cast<Parser::ParameterContext*>(ctx->parent))
       curr_parameter->name = value;
   }
 }
 
-void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
+void Listener::enterAssignment(Parser::AssignmentContext *ctx) {
   auto id       = ctx->ID()->getText();
   auto defaults = ctx->expr()->getText();
-  if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
+  if (dynamic_cast<Parser::StatContext*>(ctx->parent)) {
     auto nested   = dynamic_cast<doc::Module*>(curr_item.top().get())!=nullptr;
     auto variable = new doc::Variable(id,defaults,nested);
     assert(curr_package);
@@ -173,20 +171,32 @@ void Listener::enterAssignment(scad::SCADParser::AssignmentContext *ctx) {
   }
 }
 
-void Listener::exitAssignment(scad::SCADParser::AssignmentContext *ctx) {
-  if (dynamic_cast<scad::SCADParser::StatContext*>(ctx->parent)) {
-    if (curr_variable.size()) {
-      auto &var   = curr_variable.top();
-#ifndef NDEBUG
-      auto key    = var->documentKey();
-#endif // NDEBUG
-      if (!var->nested && !var->privateId()) {
-        if (auto [i,success] = _document->index.emplace(move(var)); !success)
-          throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
-      }
-      curr_variable.pop();
+void Listener::exitAssignment(Parser::AssignmentContext *ctx) {
+  if (dynamic_cast<Parser::StatContext*>(ctx->parent) && curr_variable.size()) {
+    if (auto &var = curr_variable.top(); !var->nested && !var->privateId()) {
+      if (auto comment = backLeftComment(ctx))
+        annotate(curr_variable.top().get(),comment);
+      if (auto [i,success] = _document->index.emplace(move(var)); !success)
+        throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
     }
+    curr_variable.pop();
   }
+}
+
+auto Listener::leftComments(const ParserRuleContext *ctx) const -> vector<Token *> {
+  auto first    = ctx->getStart();
+  auto i        = first->getTokenIndex();
+  return _tokens->getHiddenTokensToLeft(i,scad::SCADLexer::COMMENTS);
+}
+
+auto Listener::backLeftComment(const ParserRuleContext *ctx) const -> const Token* {
+  auto comments = leftComments(ctx);
+  return comments.empty() ? nullptr : comments.back();
+}
+
+auto Listener::frontLeftComment(const ParserRuleContext *ctx) const -> const Token* {
+  auto comments = leftComments(ctx);
+  return comments.empty() ? nullptr : comments.front();
 }
 
 }

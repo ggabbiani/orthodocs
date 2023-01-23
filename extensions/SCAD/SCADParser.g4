@@ -21,33 +21,26 @@
 
 parser grammar SCADParser;
 
-options { 
+options {
     tokenVocab = SCADLexer;
 }
 
-pkg: annotation_opt stats? EOF;
+pkg: stats? EOF;
 
 stats: stat | stats stat;
 
 stat
-	: incl
-	| use
-	| assignment ';'
-	| function_def
-	| module_def
-	| let_clause stat_or_block
-	| ('%'|'#'|'!'|'*')? module_inst
-	| ';'
+	: incl								# statIncl
+	| use								# statUse
+	| assignment SEMI					# statAssign
+	| function_def						# statFuncDef
+	| module_def						# statModDef
+	| let_clause stat_or_block			# statLet
+	| ('%'|'#'|'!'|'*')? module_inst	# statModInst
+	| SEMI								# statEmpty
 	;
 
-annotation_opt: annotation?;
-
-annotation
-	: BLOCK_ANNO
-	| LINE_ANNO
-	;
-
-assignment	: annotation_opt ID '=' expr;
+assignment	: ID ASSIGN expr;
 
 indexing	: '[' expr ']';
 
@@ -101,7 +94,7 @@ echo_function_call	: ECHO 		'(' arguments_opt ')';
 assert_function_call: ASSERT	'(' argument (',' argument)? ')';
 
 module_def
-	: annotation_opt MODULE ID '(' parameters_opt COMMA? ')' (stat_block|stat);
+	: MODULE ID '(' parameters_opt COMMA? ')' (stat_block|stat);
 
 stat_block: '{' stats? '}';
 
@@ -115,11 +108,11 @@ module_inst
 	;
 
 sons
-	: ';'
+	: SEMI
 	| stat_or_block
 	;
 
-function_def	: annotation_opt FUNCTION ID '(' parameters_opt COMMA? ')' '=' expr ';';
+function_def	: FUNCTION ID '(' parameters_opt COMMA? ')' ASSIGN expr SEMI;
 parameters_opt	: parameters?;
 parameters		: parameter | parameters COMMA parameter;
 parameter		: lookup | assignment;
@@ -170,7 +163,7 @@ for_styles
 	;
 
 c_style
-	: assignments_opt ';' expr ';' assignments_opt;
+	: assignments_opt SEMI expr SEMI assignments_opt;
 
 // end of list comprehension
 
@@ -181,7 +174,7 @@ assignments
 	| assignments COMMA assignment
 	;
 lookup
-	: annotation_opt ID;
+	: ID;
 
 range_expr
 	: '[' expr COLON expr ']'
