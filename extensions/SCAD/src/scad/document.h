@@ -93,6 +93,9 @@ namespace style {
 
 class Factory {
 public:
+  /**
+   * return the recognized style or null
+   */
   AbstractStyle * operator () (const std::string &text);
 };
 

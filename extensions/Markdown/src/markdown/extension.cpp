@@ -326,7 +326,7 @@ void Extension::write(const Document &document, const Module *mod, ostream &out)
   if (mod->parameters.size()) {
     // how many annotated parameters do we have in place?
     auto annotations = count_if(mod->parameters.begin(),mod->parameters.end(),
-      [] (const ::doc::Parameter::Ptr &p) {
+      [] (const ::doc::Parameter::Owner &p) {
         return !p->annotation.empty();
       }
     );
@@ -334,7 +334,7 @@ void Extension::write(const Document &document, const Module *mod, ostream &out)
       out << BOLD("Parameters:") << endl
           << endl;
       for_each(mod->parameters.begin(),mod->parameters.end(),
-        [this,&document,&out] (const ::doc::Parameter::Ptr &param) {
+        [this,&document,&out] (const ::doc::Parameter::Owner &param) {
           if (!param->annotation.empty())
             write(document,param.get(),out);
         }

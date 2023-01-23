@@ -42,7 +42,7 @@ class Item;
 namespace xref {
 
 struct Analysis : public analitic::Data {
-  Analysis(Position pos, Size len,const std::string &tok, const std::string &lit) 
+  Analysis(Position pos, Size len,const std::string &tok, const std::string &lit)
   : analitic::Data{pos,len}, token{tok}, literal{lit} {}
 
   // token to be searched for in the inclusion dictionary
@@ -79,8 +79,8 @@ using Value       = std::string;
 
 class Parameter {
 public:
-  using Ptr  = std::unique_ptr<Parameter>;
-  using Vec  = std::vector<Ptr>;
+  using Owner  = std::unique_ptr<Parameter>;
+  using OwnerVec  = std::vector<Owner>;
 
   Value       defaults;
   Name        name;
@@ -143,13 +143,13 @@ public:
    */
   virtual std::string tocKey() const;
 
-  Name              name;
-  Annotation        annotation;
-  Parameter::Vec    parameters;
-  const Value       defaults;
-  const bool        nested;
-  const std::string &type;
-  std::string dictKey;
+  Name                name;
+  Annotation          annotation;
+  Parameter::OwnerVec parameters;
+  const Value         defaults;
+  const bool          nested;
+  const std::string  &type;
+  std::string         dictKey;
 
   /**
    * this field is filled by the language extension

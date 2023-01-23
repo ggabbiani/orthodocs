@@ -69,7 +69,7 @@ auto Analizer::populate() const -> Dictionary {
       auto key = item->dictKey;
       bar.status(key);
       if (auto [i, success] = dict.try_emplace(key,item); !success) {
-        // TODO: eventually manage fully qualified referenced items 
+        // TODO: eventually manage fully qualified referenced items
         spdlog::warn("duplicate item '{}' skipped",key);
       }
       bar++;
@@ -88,7 +88,7 @@ void Analizer::xref() const {
     for(auto &item: document->index) {
       if (!item->annotation.empty())
         annos.push_back(&item->annotation);
-      for_each(item->parameters.begin(),item->parameters.end(),[&annos](const doc::Parameter::Ptr &p) {
+      for_each(item->parameters.begin(),item->parameters.end(),[&annos](const doc::Parameter::Owner &p) {
         if (!p->annotation.empty())
           annos.push_back(&p->annotation);
       });
