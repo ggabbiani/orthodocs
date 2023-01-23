@@ -1,5 +1,12 @@
 # package referring
 
+## Dependencies
+
+```mermaid
+graph LR
+    A1[referring] --o|include| A2[referred]
+```
+
 this package is referring to [package referred](referred.md#package-referred).
 
 Copyright @ 2022, Giampiero Gabbiani (giampiero@gabbiani.org)

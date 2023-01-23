@@ -5,6 +5,7 @@
  *
  * SPDX-License-Identifier: MIT or GPL-3.0-or-later
  */
+include <referred.scad>
 
 /*!
  * this annotation is just an example of reference to referred().
@@ -20,6 +21,6 @@ function test_func1() = 0;
  * this annotation is just an example of reference to variable referred.
  */
 module test_mod1() {
-  
+
 }
 
