@@ -8,5 +8,5 @@ tests-other/spdx/.antlr/SPDXLexer.tokens
 tests-other/spdx/.antlr/SPDXParser.interp
 tests-other/spdx/.antlr/SPDXParser.java
 tests-other/spdx/.antlr/SPDXParser.tokens
-commons/include/config.h
-commons/include/spdx_config.h
+commons/include/commons/config.h
+commons/include/commons/spdx_config.h
