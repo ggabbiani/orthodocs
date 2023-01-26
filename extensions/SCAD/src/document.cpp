@@ -101,53 +101,6 @@ string Single::manage(const string &text) {
   return text.length()==3 ? string() : text.substr(text.find_first_not_of(' ',3));
 }
 
-// bool Simple::check(const string &text) {
-//   const array<string,2> decoration {
-//     "/*"+Option::annotationProlog(),
-//     "*/"
-//   };
-
-//   auto len = lines(text);
-//   if (len<3)
-//     return false;
-
-//   stringstream ss(text,ios_base::in);
-//   auto i        = 1;
-//   bool goon     = true;
-//   this->column  = -1;
-//   while (goon && ss.getline(buffer,sizeof buffer)) {
-//     if (const char *m = i==1 ? decoration[start].c_str() : i==len ? decoration[end].c_str() : nullptr; m) {
-//       auto p = strstr(buffer, m);
-//       goon = (i==1 ? p==buffer && strlen(buffer)==decoration[start].length() : p==buffer+strnlen(buffer,sizeof buffer)-strlen(m));
-//     } else {
-//       this->column  = this->column==-1 ? (int)strspn(buffer," ") : min((int)strspn(buffer," "),this->column);
-//     }
-//     ++i;
-//   }
-
-//   return goon;
-// }
-
-// string Simple::manage(const string &text) {
-//   auto len = lines(text);
-//   assert(len>2);
-
-//   string result;
-//   stringstream ss(text,ios_base::in);
-//   auto i    = 1;
-//   bool goon = true;
-//   while (goon && ss.getline(buffer,sizeof buffer)) {
-//     if (i>1 && i<len)
-//       result.append(string(buffer).substr(this->column)+'\n');
-//     ++i;
-//   }
-//   return result;
-// }
-
-// const char *Simple::id() {
-//   return Simple::ID;
-// }
-
 bool Fine::check(const string &text) {
   const array<string,3> decoration{
     "/*"+Option::annotationProlog(),
