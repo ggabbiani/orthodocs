@@ -178,7 +178,7 @@ int main(int argc, const char *argv[]) {
               {"off",       spdlog::level::off      }
             }
           )))
-      ->default_val("info");
+      ->default_val("error");
     app.add_flag(opt[ORTODOX].name, Option::_orthodox,opt[ORTODOX].desc);
 
     sources_opt->needs(sroot_opt);
