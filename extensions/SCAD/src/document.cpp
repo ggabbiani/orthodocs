@@ -159,12 +159,9 @@ const char *Fine::id() {
 AbstractStyle *Factory::operator()(const string &text) {
   static Single single;
   static Fine   fine;
-  // static Simple simple;
 
   if (fine.check(text))
     return static_cast<AbstractStyle*>(&fine);
-  // else if (simple.check(text))
-  //   return static_cast<AbstractStyle*>(&simple);
   else if (single.check(text))
     return static_cast<AbstractStyle*>(&single);
   else
