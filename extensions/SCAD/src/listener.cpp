@@ -23,6 +23,11 @@ namespace fs=std::filesystem;
 
 namespace {
 
+/**
+ * return the first previous comment NOT ROOT.
+ *
+ * NOTE: for root comment see rootComment()
+ */
 const antlr4::Token *prevComment(antlr4::BufferedTokenStream *stream, const antlr4::ParserRuleContext *ctx) {
   auto firstToken   = ctx->getStart();
   auto i            = firstToken->getTokenIndex();
@@ -31,11 +36,9 @@ const antlr4::Token *prevComment(antlr4::BufferedTokenStream *stream, const antl
   return token && token->getTokenIndex()>0 ? token : nullptr;
 }
 
-antlr4::Token *firstLeftComment(antlr4::BufferedTokenStream *stream, const antlr4::ParserRuleContext *ctx) {
-  auto firstToken   = ctx->getStart();
-  auto i            = firstToken->getTokenIndex();
-  auto leftComments = stream->getHiddenTokensToLeft(i,scad::SCADLexer::COMMENTS);
-  return leftComments.empty() ? nullptr : leftComments.front();
+const antlr4::Token *rootComment(const antlr4::BufferedTokenStream *stream) {
+  const auto *token = stream->get(0);
+  return token && token->getChannel()==scad::SCADLexer::COMMENTS ? token : nullptr;
 }
 
 const antlr4::Token *nextComment(antlr4::BufferedTokenStream *stream, const antlr4::ParserRuleContext *ctx) {
@@ -56,19 +59,14 @@ namespace scad {
 
 Listener::Listener(const fs::path &pkg_source,antlr4::BufferedTokenStream *s)
 : _tokens(s), _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source)) {
-  // TODO: make an utility with the code below
-  // auto world = _tokens->get(0,_tokens->size());
-  // for(const auto *token: world) {
-  //   spdlog::debug("{0}[{1}]: {2}",token->getChannel(),token->getTokenIndex(),token->getText());
-  // }
 }
 
 void Listener::enterPkg(Parser::PkgContext *ctx) {
   curr_package = new doc::Package(_pkg_path);
   curr_item.push(::doc::Item::Owner(curr_package));
 
-  // annotate if any comment at source' beginning
-  if (auto comment  = firstLeftComment(_tokens, ctx))
+  // annotate if any root comment
+  if (auto comment  = rootComment(_tokens))
     annotate(curr_package, comment);
 }
 
