@@ -11,13 +11,13 @@ OrthoDocs is an API documentation generator and static analysis tool for the Ope
 OrthoDocs comes with a complete OpenSCAD language parser, able to recognize all the public global functions, modules and variables found in the source tree, complete with parameters and their default values. Sources can be passed as files, directories or both. Each source file (here referred to as *package*) will produce a corresponding API document.
 Even in a completely uncommented source tree, OrthoDocs will create a document with the following items:
 
-* package name;
-* package dependency tree (in textual or graphical mode);
-* global variables (name and eventual default value);
-* global functions signatures (function name, parameters and eventual defaults);
-* global modules signature (name, parameters and eventual defaults);
-* one optional Table of Contents for all the items documented in the whole source tree;
-* any number of dependecy graphs reassuming the system parts correlation in whatever part of the source tree.
+    * package name;
+    * package dependency tree (in textual or graphical mode);
+    * global variables (name and eventual default value);
+    * global functions signatures (function name, parameters and eventual defaults);
+    * global modules signature (name, parameters and eventual defaults);
+    * one optional Table of Contents for all the items documented in the whole source tree;
+    * any number of dependecy graphs reassuming the system parts correlation in whatever part of the source tree.
 
 [Here](docs/examples/documents/uncommented.md) you can find the produced document from an uncommented [source file](docs/examples/sources/uncommented.scad):
 
@@ -118,7 +118,7 @@ For more complex tasks consult the full command option list:
 | -p,--private       | **OPTION** - Every documentation item (variable, function or module) prefixed with this string will not be published.
 | --pd,--pkg-deps    | **OPTION** - Set package dependecies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
 | -s,--src-root      | **OPTION** - Source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.
-| sources            | **POSITIONAL** - source sub-trees and/or files - 
+| sources            | **POSITIONAL** - source sub-trees and/or files -
 | -t,--toc           | **FLAG** - Generate a Table of Contents in the document tree root either as absolute or «source tree root» relative path
 | -V,--verbosity     | **FLAG** - Set the message log verbosity
 | -v,--version       | **FLAG** - Display program version information and exit

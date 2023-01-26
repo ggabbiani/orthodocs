@@ -5,10 +5,11 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 #include "markdown/graph.h"
-#include "error_info.h"
+#include <commons/error_info.h>
 
 using namespace std;
 

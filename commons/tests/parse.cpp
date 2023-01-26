@@ -1,4 +1,4 @@
-#include "spdx.h"
+#include <commons/spdx.h>
 
 #include <CLI/CLI.hpp>
 
@@ -21,11 +21,11 @@ int main(int argc, const char *argv[]) {
     app.add_option("annotation",annotation,"annotation to parse")
       ->required();
     app.parse(argc,argv);
-    
+
     doc::Annotation anno(annotation);
 
     spdx::analize(anno);
-    
+
     for(const auto &[size,data]: anno.analitics()) {
       auto sdata = dynamic_cast<spdx::Data*>(data.get());
       assert(sdata);

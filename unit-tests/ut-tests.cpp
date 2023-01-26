@@ -5,12 +5,13 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 #define BOOST_TEST_MODULE orthodocs unit tests
 #include <boost/test/included/unit_test.hpp>
 
-#include "scad/extension.h"
+#include <scad/extension.h>
 
 using namespace boost::unit_test;
 using namespace std;

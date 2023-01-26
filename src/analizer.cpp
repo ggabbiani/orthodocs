@@ -10,12 +10,12 @@
 
 #include "analizer.h"
 
-#include <bar.h>
-#include <error_info.h>
-#include <extensions.h>
-#include <globals.h>
-#include <spdx.h>
-#include <utils.h>
+#include <commons/bar.h>
+#include <commons/error_info.h>
+#include <commons/extensions.h>
+#include <commons/globals.h>
+#include <commons/spdx.h>
+#include <commons/utils.h>
 
 using namespace std;
 

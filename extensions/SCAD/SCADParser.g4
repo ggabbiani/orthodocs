@@ -1,22 +1,11 @@
 /*
  * OpenSCAD parser grammar.
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * This file is part of the 'AutoDox' (ADOX) project.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ADOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ADOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ADOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 parser grammar SCADParser;
@@ -25,15 +14,13 @@ options {
     tokenVocab = SCADLexer;
 }
 
-pkg: stats? EOF;
-
-stats: stat | stats stat;
+pkg: stat* EOF;
 
 stat
 	: incl								# statIncl
 	| use								# statUse
 	| assignment SEMI					# statAssign
-	| function_def						# statFuncDef
+	| function_def SEMI					# statFuncDef
 	| module_def						# statModDef
 	| let_clause stat_or_block			# statLet
 	| ('%'|'#'|'!'|'*')? module_inst	# statModInst
@@ -44,11 +31,10 @@ assignment	: ID ASSIGN expr;
 
 indexing	: '[' expr ']';
 
-if_stat			: let_clause? IF '(' expr ')' stat_or_block else_stat?;
-else_stat		: ELSE stat_or_block;
+if_stat			: let_clause? IF '(' expr ')' stat_or_block (ELSE stat_or_block)?;
 for_stat		: FOR 		'(' assignments ')' stat_or_block;
 int_for_stat	: INT_FOR	'(' assignments ')' stat_or_block;
-stat_or_block	: stat | stat_block;
+stat_or_block	: stat | block;
 
 expr
 	: TRUE
@@ -90,18 +76,18 @@ special_function_call
 	: echo_function_call
 	| assert_function_call
 	;
-echo_function_call	: ECHO 		'(' arguments_opt ')';
+echo_function_call	: ECHO 		'(' arguments? ')';
 assert_function_call: ASSERT	'(' argument (',' argument)? ')';
 
 module_def
-	: MODULE ID '(' parameters_opt COMMA? ')' (stat_block|stat);
+	: MODULE ID '(' parameter* ')' stat_or_block;
 
-stat_block: '{' stats? '}';
+block: '{' stat* '}';
 
 module_inst
-	: ECHO '(' arguments_opt ')' sons?
+	: ECHO '(' arguments? ')' sons?
 	| ASSERT '(' argument (COMMA argument)? ')' sons?
-	| ID '(' arguments_opt ')' sons?
+	| ID '(' arguments? ')' sons?
 	| for_stat
 	| int_for_stat
 	| if_stat
@@ -112,21 +98,37 @@ sons
 	| stat_or_block
 	;
 
-function_def	: FUNCTION ID '(' parameters_opt COMMA? ')' ASSIGN expr SEMI;
-parameters_opt	: parameters?;
-parameters		: parameter | parameters COMMA parameter;
-parameter		: lookup | assignment;
+function_def	: FUNCTION ID '(' parameter* ')' ASSIGN expr;
+/*
+ * The definition rule for formal parameters in module / function calls
+ * **IS HUGLY BUT MANDATORY** in order to capture annotations in both
+ * 'directions' (i.e. in both --orthodox and --unorthodox mode).
+ *
+ * See also [ANTLR 4 - How to access hidden comment channel from custom listener?](https://stackoverflow.com/questions/34730162/antlr-4-how-to-access-hidden-comment-channel-from-custom-listener)
+ * for an interesting example of how to browse all the token in a buffered
+ * stream.
+ *
+ * The real problem is the implementation of the
+ * antlr4::BufferedTokenStream::getHiddenTokensTo(Left|Right) function, whose
+ * exact behaviour is the following:
+ *
+ * Collect all hidden tokens (i.e. any off-default channel) to the right / left
+ * of the token index passed as argument, until one of the following conditions
+ * is met:
+ *
+ *	- a token is present on the DEFAULT_TOKEN_CHANNEL
+ *  - we arrive to the EOF.
+ */
+parameter		: (lookup | assignment) COMMA?;
 
-function_literal: FUNCTION '(' arguments_opt ')' expr;
+function_literal: FUNCTION '(' arguments? ')' expr;
 
 incl: INCLUDE FILE;
 use	: USE FILE;
 
-function_call: ID '(' arguments_opt ')';
+function_call: ID '(' arguments? ')';
 
-arguments_opt: arguments?;
-
-arguments: argument | arguments COMMA argument;
+arguments: argument (COMMA argument)*;
 argument: expr | assignment;
 
 /* list comprehension */
@@ -149,7 +151,7 @@ list_comprehension_elements_or_for_variants
 	;
 
 let_clause
-	: LET 	'(' assignments_opt ')';
+	: LET 	'(' assignments? ')';
 for_clause
 	: FOR 	'(' for_styles 		')';
 if_clause
@@ -158,40 +160,23 @@ ifelse_clause
 	: if_clause list_comprehension_elements_or_expr ELSE;
 
 for_styles
-	: assignments
-	| c_style
+	: assignments								# style_scad
+	| assignments? SEMI expr SEMI assignments?	# style_c
 	;
-
-c_style
-	: assignments_opt SEMI expr SEMI assignments_opt;
 
 // end of list comprehension
 
-assignments_opt
-	: assignments?;
-assignments
-	: assignment
-	| assignments COMMA assignment
-	;
-lookup
-	: ID;
+assignments	:	assignment (COMMA assignment)*;
+lookup		:	ID;
 
 range_expr
 	: '[' expr COLON expr ']'
 	| '[' expr COLON expr COLON expr ']'
 	;
 
-sequence: '[' optional_items ']';
+sequence: '[' (items COMMA?)? ']';
 
-optional_items
-	: COMMA?
-	| items ','?
-	;
-
-items
-	: seq_item
-	| items ',' seq_item
-	;
+items: seq_item (COMMA seq_item)*;
 
 seq_item: EACH? expr;
 

@@ -6,10 +6,11 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
-#include <globals.h>
-#include <utils.h>
+#include <commons/globals.h>
+#include <commons/utils.h>
 #include <scad/document.h>
 
 #include <CLI/CLI.hpp>

@@ -15,11 +15,12 @@ project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
 
 include(CTest)
 
-option(OPTION_FUNC_TESTS      "Functional tests"              ON  )
-option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"   ON  )
-option(OPTION_OTHER_TESTS     "Other more experimental tests" OFF )
-option(OPTION_UNIT_TESTS      "Unit tests"                    ON  )
-option(OPTION_WRITER_MARKDOWN "Markdown writer extension"     ON  )
+option(OPTION_FUNC_TESTS      "Functional tests"                    ON  )
+option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"         ON  )
+option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
+option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
+option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
+option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -90,14 +91,14 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(Python3 3.10)
 # cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
 if(NOT Python3_FOUND)
-  message(WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
+  message(AUTHOR_WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
 else()
   if (NOT Python_EXECUTABLE)
     set(Python_EXECUTABLE python3)
-    message(WARNING "Python_EXECUTABLE set to 'python3'")
+    message(AUTHOR_WARNING "Python_EXECUTABLE set to 'python3'")
   endif()
 endif()
-cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
+# cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
 
 #if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
   find_program(DIFF_EXE diff)
@@ -129,7 +130,7 @@ if (OPTION_LANGUAGE_SCAD)
   set(LANGUAGE_INCS ${ANTLR4_INCLUDE_DIRS})
 
   add_subdirectory(extensions/${LANGUAGE})
-  list(APPEND ORTHODOCS_LIBS ${LANGUAGE_LIB})
+  list(APPEND ORTHODOCS_LIBS language::scad)
 endif()
 
 ###############################################################################
@@ -140,7 +141,7 @@ if (OPTION_WRITER_MARKDOWN)
   set(WRITER_LIB  Markdown)
 
   add_subdirectory(extensions/${WRITER})
-  list(APPEND ORTHODOCS_LIBS ${WRITER_LIB})
+  list(APPEND ORTHODOCS_LIBS writer::markdown)
 endif()
 
 ###############################################################################

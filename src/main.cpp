@@ -10,14 +10,17 @@
 
 #include "analizer.h"
 
-#include <config.h>
-#include <error_info.h>
-#include <extensions.h>
-#include <globals.h>
-#include <utils.h>
+// project components
+#include <commons/config.h>
+#include <commons/error_info.h>
+#include <commons/extensions.h>
+#include <commons/globals.h>
+#include <commons/utils.h>
 
+// third party
 #include <CLI/CLI.hpp>
 
+// system
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -85,6 +88,7 @@ enum {
   IGNORE,
   PRIVATE,
   DEPS,
+  ORTODOX,
   SOURCES,
   SRC_ROOT,
   TOC,
@@ -96,22 +100,21 @@ struct {
   const char *name;
   const char *desc;
 } const opt[] = {
-  {"-a,--admonitions",    "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"--anno-prolog",
-    "defines the prefix used inside comments for the annotation (default \"!\")."
-    "When empty (\"\") all the comments are interpreted as annotations."
-  },
-  {"-d,--doc-root",       "document tree root - either an absolute or current directory relative path"                  },
-  {"-g,--graphs",         "list of root relative directories where placing graphs"                                      },
-  {"-i,--ignore-prefix",  "ignore this package prefix in the Table of Contents sort"                                    },
-  {"-p,--private",        "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
-  {"--pd,--pkg-deps",     "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
-  {"sources",             "source root sub-trees and/or files - either as absolute or «source tree root» relative path."
-                          " If missing all the source root will be scanned"                                             },
-  {"-s,--src-root",       "source tree root - either an absolute or current directory relative path"                    },
-  {"-t,--toc",            "generate a Table of Contents in the document tree root"                                      },
-  {"-V,--verbosity",      "set spdlog verbosity"                                                                        },
-  {"-v,--version",        "orthodocs version " ODOX_VERSION_STR                                                         },
+  {"-a,--admonitions",            "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
+  {"--anno-prolog",               "defines the prefix used inside comments for the annotation (default \"!\")."
+                                  " When empty (\"\") all the comments are interpreted as annotations."                         },
+  {"-d,--doc-root",               "document tree root - either an absolute or current directory relative path"                  },
+  {"-g,--graphs",                 "list of root relative directories where placing graphs"                                      },
+  {"-i,--ignore-prefix",          "ignore this package prefix in the Table of Contents sort"                                    },
+  {"-p,--private",                "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
+  {"--pd,--pkg-deps",             "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
+  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceeding their formal definition (default true)"               },
+  {"sources",                     "source root sub-trees and/or files - either as absolute or «source tree root» relative path."
+                                  " If missing all the source root will be scanned"                                             },
+  {"-s,--src-root",               "source tree root - either an absolute or current directory relative path"                    },
+  {"-t,--toc",                    "generate a Table of Contents in the document tree root"                                      },
+  {"-V,--verbosity",              "set spdlog verbosity"                                                                        },
+  {"-v,--version",                "orthodocs version " ODOX_VERSION_STR                                                         },
 };
 
 std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s) {
@@ -176,6 +179,7 @@ int main(int argc, const char *argv[]) {
             }
           )))
       ->default_val("info");
+    app.add_flag(opt[ORTODOX].name, Option::_orthodox,opt[ORTODOX].desc);
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);

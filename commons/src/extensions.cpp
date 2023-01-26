@@ -5,10 +5,11 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
-#include "bar.h"
-#include "extensions.h"
+#include <commons/bar.h>
+#include <commons/extensions.h>
 
 using namespace std;
 

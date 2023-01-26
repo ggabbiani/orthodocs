@@ -1,28 +1,17 @@
 /*
  * OpenSCAD lexer grammar.
  *
- * Copyright © 2022 Giampiero Gabbiani (giampiero@gabbiani.org)
+ * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * This file is part of the 'AutoDox' (ADOX) project.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ADOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ADOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ADOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 lexer grammar SCADLexer;
 
 channels {
-	SPACES,
+	// SPACES,
 	COMMENTS
 }
 
@@ -80,8 +69,8 @@ MODIFIER		: '%'| '#'| '!'| '*';
 BLOCK_COMMENT	: '/*' .*? '*/' 	-> channel(COMMENTS);
 LINE_COMMENT	: '//' ~[\r\n]*		-> channel(COMMENTS);
 
-WS: [ \t]+ 							-> channel(SPACES);
-NL: ( '\r' '\n'? | '\n') 			-> channel(SPACES);
+WS: [ \t]+ 							-> skip;
+NL: ( '\r' '\n'? | '\n') 			-> skip;
 
 ID: SPECIAL? [a-zA-Z0-9_]+;
 

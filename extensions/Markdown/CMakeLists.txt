@@ -9,7 +9,7 @@ set(WRITER_INCS
 set(WRITER_LIBS indicators::indicators spdlog::spdlog)
 
 if (OPTION_LANGUAGE_SCAD)
-  list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/src)
+  list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
 endif()
 
 # cmake_print_variables(WRITER_INCS WRITER_LIBS)
@@ -18,13 +18,16 @@ add_library(${WRITER_LIB} STATIC
   src/markdown/graph.cpp
   src/markdown/extension.cpp
 )
+add_library(writer::markdown ALIAS ${WRITER_LIB})
 target_include_directories(${WRITER_LIB}
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
   PRIVATE # library dependencies
     ${WRITER_INCS}
-    ${Boost_INCLUDE_DIRS})
+    ${Boost_INCLUDE_DIRS}
+)
 target_link_libraries(${WRITER_LIB}
   PUBLIC # clients and library dependencies
     commons
+    language::scad
 )

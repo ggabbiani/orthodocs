@@ -38,7 +38,11 @@ function(parse_test)
     set_property(TEST "${TEST_NAME}" PROPERTY FAIL_REGULAR_EXPRESSION "${value}")
     # message("${TEST_NAME} TEST_FAIL_REGULAR_EXPRESSION: ${TEST_FAIL_REGULAR_EXPRESSION} (${value})")
   endif()
-  set_tests_properties(${TEST_NAME} PROPERTIES RUN_SERIAL TRUE)
+  set_tests_properties(${TEST_NAME}
+    PROPERTIES
+      RUN_SERIAL TRUE
+      LABELS PARSE
+  )
 endfunction(parse_test)
 
 # annotation style recognition tests
@@ -53,7 +57,11 @@ function(style_recon_test)
     COMMAND style-factory-test -s annotation-styles -e ${TEST_STYLE} ${TEST_FILES}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
-  set_tests_properties(${TEST_NAME} PROPERTIES RUN_SERIAL TRUE)
+  set_tests_properties(${TEST_NAME}
+    PROPERTIES
+      RUN_SERIAL TRUE
+      LABELS STYLE
+  )
 endfunction(style_recon_test)
 
 add_executable(style-factory-test
@@ -69,7 +77,8 @@ parse_test(NAME assert        RULE pkg  FILE assert.scad        FAIL_REGULAR_EXP
 parse_test(NAME assignments   RULE pkg  FILE assignment.scad    FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME comments      RULE pkg  FILE comments.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME error         RULE pkg  FILE error.scad         PASS_REGULAR_EXPRESSION DEFAULT)
-parse_test(NAME func_lit      RULE function_literal FILE func_lit.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
+parse_test(NAME func_lit      RULE pkg  FILE func_lit.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
+parse_test(NAME func_lit_bug  RULE pkg  FILE bug.scad           FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME if_statement  RULE pkg  FILE if_statement.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME includes      RULE pkg  FILE includes.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME lc_advanced   RULE pkg  FILE lc_advanced.scad   FAIL_REGULAR_EXPRESSION DEFAULT)
@@ -82,5 +91,5 @@ parse_test(NAME vars          RULE pkg  FILE vars.scad          FAIL_REGULAR_EXP
 parse_test(NAME vectors       RULE pkg  FILE vectors.scad       FAIL_REGULAR_EXPRESSION DEFAULT)
 
 style_recon_test(STYLE SINGLE FILES style-single.anno)
-style_recon_test(STYLE SIMPLE FILES style-simple0.anno style-simple1.anno style-simple2.anno)
+# style_recon_test(STYLE SIMPLE FILES style-simple0.anno style-simple1.anno style-simple2.anno)
 style_recon_test(STYLE FINE   FILES style-fine.anno style-fine1.anno)

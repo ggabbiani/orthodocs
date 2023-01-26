@@ -20,11 +20,11 @@
 - [x] adopt SPDX License schema
 - [x] implement boost unit tests
 - [x] move bin(s) from bash to python
+- [x] implement reverse comment annotation;
 
 ## Others
 
 - [ ] implement a better error listener;
-- [ ] implement reverse comment annotation;
 - [ ] improve ToC with a first line referring indexed paragraphs;
 - [ ] set -i,--ignore-prefix cli option as a regex
 - [ ] fix heading id bug on items containing dollar ('$') character inside

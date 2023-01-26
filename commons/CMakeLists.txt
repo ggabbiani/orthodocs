@@ -1,6 +1,6 @@
 project(commons VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
 
-configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/config.h @ONLY)
+configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
 ###############################################################################
 # Jason resources from github spdx
 set(SPDX_LICENSES_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/licenses.json")
@@ -13,7 +13,7 @@ file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/exceptions.json
   ${SPDX_EXCEPTIONS_JSON}
 )
-configure_file(spdx_config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/include/spdx_config.h" @ONLY)
+configure_file(spdx_config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/include/commons/spdx_config.h" @ONLY)
 
 # builds spdx parser
 add_subdirectory(spdx)

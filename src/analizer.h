@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include <document.h>
+#include <commons/document.h>
 
 #include <filesystem>
 #include <iostream>
@@ -42,8 +42,8 @@ public:
   auto buildDocuments() ->void;
   /**
    * @brief populate a dictionary with candidate items
-   * 
-   * @return Dictionary 
+   *
+   * @return Dictionary
    */
   auto populate() const -> Dictionary;
 

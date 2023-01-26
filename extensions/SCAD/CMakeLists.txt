@@ -13,7 +13,7 @@ find_package(ANTLR REQUIRED)
 antlr_target(${LEXER} ${LEXER}.g4 LEXER PACKAGE scad)
 antlr_target(${PARSER}
   ${PARSER}.g4
-  PARSER LISTENER
+  PARSER LISTENER VISITOR
   PACKAGE scad
   DEPENDS_ANTLR ${LEXER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
@@ -29,25 +29,29 @@ antlr_target(${PARSER}
 ###############################################################################
 # C++ client application lib
 add_library(${LANGUAGE_LIB} STATIC
-  src/scad/doc/annotations.cpp
-  src/scad/document.cpp
-  src/scad/extension.cpp
-  src/scad/listener.cpp
-  ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS}
+  src/annotations.cpp
+  src/document.cpp
+  src/extension.cpp
+  src/listener.cpp
+  $<$<BOOL:${OPTION_SCAD_VISITORS}>:src/visitor.cpp>
+  ${ANTLR_${LEXER}_CXX_OUTPUTS}
+  ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
+add_library(language::scad ALIAS ${LANGUAGE_LIB})
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR}
+    src
+    ${ANTLR_${LEXER}_OUTPUT_DIR}
+    ${ANTLR_${PARSER}_OUTPUT_DIR}
 )
-target_link_libraries(${LANGUAGE_LIB} 
-  PUBLIC # clients and library dependencies
-    # spdlog::spdlog
+target_link_libraries(${LANGUAGE_LIB}
+  PUBLIC
     commons
-  PRIVATE # library dependencies
-    antlr4_static 
+  PRIVATE
+    antlr4_static
 )
 # cmake_print_variables(
 #   ANTLR_${LEXER}_CXX_OUTPUTS

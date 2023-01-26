@@ -79,6 +79,9 @@ function (doc_test)
     CMD1 "$<TARGET_FILE:orthodocs> --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
     CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
+  set_tests_properties(${DOC_NAME}
+    PROPERTIES LABELS DOCUMENT
+  )
 endfunction(doc_test)
 
 # add a doc compare test using batch.py
@@ -93,6 +96,9 @@ function (batch_test)
   set(multiValueArgs)
   cmake_parse_arguments(BATCH "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+  if (NOT Python3_FOUND)
+    message(FATAL_ERROR "Python is needed for batch_test")
+  endif()
   if (NOT DEFINED BATCH_SERIAL)
     set(BATCH_SERIAL TRUE)
   endif()
@@ -106,7 +112,6 @@ function (batch_test)
     )
   set_tests_properties(${BATCH_NAME}
     PROPERTIES RUN_SERIAL ${BATCH_SERIAL}
-    LABELS BATCH
   )
 endfunction(batch_test)
 
@@ -117,16 +122,48 @@ boost_test(NAME UnitTests
     ${ORTHODOCS_LIBS}
     ${Boost_LIBRARIES}
 )
+cmake_print_variables(ORTHODOCS_LIBS)
 
 if (Python3_FOUND)
-  doc_test(NAME flat-lib
-    SOURCES "flat-lib/sources"
-    COMPARE "flat-lib/docs"
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$>"
+  doc_test(NAME ortho-lib-defdecorations
+    SOURCES docu-styles/ortho/lib-defdecorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --graphs ."
   )
-  doc_test(NAME flat-lib-legacy
-    SOURCES "flat-lib/sources"
-    COMPARE "flat-lib/docs-legacy"
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix prefix_ $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog ''"
+  doc_test(NAME ortho-lib-custom-decorations
+    SOURCES docu-styles/ortho/lib-custom-decorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog '@' --graphs ."
   )
-endif()
+  doc_test(NAME ortho-lib-nocomments
+    SOURCES docu-styles/ortho/lib-nocomments
+    COMPARE docu-styles/results/no-annotations
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --graphs ."
+  )
+  doc_test(NAME ortho-lib-nodecorations
+    SOURCES docu-styles/ortho/lib-nodecorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog '' --graphs ."
+  )
+
+  doc_test(NAME unortho-lib-defdecorations
+    SOURCES docu-styles/unortho/lib-defdecorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --graphs ."
+  )
+  doc_test(NAME unortho-lib-custom-decorations
+    SOURCES docu-styles/unortho/lib-custom-decorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --anno-prolog '@' --graphs ."
+  )
+  doc_test(NAME unortho-lib-nocomments
+    SOURCES docu-styles/unortho/lib-nocomments
+    COMPARE docu-styles/results/no-annotations
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --graphs ."
+  )
+  doc_test(NAME unortho-lib-nodecorations
+    SOURCES docu-styles/unortho/lib-nodecorations
+    COMPARE docu-styles/results/annotated
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --anno-prolog '' --graphs ."
+  )
+  endif()

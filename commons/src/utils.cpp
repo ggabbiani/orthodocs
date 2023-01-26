@@ -5,11 +5,12 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
-#include "error_info.h"
-#include "globals.h"
-#include "utils.h"
+#include <commons/error_info.h>
+#include <commons/globals.h>
+#include <commons/utils.h>
 
 #include <spdlog/spdlog.h>
 

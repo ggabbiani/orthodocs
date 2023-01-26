@@ -5,13 +5,14 @@
  *
  * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * SPDX-License-Identifier: GPL-3.0-or-later */
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 #include "extension.h"
 #include "graph.h"
 
-#include <bar.h>
-#include <spdx.h>
+#include <commons/bar.h>
+#include <commons/spdx.h>
 
 #include <spdlog/spdlog.h>
 #include <boost/algorithm/string/predicate.hpp>

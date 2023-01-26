@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "globals.h"
-#include "spdx.h"
+#include <commons/globals.h>
+#include <commons/spdx.h>
 
-#include "SPDXLexer.h"
-#include "SPDXParser.h"
+#include <SPDXLexer.h>
+#include <SPDXParser.h>
 
 #include <spdlog/spdlog.h>
 
