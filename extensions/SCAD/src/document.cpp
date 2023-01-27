@@ -91,7 +91,7 @@ const char *Single::id() {
 }
 
 bool Single::check(const string &text) {
-  string prolog = "//"+Option::annotationProlog()+" ";
+  string prolog = "//"+Option::decorations()+" ";
   return (lines(text)==1 && text.find(prolog)==0);
 }
 
@@ -103,7 +103,7 @@ string Single::manage(const string &text) {
 
 bool Fine::check(const string &text) {
   const array<string,3> decoration{
-    "/*"+Option::annotationProlog(),
+    "/*"+Option::decorations(),
     " */",
     " *"
   };

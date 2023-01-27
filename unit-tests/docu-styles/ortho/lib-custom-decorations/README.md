@@ -2,7 +2,7 @@
 
 It is possible to use any string/character as decoration for annotations.
 
-The option `--anno-prolog` must be used for this.
+The option `--decorations` must be used for this.
 
 Valid examples for custom annotations are:
 

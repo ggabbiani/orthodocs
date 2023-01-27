@@ -133,7 +133,7 @@ if (Python3_FOUND)
   doc_test(NAME ortho-lib-custom-decorations
     SOURCES docu-styles/ortho/lib-custom-decorations
     COMPARE docu-styles/results/annotated
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog '@' --graphs ."
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --decorations '@' --graphs ."
   )
   doc_test(NAME ortho-lib-nocomments
     SOURCES docu-styles/ortho/lib-nocomments
@@ -143,7 +143,7 @@ if (Python3_FOUND)
   doc_test(NAME ortho-lib-nodecorations
     SOURCES docu-styles/ortho/lib-nodecorations
     COMPARE docu-styles/results/annotated
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --anno-prolog '' --graphs ."
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --decorations '' --graphs ."
   )
 
   doc_test(NAME unortho-lib-defdecorations
@@ -154,7 +154,7 @@ if (Python3_FOUND)
   doc_test(NAME unortho-lib-custom-decorations
     SOURCES docu-styles/unortho/lib-custom-decorations
     COMPARE docu-styles/results/annotated
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --anno-prolog '@' --graphs ."
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --decorations '@' --graphs ."
   )
   doc_test(NAME unortho-lib-nocomments
     SOURCES docu-styles/unortho/lib-nocomments
@@ -164,6 +164,6 @@ if (Python3_FOUND)
   doc_test(NAME unortho-lib-nodecorations
     SOURCES docu-styles/unortho/lib-nodecorations
     COMPARE docu-styles/results/annotated
-    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --anno-prolog '' --graphs ."
+    OPTIONS "--toc --pkg-deps graph --ignore-prefix $<IF:$<BOOL:${CMAKE_HOST_UNIX}>,'\$',$> --unorthodox --decorations '' --graphs ."
   )
   endif()

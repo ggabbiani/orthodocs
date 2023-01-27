@@ -101,16 +101,16 @@ struct {
   const char *desc;
 } const opt[] = {
   {"-a,--admonitions",            "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"--anno-prolog",               "defines the prefix used inside comments for the annotation (default \"!\")."
-                                  " When empty (\"\") all the comments are interpreted as annotations."                         },
+  {"--decorations",               "defines the prefix used inside comments for distinguish a simple comment from an annotation"
+                                  " Set to '' means no decorations, and all the comments are interpreted as annotations."       },
   {"-d,--doc-root",               "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",                 "list of root relative directories where placing graphs"                                      },
   {"-i,--ignore-prefix",          "ignore this package prefix in the Table of Contents sort"                                    },
   {"-p,--private",                "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
   {"--pd,--pkg-deps",             "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
-  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceeding their formal definition (default true)"               },
-  {"sources",                     "source root sub-trees and/or files - either as absolute or «source tree root» relative path."
-                                  " If missing all the source root will be scanned"                                             },
+  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceeding their formal definition"                              },
+  {"sources",                     "«source root» sub-trees and/or files - either as absolute or «source root» relative path."
+                                  " If missing all the «source root» content sources will be scanned"                           },
   {"-s,--src-root",               "source tree root - either an absolute or current directory relative path"                    },
   {"-t,--toc",                    "generate a Table of Contents in the document tree root"                                      },
   {"-V,--verbosity",              "set spdlog verbosity"                                                                        },
@@ -150,7 +150,8 @@ int main(int argc, const char *argv[]) {
     auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
-    app.add_option(opt[ANNO_PROLOG].name, Option::_annotation_prolog, opt[ANNO_PROLOG].desc);
+    app.add_option(opt[ANNO_PROLOG].name, Option::_decorations, opt[ANNO_PROLOG].desc)
+      ->default_val("!");
     app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(canonical_dir,"DIR"));
@@ -162,7 +163,8 @@ int main(int argc, const char *argv[]) {
       ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
     auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-    app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc);
+    app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc)
+      ->default_val("__");
     app.set_version_flag(opt[VERSION].name, opt[VERSION].desc);
     app.add_option(opt[VERBOSITY].name,Option::_verbosity,opt[VERBOSITY].desc)
       ->transform(
@@ -179,7 +181,8 @@ int main(int argc, const char *argv[]) {
             }
           )))
       ->default_val("error");
-    app.add_flag(opt[ORTODOX].name, Option::_orthodox,opt[ORTODOX].desc);
+    app.add_flag(opt[ORTODOX].name, Option::_orthodox,opt[ORTODOX].desc)
+      ->default_val(true);
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);

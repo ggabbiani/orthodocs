@@ -3,7 +3,7 @@
 The default decoration used by OrthoDocs is the single character `'!'` soon after
 any native SCAD comment start.
 
-The option `--anno-prolog` can be left unset.
+The option `--decorations` can be left unset.
 
 Valid examples for annotations are:
 

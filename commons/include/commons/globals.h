@@ -42,7 +42,7 @@ public:
   /**
    * defines the annotation prologue string
    */
-  static const std::string &annotationProlog() {return _annotation_prolog;}
+  static const std::string &decorations() {return _decorations;}
   /**
    * set of directory for partial dependencies graphs
    */
@@ -97,7 +97,7 @@ public:
   static Verbosity verbosity() {return _verbosity;}
 private:
   static bool                     _admonitions;
-  static std::string              _annotation_prolog;
+  static std::string              _decorations;
   static std::filesystem::path    _droot;
   static FileSet                  _graphs;
   static std::vector<std::string> _ignore_prefix;
