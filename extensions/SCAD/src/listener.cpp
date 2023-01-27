@@ -91,8 +91,7 @@ string nextAnnoData(antlr4::BufferedTokenStream *stream, const antlr4::ParserRul
   // list of tokens from the COMMENTS channel with an index value following the start index
   auto rightComments  = stream->getHiddenTokensToRight(startIndex,scad::SCADLexer::COMMENTS);
   // search for usable annotation FROM THE START (i.e. from the nearest to our last token)
-  for(auto i=rightComments.begin(); i!=rightComments.end(); ++i) {
-    const auto *token = *i;
+  for(const auto *token:rightComments) {
     // we use the style factory as a sentinel for distinguish a normal
     // comment from an annotation (a decorated comment)
     if (auto comment = token->getText(); factory(comment)) {
