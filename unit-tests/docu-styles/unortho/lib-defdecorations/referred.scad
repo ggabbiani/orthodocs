@@ -15,6 +15,7 @@ __referred_global_private__ = 10;
 /*!
  * This variable is global public and will be published.
  */
+/* this comment will be ignored */
 referred_global_public = "global public variable";
 
 /*!

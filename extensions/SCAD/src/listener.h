@@ -13,6 +13,7 @@
 
 #include <scad/document.h>
 #include <commons/globals.h>
+#include <commons/singleton.h>
 #include <SCADParserBaseListener.h>
 
 #include <memory>
@@ -33,6 +34,7 @@ public:
   using Parameter             = ::doc::Parameter;
   using Parser                = scad::SCADParser;
   using ParserRuleContext     = antlr4::ParserRuleContext;
+  using StyleFactory          = Singleton<scad::doc::style::Factory>;
   using Token                 = antlr4::Token;
 
   Listener(const std::filesystem::path &pkg_source,antlr4::BufferedTokenStream *s);
@@ -55,16 +57,16 @@ public:
   void exitPkg(Parser::PkgContext *ctx)                     override;
 
 private:
+  /*
+   * Enrich the item with annotation data (a valid decorated comment)
+   */
   template <class ANNOTABLE>
-  void annotate(ANNOTABLE *item, const Token *comment) const {
-    static doc::style::Factory factory;
-    auto anno = comment->getText();
-    if (auto style  = factory(anno)) {
-      auto value  = style->manage(anno);
-      if (Option::admonitions())
-        mk_admonitions(value);
-      set(item->annotation, value);
-    }
+  void annotate(ANNOTABLE *item, const std::string &comment) const {
+    // comment has been already checked, so style is !=nullptr
+    auto data = StyleFactory::instance()(comment)->manage(comment);
+    if (Option::admonitions())
+      mk_admonitions(data);
+    set(item->annotation, data);
   }
 
   antlr4::BufferedTokenStream *_tokens;
