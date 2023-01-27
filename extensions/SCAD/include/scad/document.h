@@ -109,18 +109,6 @@ class Single : public AbstractStyle {
   const char *id() override;
 };
 
-// class Simple : public AbstractStyle {
-//   friend class Factory;
-
-//   static constexpr const char *ID = "SIMPLE";
-//   enum Decoration {start,end};
-//   bool check(const std::string &text) override;
-//   std::string manage(const std::string &text) override;
-//   const char *id() override;
-
-//   int column;
-// };
-
 class Fine : public AbstractStyle {
   friend class Factory;
 
