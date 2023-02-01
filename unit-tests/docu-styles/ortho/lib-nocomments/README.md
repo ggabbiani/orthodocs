@@ -22,21 +22,21 @@ The availability matrix for the supported features without and with comments is 
 
 | Type      | Feature                                       | Uncommented   | Commented |
 | ---       | ---                                           | ---           | ---       |
-| Packages  | direct dependecy list (textual or graphical)  | ✅            | ✅        |
-|           | inter-package dependecy graph(s)              | ✅            | ✅        |
-|           | detailed description                          | ❌            | ✅        |
-|           | SPDX licensing                                | ❌            | ✅        |
-| Variables | signature (name and defaults)                 | ✅            | ✅        |
-|           | detailed description                          | ❌            | ✅        |
-| Functions | signature (name, prameters and defaults)      | ✅            | ✅        |
-|           | detailed description                          | ❌            | ✅        |
-|           | parameter detailed description                | ❌            | ✅        |
-| Modules   | signature (name, prameters and defaults)      | ✅            | ✅        |
-|           | detailed description                          | ❌            | ✅        |
-|           | parameter detailed description                | ❌            | ✅        |
-| General   | Table of Contents                             | ✅            | ✅        |
-|           | Cross references                              | ❌            | ✅        |
-|           | Admonitions                                   | ❌            | ✅        |
+| Packages  | direct dependecy list (textual or graphical)  | ✔            | ✔        |
+|           | inter-package dependecy graph(s)              | ✔            | ✔        |
+|           | detailed description                          | ❌            | ✔        |
+|           | SPDX licensing                                | ❌            | ✔        |
+| Variables | signature (name and defaults)                 | ✔            | ✔        |
+|           | detailed description                          | ❌            | ✔        |
+| Functions | signature (name, prameters and defaults)      | ✔            | ✔        |
+|           | detailed description                          | ❌            | ✔        |
+|           | parameter detailed description                | ❌            | ✔        |
+| Modules   | signature (name, prameters and defaults)      | ✔            | ✔        |
+|           | detailed description                          | ❌            | ✔        |
+|           | parameter detailed description                | ❌            | ✔        |
+| General   | Table of Contents                             | ✔             | ✔        |
+|           | Cross references                              | ❌            | ✔        |
+|           | Admonitions                                   | ❌            | ✔        |
 |           |                                               |               |           |
 
 ## Restricting the produced documentation
