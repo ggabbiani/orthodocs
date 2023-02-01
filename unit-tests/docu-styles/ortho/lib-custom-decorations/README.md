@@ -1,20 +1,18 @@
-# Using custom decorated comments as annotation
+# Using custom decorations
 
-It is possible to use any string/character as decoration for annotations.
+It is possible to use any string/character as decoration for the annotations through the option `--decorations` like in the following examples:
 
-The option `--decorations` must be used for this.
-
-Valid examples for custom annotations are:
-
-```
+```text
 /*@
  * multi-line annotation
  * example.
  */
 ```
 
-```
+```text
 //@ single-line annotation example
 ```
 
-Comments without the default decoration or with different decorations will be ignored.
+In this case OrthoDocs must be invoked with `--decorations` set to `"@"`.
+
+As with the defaults, even with custom decorations any comment not matching and/or outside relevant positions will be ignored.

@@ -6,40 +6,14 @@
 
 OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
 
-## Design
+## How to document
 
-OrthoDocs comes with a complete OpenSCAD language parser, able to recognize all the public global functions, modules and variables found in the source tree, complete with parameters and their default values. Sources can be passed as files, directories or both. Each source file (here referred to as *package*) will produce a corresponding API document.
-Even in a completely uncommented source tree, OrthoDocs will create a document with the following items:
+OrthoDocs is able to recognize all the public global functions, modules and variables found in the source tree, complete with parameters and their default values. Sources can be passed as files, directories or both. Each source file (here referred to as *package*) will produce a corresponding API document.
 
-    * package name;
-    * package dependency tree (in textual or graphical mode);
-    * global variables (name and eventual default value);
-    * global functions signatures (function name, parameters and eventual defaults);
-    * global modules signature (name, parameters and eventual defaults);
-    * one optional Table of Contents for all the items documented in the whole source tree;
-    * any number of dependecy graphs reassuming the system parts correlation in whatever part of the source tree.
-
-[Here](docs/examples/documents/uncommented.md) you can find the produced document from an uncommented [source file](docs/examples/sources/uncommented.scad):
-
-### Annotations
-
-Orthodocs annotations are single line or C-style block comments in which the comment start is immediately followed by the `!` character. All the other comments are ignored.
-
-    /*
-     * This is a C-style block comment and is ignored by OrthoDocs
-     */
-
-    // This is a single line comment ignored as well
-
-    /*!
-     * This is a C-style block comment interpreted
-     * as a multi
-     * line annotation
-     */
-
-     //! This is a single line comment interpreted as a single line annotation
-
-[Here](docs/examples/documents/annotated.md) a document example from the same [source file](docs/examples/sources/annotated.scad) enriched with annotations.
+- [OrthoDocs basics](unit-tests/docu-styles/ortho/lib-nocomments/README.md) - documenting uncommented code
+- [Using decorations](unit-tests/docu-styles/ortho/lib-defdecorations/README.md) - default behaviour
+- [Using custom decorations](unit-tests/docu-styles/ortho/lib-custom-decorations/README.md) - customized decoration
+- [Using comments](unit-tests/docu-styles/ortho/lib-nodecorations/README.md) - documenting existing code
 
 ## The command line
 
@@ -85,7 +59,7 @@ will scan all the SCAD sources in the source-root and produce the consequent doc
                 ├── type_trait.scad
                 └── uncommented.scad
 
-If we want to keep the same source-root while documenting only one subset of the present sources the following command
+If we want to keep the same source-root **while documenting only a subset** of the present sources the following command
 
     /home/giampa $ orthodocs --src-root example/sources --doc-root example/docs annotated.scad uncommented.scad
 
