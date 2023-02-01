@@ -62,14 +62,14 @@ void Extension::analize(Annotation &anno) const {
     while (regex_search(t, match, sl.regularExpression)) {
       auto offset   = (t-data.c_str());
       auto pos      = match.position(0)+offset;
-      auto len      = (analitic::Data::Size)match.length(0);
+      auto len      = (analytic::Data::Size)match.length(0);
       auto analysis = make_unique<xref::Analysis>(
         pos,                                                    // position
         len,                                                    // length
         data.substr(pos,match.length(0)),                       // token to be substituted with reference
         data.substr(match.position(1)+offset,match.length(1))   // literal to be searched for in the exclusion vocabulary
       );
-      spdlog::trace("Adding analitic data token {}",analysis->token);
+      spdlog::trace("Adding analytic data token {}",analysis->token);
       add(anno,analysis.release());
       t += pos+len;
     }

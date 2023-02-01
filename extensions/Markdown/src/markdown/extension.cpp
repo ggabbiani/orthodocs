@@ -227,11 +227,11 @@ void Extension::write(const Document &document, const Annotation &annotation, os
   try {
     if (!annotation.empty()) {
       string s = annotation.data();
-      auto &results = annotation.analitics();
+      auto &results = annotation.analytics();
       // xref substitution starts from last occurrence
       for_each(results.rbegin(), results.rend(),
-        [this,&document,&s] (const Analitics::value_type &value) {
-          // check if the analitic result is an xref result
+        [this,&document,&s] (const Analytics::value_type &value) {
+          // check if the analytic result is an xref result
           if (auto xref_data = dynamic_cast<const xref::Analysis*>(value.second.get()); xref_data) {
             if (auto i=this->_dict->find(xref_data->token); i!=this->_dict->end()) {
               auto ref    = this->reference(i->second,&document.source);

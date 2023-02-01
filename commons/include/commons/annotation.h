@@ -15,7 +15,7 @@
 #include <memory>
 #include <string>
 
-namespace analitic {
+namespace analytic {
 
 struct Data {
   using Position  = std::ptrdiff_t;
@@ -36,7 +36,7 @@ struct Data {
 /**
  * analysis results data ordered by character position
  */
-using Analitics = std::map<analitic::Data::Position,analitic::Data::Owner>;
+using Analytics = std::map<analytic::Data::Position,analytic::Data::Owner>;
 
 namespace doc {
 
@@ -54,14 +54,14 @@ public:
       anno._data = s;
     }
     /**
-     * add new analitic data
+     * add new analytic data
      */
-    void add(Annotation &anno,analitic::Data *data) const {
-      auto [ignored,success] = anno._analitics.try_emplace(data->position,data);
+    void add(Annotation &anno,analytic::Data *data) const {
+      auto [ignored,success] = anno._analytics.try_emplace(data->position,data);
       assert(success);
     }
-    Analitics &analitics(Annotation &anno) const {
-      return anno._analitics;
+    Analytics &analytics(Annotation &anno) const {
+      return anno._analytics;
     }
   };
 
@@ -72,11 +72,11 @@ public:
   // property getters
   bool empty() const {return data().empty();}
   const std::string &data() const {return _data;}
-  const Analitics &analitics() const {return _analitics;}
+  const Analytics &analytics() const {return _analytics;}
 
 private:
   std::string _data;
-  Analitics   _analitics;
+  Analytics   _analytics;
 };
 
 }

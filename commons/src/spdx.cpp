@@ -100,7 +100,7 @@ void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
     data->name  = lic ? lic->name() : id;
   }
   data->url         = lic ? fs::path(lic->url()).replace_extension(".html").string() : "";
-  auto [i,success] = _analitics.try_emplace(data->position,move(data));
+  auto [i,success] = _analytics.try_emplace(data->position,move(data));
   assert(success);
 }
 
@@ -113,7 +113,7 @@ void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
     auto xcp          = _exceptions.find(xid);
     data->name        = (xcp ? xcp->name() : xid);
     data->url         = (xcp ? "https://spdx.org/licenses/"+fs::path(xcp->url()).filename().string() : "");
-    auto [i,success]  = _analitics.try_emplace(data->position,move(data));
+    auto [i,success]  = _analytics.try_emplace(data->position,move(data));
     assert(success);
   }
 }

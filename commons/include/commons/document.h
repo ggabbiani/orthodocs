@@ -36,14 +36,14 @@ class Item;
  * Simple cross-reference namespace based on three elements:
  *
  * 1. a language extension for reference analysis;
- * 2. one dictionary, containing all the referrable items;
+ * 2. one dictionary, containing all the referencible items;
  * 3. a writer extension for references substitution during document saving.
  */
 namespace xref {
 
-struct Analysis : public analitic::Data {
+struct Analysis : public analytic::Data {
   Analysis(Position pos, Size len,const std::string &tok, const std::string &lit)
-  : analitic::Data{pos,len}, token{tok}, literal{lit} {}
+  : analytic::Data{pos,len}, token{tok}, literal{lit} {}
 
   // token to be searched for in the inclusion dictionary
   std::string token;

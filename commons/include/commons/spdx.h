@@ -322,7 +322,7 @@ private:
 /**
  * spdx analysis data
  */
-struct Data : public analitic::Data {
+struct Data : public analytic::Data {
   Data() = default;
   // full license name
   std::string name;
@@ -337,7 +337,7 @@ class Listener : public spdx::SPDXParserBaseListener, doc::Annotation::Setter {
 public:
 
   Listener(const LicenseList &licenses, const ExceptionList &exceptions, doc::Annotation &anno)
-    : _licenses(licenses),_exceptions(exceptions),_analitics(doc::Annotation::Setter::analitics(anno)) {}
+    : _licenses(licenses),_exceptions(exceptions),_analytics(doc::Annotation::Setter::analytics(anno)) {}
 
   using License_and_beyondContext   = SPDXParser::License_and_beyondContext;
   using Compound_expressionContext  = SPDXParser::Compound_expressionContext;
@@ -345,13 +345,13 @@ public:
   void exitCompound_expression(Compound_expressionContext *ctx) override;
   void exitLicense_and_beyond(License_and_beyondContext *ctx) override;
 
-  const Analitics &analitics() const {return _analitics;}
+  const Analytics &analytics() const {return _analytics;}
 
 private:
   const LicenseList&      _licenses;
   const ExceptionList&    _exceptions;
   // overall analysis results
-  Analitics&              _analitics;
+  Analytics&              _analytics;
 };
 
 /**
