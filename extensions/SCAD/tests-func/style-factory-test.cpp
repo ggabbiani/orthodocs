@@ -56,8 +56,7 @@ int main(int argc, const char *argv[]) {
   app.add_option("sources", Option::_sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
-        auto path = fs::path(file);
-        if (path.is_relative())
+        if (auto path = fs::path(file); path.is_relative())
           file = fs::path(sroot / path).string();
         return string();
       }
@@ -65,7 +64,7 @@ int main(int argc, const char *argv[]) {
     ))
     ->check(CLI::ExistingPath);
   app.add_option("-e,--expected",expected,"Expected annotation type, when empty only the resulted annotation style will be reported")
-    ->check(CLI::IsMember({"SINGLE","SIMPLE","FINE"}, CLI::ignore_case));
+    ->check(CLI::IsMember({scad::doc::style::Single::ID,scad::doc::style::Block::ID,scad::doc::style::Fine::ID}, CLI::ignore_case));
 
   try {
     app.parse(argc, argv);
@@ -78,7 +77,7 @@ int main(int argc, const char *argv[]) {
     string fname;
     // just one reusable input stream
     ifstream in;
-    for(auto file: src_files) {
+    for(const auto &file: src_files) {
       static char buffer[256];
       in.open(file);
       fname = file.filename().string();
@@ -86,14 +85,17 @@ int main(int argc, const char *argv[]) {
       // getline() method consumes the ending newline, so we have to re-insert
       auto line = 1;
       while (in.getline(buffer, sizeof buffer)) {
-        annotation.append(string(buffer)+'\n');
+        if (line>1)
+          annotation.append("\n");
+        annotation.append(string(buffer) );
         if (line==1)  // skip leading spaces in first row
           annotation = annotation.substr(annotation.find('/'));
         ++line;
       }
+      // strip last newline
 
       // detected annotation style
-      scad::doc::AbstractStyle *style;
+      scad::doc::style::Abstract *style;
       try {
         style  = scad::doc::style::Factory()(annotation);
       } catch (runtime_error &error) {
@@ -101,7 +103,7 @@ int main(int argc, const char *argv[]) {
         throw runtime_error(fname+": "+error.what());
       }
       if (expected.empty()) { // detected style report only
-        cout << fname << ": " << style->id() << endl;
+        cout << fname << ": " << (style ? style->id() : "***UNKNOWN**") << endl;
       } else { // full check and report
         if (expected.compare(style->id())!=0)
           throw runtime_error("File "+fname+": expected "+expected+" got "+style->id());
