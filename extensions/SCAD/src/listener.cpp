@@ -41,7 +41,7 @@ string prevAnnoData(antlr4::BufferedTokenStream *stream, const antlr4::ParserRul
   auto firstToken   = ctx->getStart();
   // index from which start searching
   auto startIndex   = firstToken->getTokenIndex();
-  // list of tokens from the COMMENTS channel with an index value preceeding the start index
+  // list of tokens from the COMMENTS channel with an index value preceding the start index
   auto leftComments = stream->getHiddenTokensToLeft(startIndex, scad::SCADLexer::COMMENTS);
   // search for usable annotation FROM THE END (i.e. from the nearest to our first token)
   for(auto i=leftComments.rbegin(); i!=leftComments.rend(); ++i) {

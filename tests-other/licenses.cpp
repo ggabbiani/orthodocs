@@ -1,10 +1,10 @@
 #include <scad/document.h>
 
-#include <iostream> 
-#include <regex> 
-#include <string> 
+#include <iostream>
+#include <regex>
+#include <string>
 
-using namespace std; 
+using namespace std;
 
 class License {
 public:
@@ -22,8 +22,8 @@ public:
     return regex_search(s, result, _regex) ? result : smatch();
   }
   /**
-   * Analize «s» searching for a known license match. If any, removes it from 
-   * «s» and returns the found license or nullprt otherwise.
+   * Analyze «s» searching for a known license match. If any, removes it from
+   * «s» and returns the found license or nullptr otherwise.
    */
   static const License *remove(std::string &s) {
     static License licenses[]={
@@ -32,12 +32,12 @@ public:
     };
 
     for(auto lic = std::begin(licenses);lic!=std::end(licenses);++lic) {
-      // search pattern regexp in the annotation string 
+      // search pattern regexp in the annotation string
       smatch match = lic->match(s);
       if (match.ready()) {
         // save the license text
         string license=match[0];
-        // change the annotation 
+        // change the annotation
         s = s.substr(0,match.position(0))+s.substr(match.position(0)+match.length(0));
         return &(*lic);
       }
@@ -48,24 +48,24 @@ private:
   std::regex _regex;
 };
 
-int main() { 
+int main() {
   // annotation from stdin
   string anno;
   std::string line;
   while (std::getline(std::cin, line))
     anno += line + '\n';
-  cout << "Got annotation:\n" 
+  cout << "Got annotation:\n"
       << '\'' <<  anno << '\'' << endl;
-  
+
   scad::doc::style::Factory factory;
   auto style  = factory(anno);
   anno  = style->manage(anno);
-  cout << "Style managed annotation:\n" 
+  cout << "Style managed annotation:\n"
       << '\'' <<  anno << '\'' << endl;
 
   auto lic = License::remove(anno);
   if (lic)
-    cout  << "Found '" << lic->name << "'\nAnnotation now is:\n" 
+    cout  << "Found '" << lic->name << "'\nAnnotation now is:\n"
           << '\'' <<  anno << '\'' << endl;
-  return EXIT_SUCCESS; 
+  return EXIT_SUCCESS;
 }
