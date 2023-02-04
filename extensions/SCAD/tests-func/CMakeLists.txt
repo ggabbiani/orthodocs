@@ -91,5 +91,11 @@ parse_test(NAME vars          RULE pkg  FILE vars.scad          FAIL_REGULAR_EXP
 parse_test(NAME vectors       RULE pkg  FILE vectors.scad       FAIL_REGULAR_EXPRESSION DEFAULT)
 
 style_recon_test(STYLE SINGLE FILES style-single.anno)
-# style_recon_test(STYLE SIMPLE FILES style-simple0.anno style-simple1.anno style-simple2.anno)
+style_recon_test(STYLE block
+  FILES
+    style-simple0.anno
+    style-simple1.anno
+    style-simple2.anno
+    style-simple3.anno
+)
 style_recon_test(STYLE FINE   FILES style-fine.anno style-fine1.anno)

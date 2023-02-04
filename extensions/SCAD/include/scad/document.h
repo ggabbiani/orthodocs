@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <regex>
 #include <set>
 #include <stack>
 #include <string>
@@ -80,47 +81,92 @@ public:
   Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nested=false);
 };
 
-/**
- * base for comment styles.
- */
-struct AbstractStyle {
-  virtual ~AbstractStyle() = default;
-  virtual bool check(const std::string &text) = 0;
-  virtual std::string manage(const std::string &text) = 0;
-  virtual const char *id() = 0;
-};
-
 namespace style {
+
+/**
+ * Abstract comment style.
+ */
+class Abstract {
+public:
+  /**
+   * Trying to manage a style in failed state
+   */
+  struct BadStyle : std::runtime_error {
+    BadStyle();
+  };
+  /**
+   * Returns text from comment.
+   *
+   * Text is check()ed, in case of failure BadStyle is thrown.
+   */
+  virtual std::string manage(const std::string &text);
+  /**
+   * Enables polymorphic behaviour on derived destructors.
+   */
+  virtual ~Abstract() = default;
+  /**
+   * Returns true when the passed «text» is in style
+   */
+  virtual bool check(const std::string &text) = 0;
+  /**
+   * Returns the style ID of which the object is an instance.
+   */
+  virtual const char *id() = 0;
+protected:
+  // data getter
+  std::string &data() {return _data;}
+  // data setter
+  void setData(std::string_view data) {_data = data;}
+private:
+  std::string _data;
+};
 
 class Factory {
 public:
   /**
    * return the recognized style or null
    */
-  AbstractStyle * operator () (const std::string &text);
+  Abstract * operator () (const std::string &text);
 };
 
-class Single : public AbstractStyle {
+/**
+ * Single style: c++ single line comment
+ */
+class Single : public Abstract {
   friend class Factory;
-
+public:
   static constexpr const char *ID = "SINGLE";
+private:
   bool check(const std::string &text) override;
-  std::string manage(const std::string &text) override;
   const char *id() override;
 };
 
-class Fine : public AbstractStyle {
+/**
+ * Fine style: c-like block comment WITH internal alignment
+ */
+class Fine : public Abstract {
   friend class Factory;
-
+public:
   static constexpr const char *ID = "FINE";
-  enum Decoration {start,end,body};
+private:
   bool check(const std::string &text) override;
   std::string manage(const std::string &text) override;
   const char *id() override;
 
-  int column;
+  int         column;
 };
 
+/**
+ * Block style: c-like block comment with no internal alignment
+ */
+class Block : public Abstract {
+  friend class Factory;
+public:
+  static constexpr const char *ID = "block";
+private:
+  bool check(const std::string &text) override;
+  const char *id() override;
+};
 } // namespace style
 
 } // namespace scad::doc

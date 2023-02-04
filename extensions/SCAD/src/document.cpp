@@ -21,6 +21,8 @@
 #include <string.h>
 #include <sstream>
 
+#include <iostream>
+
 using namespace std;
 
 namespace fs = std::filesystem;
@@ -73,17 +75,18 @@ Variable::Variable(const ::doc::Name &name,const ::doc::Value &defaults,bool nes
   dictKey = ::scad::Extension::slot[::scad::Extension::TYPE_VARIABLE].dictionaryKey(this);
 }
 
+
+/******************************************************************************
+ * Comment styles
+ *****************************************************************************/
 namespace style {
 
 static char buffer[256];
 
-// calculate the number of lines
-static size_t lines(const string &text) {
-  stringstream ss(text,ios_base::in);
-  auto len = 0;
-  while (ss.getline(buffer,sizeof buffer))
-    ++len;
-  return len;
+string Abstract::manage(const string &text) {
+  if (!check(text))
+    throw BadStyle();
+  return data();
 }
 
 const char *Single::id() {
@@ -91,64 +94,54 @@ const char *Single::id() {
 }
 
 bool Single::check(const string &text) {
-  string prolog = "//"+Option::decorations()+" ";
-  return (lines(text)==1 && text.find(prolog)==0);
-}
-
-string Single::manage(const string &text) {
-  assert(lines(text)==1);
-  assert(text.length()>=3);
-  return text.length()==3 ? string() : text.substr(text.find_first_not_of(' ',3));
+  // text in caption group #1
+  static regex re{R"(//)"+Option::decorations()+R"(\s((.|\n)*))"};
+  smatch match;
+  auto success = regex_search(text,match,re);
+  if (success)
+    setData(match[1].str());
+  return success;
 }
 
 bool Fine::check(const string &text) {
-  const array<string,3> decoration{
-    "/*"+Option::decorations(),
-    " */",
-    " *"
-  };
-
-  auto len = lines(text);
-  if (len<3)
-    return false;
-
-  stringstream ss(text,ios_base::in);
-  auto row        = 1;
-  bool goon     = true;
-  this->column  = -1;
-  while (goon && ss.getline(buffer,sizeof buffer)) {
-    const char * const m = row==1 ? decoration[start].c_str() : row==len ? decoration[end].c_str() : decoration[body].c_str();
-    auto pos = strstr(buffer, m);
-    if (row==1) {         // parser strip any trailing space on first row
-      goon  = pos==buffer && strlen(buffer)==decoration[start].length();
-    } else if (row==2) {       // we take the column number of the '*'
-      goon  = pos!=nullptr;
-      if (goon)
-        this->column  = (int)(pos-buffer+1);
-    } else if (row<len) // check if '*' column is equal to the one we got in row 2
-      goon  = (pos-buffer+1==this->column);
-    ++row;
+  // text in caption group #2
+  // Option::decorations()=="@" ⟹ (/\*@\s*\n)((\s*\*\s.*\n)*)(\s*\*/)
+  // Option::decorations()==""  ⟹ (/\*\s*\n)((\s*\*\s.*\n)*)(\s*\*/)
+  static regex re{R"((/\*)"+Option::decorations()+R"(\s*\n)((\s*\*\s.*\n)*)(\s*\*/))"};
+  smatch match;
+  auto success  = regex_search(text,match,re);
+  if (success) {
+    stringstream ss(match[2],ios_base::in);
+    this->column  = -1;
+    while (success && ss.getline(buffer,sizeof buffer)) {
+      auto pos  = strstr(buffer, " *");
+      success      = pos!=nullptr;
+      if (success) {
+        if (this->column==-1) {
+          // column uninitialized ⟹ first resulting line
+          this->column  = (int)(pos-buffer+1);
+        } else {
+          // new column equal to the previous one?
+          success  = (pos-buffer+1==this->column);
+        }
+      }
+    }
   }
-
-  return goon;
+  if (success)
+    setData(match[2].str());
+  return success;
 }
 
 string Fine::manage(const string &text) {
+  if (!check(text))
+    throw BadStyle();
+
+  stringstream ss(data(),ios_base::in);
   string result;
-  auto len = lines(text);
-  assert(len>2);
-
-  stringstream ss(text,ios_base::in);
-  auto i    = 1;
-  bool goon = true;
-  while (goon && ss.getline(buffer,sizeof buffer)) {
-    if (i>1 && i<len) {
-      auto offset = this->column+1;
-      result.append(string(buffer+offset+(int)(offset<strnlen(buffer,sizeof buffer)))+'\n');
-    }
-    ++i;
+  while (ss.getline(buffer,sizeof buffer)) {
+    auto offset = this->column+1;
+    result.append(string(buffer+offset+(int)(offset<strnlen(buffer,sizeof buffer)))+'\n');
   }
-
   return result;
 }
 
@@ -156,18 +149,41 @@ const char *Fine::id() {
   return Fine::ID;
 }
 
-AbstractStyle *Factory::operator()(const string &text) {
+const char *Block::id() {
+  return Block::ID;
+}
+
+bool Block::check(const string &text) {
+  // text in caption group #2
+  // Option::decorations()=="@" ⇒ (/\*@)((.|\n)*)(\*/)
+  // Option::decorations()==""  ⇒ (/\*)((.|\n)*)(\*/)
+  static std::regex re{R"((/\*)"+Option::decorations()+R"()((.|\n)*)(\*/))"};
+  smatch match;
+  auto success = regex_search(text,match,re);
+  if (success)
+    setData(match[2].str());
+  return success;
+}
+
+Abstract *Factory::operator()(const string &text) {
   static Single single;
   static Fine   fine;
+  static Block  block;
 
   if (fine.check(text))
-    return static_cast<AbstractStyle*>(&fine);
+    return static_cast<Abstract*>(&fine);
   else if (single.check(text))
-    return static_cast<AbstractStyle*>(&single);
+    return static_cast<Abstract*>(&single);
+  else if (block.check(text))
+    return static_cast<Abstract*>(&block);
   else
     return nullptr;
 }
 
+Abstract::BadStyle::BadStyle()
+  : std::runtime_error("Style result access after unsuccessful match.") {
 }
+
+} // namespace style
 
 } // namespace scad::doc
