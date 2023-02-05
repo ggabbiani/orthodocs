@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(FetchContent)
 include(CMakePrintHelpers)
 include(GitUtils)
+include(GNUInstallDirs)
 
 # get GIT_BRANCH_VERSION
 git_branch_version()
@@ -27,6 +28,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# disable in-source builds
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+  message(FATAL_ERROR “In-source build detected!”)
+endif()
 
 ###############################################################################
 # propedeutics for antrl4cpp
@@ -161,10 +167,27 @@ target_link_libraries(orthodocs
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
+install(TARGETS orthodocs
+  PERMISSIONS WORLD_EXECUTE
+  RUNTIME DESTINATION bin
+)
 # cmake_print_properties(
 #     TARGETS orthodocs
 #     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
 # )
+
+###############################################################################
+# uninstall target
+###############################################################################
+if(NOT TARGET uninstall)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+  add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()
 
 ###############################################################################
 # tests
