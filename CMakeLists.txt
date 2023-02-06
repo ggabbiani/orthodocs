@@ -1,11 +1,12 @@
 # minimum required CMAKE version
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
 
 include(FetchContent)
 include(CMakePrintHelpers)
 include(GitUtils)
 include(GNUInstallDirs)
+include(cpackd)
 
 # get GIT_BRANCH_VERSION
 git_branch_version()
@@ -22,6 +23,12 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
+option(OPTION_USE_CPACK       "Build of target platform packages"   OFF )
+
+report_prepare(
+  OPTION_LANGUAGE_SCAD
+  OPTION_WRITER_MARKDOWN
+)
 
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -168,8 +175,9 @@ target_link_libraries(orthodocs
     ${ORTHODOCS_LIBS}
 )
 install(TARGETS orthodocs
-  PERMISSIONS WORLD_EXECUTE
+  # PERMISSIONS WORLD_EXECUTE
   RUNTIME DESTINATION bin
+  COMPONENT runtime
 )
 # cmake_print_properties(
 #     TARGETS orthodocs
@@ -200,3 +208,8 @@ if (OPTION_UNIT_TESTS)
   add_subdirectory(unit-tests)
 endif()
 
+# ############################################################################
+# New CPACK section, please see the README file inside cpack.d directory.
+if (OPTION_USE_CPACK)
+  add_subdirectory(cpack.d)
+endif()
