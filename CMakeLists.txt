@@ -12,7 +12,10 @@ include(cpackd)
 git_branch_version()
 # cmake_print_variables(GIT_BRANCH_VERSION)
 
-project(OrthoDocs VERSION ${GIT_BRANCH_VERSION})
+project(OrthoDocs
+  VERSION ${GIT_BRANCH_VERSION}
+  DESCRIPTION "OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language."
+)
 # cmake_print_variables(PROJECT_VERSION PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH PROJECT_VERSION_TWEAK)
 
 include(CTest)
@@ -23,7 +26,7 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
-option(OPTION_USE_CPACK       "Build of target platform packages"   OFF )
+option(OPTION_CPACK_D         "Build of target platform packages"   OFF )
 
 report_prepare(
   OPTION_LANGUAGE_SCAD
@@ -210,6 +213,19 @@ endif()
 
 # ############################################################################
 # New CPACK section, please see the README file inside cpack.d directory.
-if (OPTION_USE_CPACK)
-  add_subdirectory(cpack.d)
+if (OPTION_CPACK_D)
+  cpack_d(
+    PATH "cpack.d"
+    REPORT
+      OPTION_FUNC_TESTS
+      OPTION_LANGUAGE_SCAD
+      OPTION_OTHER_TESTS
+      OPTION_UNIT_TESTS
+      OPTION_WRITER_MARKDOWN
+      OPTION_SCAD_VISITORS
+    CONTACT "https://github.com/ggabbiani/orthodocs/issues"
+    URL     "https://github.com/ggabbiani/orthodocs"
+  )
+else()
+  message(AUTHOR_WARNING "OPTION_CPACK_D is disabled")
 endif()
