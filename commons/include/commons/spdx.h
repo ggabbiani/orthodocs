@@ -360,6 +360,6 @@ private:
  * Returns a std::pair with the extracted spdx information in the 'first'
  * string, the stripped annotation in the 'second'.
  */
-void analize(doc::Annotation &annotation);
+void analyze(doc::Annotation &annotation);
 
 }

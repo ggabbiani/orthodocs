@@ -40,7 +40,7 @@ public:
    * Analizes a document annotation for cross-references and enrich the
    * annotation with the analysis results.
    */
-  virtual void analize(Annotation &anno) const = 0;
+  virtual void analyze(Annotation &anno) const = 0;
 
   /**
    * returns the Lexer Vocabulary

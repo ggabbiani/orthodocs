@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "analizer.h"
+#include "analyzer.h"
 
 // project components
 #include <commons/config.h>
@@ -195,7 +195,7 @@ int main(int argc, const char *argv[]) {
     // desired language extension for source analysis
     auto language = language::Extension::factory(Option::language());
     // language analyst setup
-    Analizer analyst(language);
+    Analyzer analyst(language);
     // in-memory source tree analysis prodution
     analyst.buildDocuments();
     // populated cross-reference dictionary

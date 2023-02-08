@@ -1,12 +1,12 @@
 # minimum required CMAKE version
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
+if (CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
 
-include(FetchContent)
-include(CMakePrintHelpers)
 include(GitUtils)
-include(GNUInstallDirs)
-include(cpackd)
 
 # get GIT_BRANCH_VERSION
 git_branch_version()
@@ -18,6 +18,10 @@ project(OrthoDocs
 )
 # cmake_print_variables(PROJECT_VERSION PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH PROJECT_VERSION_TWEAK)
 
+include(FetchContent)
+include(CMakePrintHelpers)
+include(GNUInstallDirs)
+include(cpackd)
 include(CTest)
 
 option(OPTION_FUNC_TESTS      "Functional tests"                    ON  )
@@ -121,7 +125,7 @@ endif()
 #elseif(CMAKE_HOST_WIN32)
 #  set(DIFF_EXE FC)
 #endif()
-cmake_print_variables(DIFF_EXE)
+# cmake_print_variables(DIFF_EXE)
 
 ###############################################################################
 # commons
@@ -165,7 +169,7 @@ endif()
 ###############################################################################
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
 add_executable(orthodocs
-  src/analizer.cpp
+  src/analyzer.cpp
   src/main.cpp
 )
 target_include_directories(orthodocs

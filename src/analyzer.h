@@ -28,16 +28,16 @@ class Extension;
 } // namespace writer
 
 /**
- * Analize sources producing the Document through a language parser listener
+ * Analyze sources producing the Document through a language parser listener
  */
-class Analizer {
+class Analyzer {
 public:
   using Dictionary  = doc::xref::Dictionary;
 
-  explicit Analizer(language::Extension *language): _language(language) {}
+  explicit Analyzer(language::Extension *language): _language(language) {}
 
   /**
-   * analize a set of files / directories as specified from Option(s)
+   * analyze a set of files / directories as specified from Option(s)
    */
   auto buildDocuments() ->void;
   /**

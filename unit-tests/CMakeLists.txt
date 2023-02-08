@@ -122,7 +122,7 @@ boost_test(NAME UnitTests
     ${ORTHODOCS_LIBS}
     ${Boost_LIBRARIES}
 )
-cmake_print_variables(ORTHODOCS_LIBS)
+# cmake_print_variables(ORTHODOCS_LIBS)
 
 if (Python3_FOUND)
   doc_test(NAME ortho-lib-defdecorations

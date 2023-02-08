@@ -26,7 +26,7 @@ public:
   Extension();
 
   Document::Owner parse(const std::filesystem::path &source) const override;
-  void analize(Annotation &anno) const override;
+  void analyze(Annotation &anno) const override;
 
   const char *sourcePostfix() const override;
 

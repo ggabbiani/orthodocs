@@ -24,7 +24,7 @@ int main(int argc, const char *argv[]) {
 
     doc::Annotation anno(annotation);
 
-    spdx::analize(anno);
+    spdx::analyze(anno);
 
     for(const auto &[size,data]: anno.analytics()) {
       auto sdata = dynamic_cast<spdx::Data*>(data.get());

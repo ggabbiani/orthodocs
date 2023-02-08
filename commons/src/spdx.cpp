@@ -118,7 +118,7 @@ void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
   }
 }
 
-void analize(doc::Annotation &annotation) {
+void analyze(doc::Annotation &annotation) {
   static const spdx::db<spdx::LicenseList>   licenses{SPDX_LICENSES_JSON};
   static const spdx::db<spdx::ExceptionList> exceptions{SPDX_EXCEPTIONS_JSON};
 

@@ -54,7 +54,7 @@ const array<Extension::Slot,4> Extension::slot{{
   {"variable",  [](const ::doc::Item *item) {return item->type+' '+item->name;},  regex("variable ([a-zA-Z_][a-zA-Z0-9_]*)" )}
 }};
 
-void Extension::analize(Annotation &anno) const {
+void Extension::analyze(Annotation &anno) const {
   for_each(slot.begin(),slot.end(),[&anno,this](const Slot &sl) {
     auto &data  = anno.data();
     auto t      = data.c_str();

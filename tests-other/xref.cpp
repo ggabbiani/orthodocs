@@ -54,14 +54,14 @@ public:
 
   static string manage(string s) {
     Analysis::Results results;
-    analize(s,results);
+    analyze(s,results);
     return apply(results,s);
   }
 
   /**
    * Analize «s» searching for a known pattern. If any, register it in the cross-reference.
    */
-  static void analize(const std::string &s,Analysis::Results &result) {
+  static void analyze(const std::string &s,Analysis::Results &result) {
     static CrossReference rules[]={
       {"Function",  "([a-zA-Z_][a-zA-Z0-9_]*)\\(\\)"},
       {"Module",    "([a-zA-Z_][a-zA-Z0-9_]*)\\{\\}"},

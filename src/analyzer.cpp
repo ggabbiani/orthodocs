@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "analizer.h"
+#include "analyzer.h"
 
 #include <commons/bar.h>
 #include <commons/error_info.h>
@@ -29,7 +29,7 @@ std::filesystem::path subpath(const std::filesystem::path &path, std::filesystem
   return result;
 }
 
-void Analizer::document(fs::path source) {
+void Analyzer::document(fs::path source) {
   assert(source.is_relative());
   assert(source.has_filename());
   if (source.begin()!=source.end() && *source.begin()==".")
@@ -45,11 +45,11 @@ void Analizer::document(fs::path source) {
   }
 }
 
-auto Analizer::buildDocuments() -> void {
+auto Analyzer::buildDocuments() -> void {
   try {
     FileSet files;
     lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _language->sourcePostfix(),files);
-    Bar bar(files,"sources analized");
+    Bar bar(files,"sources analyzed");
     for(const auto &file: files) {
       bar.status(file.string());
       document(file);
@@ -61,7 +61,7 @@ auto Analizer::buildDocuments() -> void {
   }
 }
 
-auto Analizer::populate() const -> Dictionary {
+auto Analyzer::populate() const -> Dictionary {
   try {
     Dictionary dict;
     Bar bar(_toc, "item(s) in the xref dictionary");
@@ -81,7 +81,7 @@ auto Analizer::populate() const -> Dictionary {
   }
 }
 
-void Analizer::xref() const {
+void Analyzer::xref() const {
   // setup array of non empty annotations
   vector<doc::Annotation*> annos;
   for(const auto& document: _docs) {
@@ -95,10 +95,10 @@ void Analizer::xref() const {
     }
   }
   try {
-    Bar bar(annos, "annotations analized");
+    Bar bar(annos, "annotations analyzed");
     for_each(annos.begin(),annos.end(),[&bar,this] (doc::Annotation *a) {
-      _language->analize(*a);
-      spdx::analize(*a);
+      _language->analyze(*a);
+      spdx::analyze(*a);
       bar++;
     });
   } catch(...) {
@@ -107,7 +107,7 @@ void Analizer::xref() const {
   }
 }
 
-void Analizer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
+void Analyzer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
   cwd pwd(Option::sroot());
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
