@@ -119,8 +119,8 @@ void Listener::exitCompound_expression(Compound_expressionContext *ctx) {
 }
 
 void analyze(doc::Annotation &annotation) {
-  static const spdx::db<spdx::LicenseList>   licenses{SPDX_LICENSES_JSON};
-  static const spdx::db<spdx::ExceptionList> exceptions{SPDX_EXCEPTIONS_JSON};
+  static const spdx::db<spdx::LicenseList>   licenses{Option::dataDir()/SPDX_LICENSES_JSON};
+  static const spdx::db<spdx::ExceptionList> exceptions{Option::dataDir()/SPDX_EXCEPTIONS_JSON};
 
   if (Option::verbosity()<=spdlog::level::debug) {
     cout  << licenses.size() << " SPDX Licenses:\n"

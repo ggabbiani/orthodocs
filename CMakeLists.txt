@@ -130,6 +130,9 @@ endif()
 ###############################################################################
 # commons
 ###############################################################################
+set(ODOX_INSTALL_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/orthodocs")
+set(ODOX_BUILD_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/commons/data")
+
 add_subdirectory(commons)
 
 ###############################################################################

@@ -9,5 +9,5 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#cmakedefine     SPDX_LICENSES_JSON      "@SPDX_DATADIR@/@SPDX_LICENSES_JSON@"
-#cmakedefine     SPDX_EXCEPTIONS_JSON    "@SPDX_DATADIR@/@SPDX_EXCEPTIONS_JSON@"
+#cmakedefine     SPDX_LICENSES_JSON      "@SPDX_LICENSES_JSON@"
+#cmakedefine     SPDX_EXCEPTIONS_JSON    "@SPDX_EXCEPTIONS_JSON@"

@@ -40,7 +40,11 @@ function(parse_spdx)
     set_property(TEST "${TEST_NAME}" PROPERTY FAIL_REGULAR_EXPRESSION "${value}")
     # message("${TEST_NAME} TEST_FAIL_REGULAR_EXPRESSION: ${TEST_FAIL_REGULAR_EXPRESSION} (${value})")
   endif()
-  set_tests_properties(${TEST_NAME} PROPERTIES RUN_SERIAL TRUE)
+  set_tests_properties(${TEST_NAME}
+    PROPERTIES
+      RUN_SERIAL TRUE
+      LABELS SPDX
+  )
 endfunction(parse_spdx)
 
 parse_spdx(NAME spdx-id           RULE all FILE id.spdx             FAIL_REGULAR_EXPRESSION DEFAULT)

@@ -10,6 +10,7 @@
  */
 
 #include <commons/annotation.h>
+#include <commons/error_info.h>
 #include <commons/spdx_config.h>
 #include <commons/utils.h>
 
@@ -306,8 +307,15 @@ private:
 template <typename T>
 class db {
 public:
-  explicit db(const std::string &db_name=SPDX_LICENSES_JSON) : _consumer(_db) {
-    nlohmann::json::sax_parse(std::ifstream(db_name),&_consumer);
+  explicit db(const std::string &db_name) : _consumer(_db) {
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+      file.open(db_name);
+      nlohmann::json::sax_parse(file,&_consumer);
+    } catch(...) {
+      throw_with_nested(std::runtime_error(ERR_CALL(db_name)));
+    }
   }
   inline size_t size() const {return _db.size();}
   inline const std::string &version() const {return _db.version();}

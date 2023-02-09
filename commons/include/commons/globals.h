@@ -36,6 +36,10 @@ public:
    */
   static bool admonitions() {return _admonitions;}
   /**
+   * data dir in canonical form
+   */
+  static const std::filesystem::path &dataDir() {return _data_dir;}
+  /**
    * document root in canonical form
    */
   static const std::filesystem::path &droot() {return _droot;}
@@ -97,6 +101,7 @@ public:
   static Verbosity verbosity() {return _verbosity;}
 private:
   static bool                     _admonitions;
+  static std::filesystem::path    _data_dir;
   static std::string              _decorations;
   static std::filesystem::path    _droot;
   static FileSet                  _graphs;

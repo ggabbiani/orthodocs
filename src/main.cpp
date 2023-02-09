@@ -83,12 +83,13 @@ string sroot_relative(string &sub) {
 enum {
   ADMONITIONS,
   ANNO_PROLOG,
+  DATA_DIR,
   DOC_ROOT,
   GRAPHS,
   IGNORE,
   PRIVATE,
   DEPS,
-  ORTODOX,
+  ORTHODOX,
   SOURCES,
   SRC_ROOT,
   TOC,
@@ -103,6 +104,7 @@ struct {
   {"-a,--admonitions",            "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
   {"--decorations",               "defines the prefix used inside comments for distinguish a simple comment from an annotation"
                                   " Set to '' means no decorations, and all the comments are interpreted as annotations."       },
+  {"--data-dir",                  "absolute path to data directory: touch only if you know what you do"                         },
   {"-d,--doc-root",               "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",                 "list of root relative directories where placing graphs"                                      },
   {"-i,--ignore-prefix",          "ignore this package prefix in the Table of Contents sort"                                    },
@@ -181,8 +183,11 @@ int main(int argc, const char *argv[]) {
             }
           )))
       ->default_val("error");
-    app.add_flag(opt[ORTODOX].name, Option::_orthodox,opt[ORTODOX].desc)
+    app.add_flag(opt[ORTHODOX].name, Option::_orthodox,opt[ORTHODOX].desc)
       ->default_val(true);
+    app.add_option(opt[DATA_DIR].name, Option::_data_dir, opt[DATA_DIR].desc)
+      ->default_val(ODOX_INSTALL_DATADIR)
+      ->check(CLI::ExistingDirectory);
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);

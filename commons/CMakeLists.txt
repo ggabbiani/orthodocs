@@ -4,34 +4,25 @@ configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
 ###############################################################################
 # Jason resources from github spdx
 
-set(SPDX_BUILD_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(SPDX_DATADIR "${SPDX_BUILD_DATADIR}")
-else()
-  set(SPDX_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/orthodocs")
-endif()
-
 set(SPDX_LICENSES_JSON licenses.json)
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json
-  "${SPDX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
+  "${ODOX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
 )
 set(SPDX_EXCEPTIONS_JSON exceptions.json)
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/exceptions.json
-  "${SPDX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
+  "${ODOX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
 )
 
 configure_file(spdx_config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/include/commons/spdx_config.h" @ONLY)
-if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  install(
-    FILES
-      "${SPDX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
-      "${SPDX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
-    DESTINATION ${SPDX_DATADIR}
-    COMPONENT runtime
-  )
-endif()
+install(
+  FILES
+    "${ODOX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
+    "${ODOX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
+  DESTINATION ${ODOX_INSTALL_DATADIR}
+  COMPONENT runtime
+)
 
 # builds spdx parser
 add_subdirectory(spdx)

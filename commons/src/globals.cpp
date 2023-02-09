@@ -15,6 +15,7 @@ namespace fs=std::filesystem;
 
 bool              Option::_admonitions{false};
 string            Option::_decorations{"!"};
+fs::path          Option::_data_dir;
 fs::path          Option::_droot;
 FileSet           Option::_graphs;
 vector<string>    Option::_ignore_prefix;
