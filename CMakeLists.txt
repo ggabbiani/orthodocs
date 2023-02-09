@@ -1,8 +1,6 @@
 # minimum required CMAKE version
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
-if (CMP0135)
-  cmake_policy(SET CMP0135 NEW)
-endif()
+cmake_policy(SET CMP0135 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
 
@@ -30,7 +28,7 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
-option(OPTION_CPACK_D         "Build of target platform packages"   OFF )
+option(OPTION_PKG         "Build of target platform packages"   OFF )
 
 report_prepare(
   OPTION_LANGUAGE_SCAD
@@ -220,7 +218,7 @@ endif()
 
 # ############################################################################
 # New CPACK section, please see the README file inside cpack.d directory.
-if (OPTION_CPACK_D)
+if (OPTION_PKG)
   cpack_d(
     PATH "cpack.d"
     REPORT
@@ -234,5 +232,5 @@ if (OPTION_CPACK_D)
     URL     "https://github.com/ggabbiani/orthodocs"
   )
 else()
-  message(AUTHOR_WARNING "OPTION_CPACK_D is disabled")
+  message(AUTHOR_WARNING "OPTION_PKG is disabled")
 endif()
