@@ -1,26 +1,29 @@
-# minimum required CMAKE version
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
+# try to get rid of CMake Warning (dev) about policy CMP0135.
+# Unfortunately it seems not able to make it less verbouse for a bug on
+# cmake versions >= 3.24
 cmake_policy(SET CMP0135 NEW)
+# NEW behavior is to add link flags if POSITION_INDEPENDENT_CODE is set
+cmake_policy(SET CMP0083 NEW)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
 
 include(GitUtils)
-
-# get GIT_BRANCH_VERSION
-git_branch_version()
-# cmake_print_variables(GIT_BRANCH_VERSION)
+git_branch_version(VARIABLE GIT_BRANCH_VERSION)
 
 project(OrthoDocs
   VERSION ${GIT_BRANCH_VERSION}
-  DESCRIPTION "OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language."
+  DESCRIPTION "API documentation generator and static analysis tool"
 )
-# cmake_print_variables(PROJECT_VERSION PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH PROJECT_VERSION_TWEAK)
 
-include(FetchContent)
+include(CMakeDependentOption)
 include(CMakePrintHelpers)
-include(GNUInstallDirs)
-include(cpackd)
+include(CheckPIESupported)
+include(CPack.d)
 include(CTest)
+include(FetchContent)
+include(GNUInstallDirs)
 
 option(OPTION_FUNC_TESTS      "Functional tests"                    ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"         ON  )
@@ -28,13 +31,19 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
-option(OPTION_PKG         "Build of target platform packages"   OFF )
 
-report_prepare(
-  OPTION_LANGUAGE_SCAD
-  OPTION_WRITER_MARKDOWN
-)
+option(OPTION_PKG             "Build of target platform packages"   OFF )
 
+# Check if PIE is supported on the build system
+check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
+if (NOT CMAKE_C_LINK_PIE_SUPPORTED)
+  message(AUTHOR_WARNING
+    "PIE is not supported at link time (${output}).\n"
+    "PIE link options will not be passed to linker."
+  )
+else()
+  set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+endif()
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -103,32 +112,31 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(cli11 json indicators spdlog)
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-# cmake_print_variables(Boost_LIBRARIES Boost_INCLUDE_DIRS)
-
-find_package(Python3 3.10)
-# cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
-if(NOT Python3_FOUND)
-  message(AUTHOR_WARNING "Python3 version >= 3.10 required: no version bump and unit test possible")
-else()
-  if (NOT Python_EXECUTABLE)
-    set(Python_EXECUTABLE python3)
-    message(AUTHOR_WARNING "Python_EXECUTABLE set to 'python3'")
-  endif()
+find_package(Boost 1.76 REQUIRED COMPONENTS unit_test_framework)
+find_package(Python 3.10 COMPONENTS Interpreter)
+if (NOT Python_FOUND)
+  message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
 endif()
-# cmake_print_variables(Python_EXECUTABLE Python3_FOUND)
 
-#if (CMAKE_HOST_APPLE OR CMAKE_HOST_LINUX)
-  find_program(DIFF_EXE diff)
-#elseif(CMAKE_HOST_WIN32)
-#  set(DIFF_EXE FC)
-#endif()
-# cmake_print_variables(DIFF_EXE)
+find_program(DIFF_EXE diff)
 
 ###############################################################################
 # commons
 ###############################################################################
-set(ODOX_INSTALL_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/orthodocs")
+if (CMAKE_HOST_LINUX)
+  set(CPACK_PACKAGING_INSTALL_PREFIX /usr)
+# elseif(CMAKE_HOST_WIN32)
+#   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
+# elseif(CMAKE_HOST_APPLE)
+#   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
+else()
+  message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set for ${CMAKE_SYSTEM}")
+endif()
+# relative DATADIR for LOCAL install (cmake --install)
+set(ODOX_DATADIR "${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}")
+# default absolute datadir set in the config.h (fallback if no CLI option)
+set(ODOX_INSTALL_DATADIR "${CPACK_PACKAGING_INSTALL_PREFIX}/${ODOX_DATADIR}")
+# the following is used during built-in tests
 set(ODOX_BUILD_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/commons/data")
 
 add_subdirectory(commons)
@@ -219,8 +227,11 @@ endif()
 # ############################################################################
 # New CPACK section, please see the README file inside cpack.d directory.
 if (OPTION_PKG)
-  cpack_d(
-    PATH "cpack.d"
+  set(CPACK_VERBATIM_VARIABLES TRUE)
+  cpackd(
+    DESCRIPTION
+      "OrthoDocs is an API documentation generator and static"
+      "analysis tool for the OpenSCAD scripting language"
     REPORT
       OPTION_FUNC_TESTS
       OPTION_LANGUAGE_SCAD
@@ -228,8 +239,16 @@ if (OPTION_PKG)
       OPTION_UNIT_TESTS
       OPTION_WRITER_MARKDOWN
       OPTION_SCAD_VISITORS
-    CONTACT "https://github.com/ggabbiani/orthodocs/issues"
-    URL     "https://github.com/ggabbiani/orthodocs"
+      CMAKE_C_LINK_PIE_SUPPORTED
+    CONTACT
+      "https://github.com/ggabbiani/orthodocs/issues"
+    URL
+      "https://github.com/ggabbiani/orthodocs"
+    README
+      README.md
+    LICENSE
+      "GPL-3.0-or-later"
+    VERBOSE
   )
 else()
   message(AUTHOR_WARNING "OPTION_PKG is disabled")

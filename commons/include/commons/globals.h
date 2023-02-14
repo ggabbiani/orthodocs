@@ -32,7 +32,7 @@ public:
   using Verbosity = spdlog::level::level_enum;
 
   /**
-   * when true, adminitions emoji are enabled for the annotation.
+   * when true, admonitions emoji are enabled for the annotation.
    */
   static bool admonitions() {return _admonitions;}
   /**
@@ -57,7 +57,7 @@ public:
    */
   static const std::string &language() {return _language;}
   /**
-   * how package dependecies are documented (default "text")
+   * how package dependencies are documented (default "text")
    */
   static const std::string &pkg_deps() {return _pkg_deps;}
   /**

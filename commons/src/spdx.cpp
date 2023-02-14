@@ -16,6 +16,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 
@@ -23,26 +24,6 @@ using namespace std;
 using namespace antlr4;
 
 namespace fs = std::filesystem;
-
-namespace {
-
-void append(char c, string &to) {
-  if (!to.empty())
-    to.push_back(' ');
-  to.push_back(c);
-}
-
-void append(const string_view &s, string &to) {
-  if (!to.empty())
-    to.push_back(' ');
-  to.append(s);
-}
-
-void append(antlr4::tree::TerminalNode *node, string &to) {
-  append(node->getText(),to);
-}
-
-}
 
 namespace spdx {
 

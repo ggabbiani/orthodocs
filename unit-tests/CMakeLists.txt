@@ -79,8 +79,9 @@ function (doc_test)
     CMD1 "$<TARGET_FILE:orthodocs> --data-dir \"${ODOX_BUILD_DATADIR}\" --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
     CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
+  # set_property(TEST ${DOC_NAME} PROPERTY LABELS DOCUMENT DIFF)
   set_tests_properties(${DOC_NAME}
-    PROPERTIES LABELS DOCUMENT
+    PROPERTIES LABELS "DOCUMENT;DIFF;Python"
   )
 endfunction(doc_test)
 
@@ -96,7 +97,7 @@ function (batch_test)
   set(multiValueArgs)
   cmake_parse_arguments(BATCH "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-  if (NOT Python3_FOUND)
+  if (NOT Python_FOUND)
     message(FATAL_ERROR "Python is needed for batch_test")
   endif()
   if (NOT DEFINED BATCH_SERIAL)
@@ -124,7 +125,7 @@ boost_test(NAME UnitTests
 )
 # cmake_print_variables(ORTHODOCS_LIBS)
 
-if (Python3_FOUND)
+if (Python_FOUND)
   doc_test(NAME ortho-lib-defdecorations
     SOURCES docu-styles/ortho/lib-defdecorations
     COMPARE docu-styles/results/annotated
