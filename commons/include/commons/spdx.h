@@ -215,6 +215,8 @@ public:
       case Status::LIST:
         _status  = Status::OBJECT;
         break;
+      default:
+        ;
     }
     return true;
   }
@@ -235,6 +237,8 @@ public:
         _root.add(_item);
         _status = Status::LIST;
         break;
+      default:
+        ;
     }
     return true;
   }
