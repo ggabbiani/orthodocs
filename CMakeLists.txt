@@ -35,16 +35,15 @@ option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
 
 option(OPTION_PKG             "Build of target platform packages"   OFF )
 
-# # Check if PIE is supported on the build system
-# check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
-# if (NOT CMAKE_C_LINK_PIE_SUPPORTED)
-#   message(AUTHOR_WARNING
-#     "PIE is not supported at link time:\n"
-#     "${output}\n"
-#   )
-# else()
-  # set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-# endif()
+# Check if PIE is supported on the build system
+check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+if (NOT CMAKE_CXX_LINK_PIE_SUPPORTED)
+  message(AUTHOR_WARNING
+    "PIE is not supported at link time:\n"
+    "${output}\n"
+  )
+endif()
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -69,6 +68,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 # binaries in build/bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+
+# static library as default in case of add_library() with no type specifier
+set(BUILD_SHARED_LIBS OFF)
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
@@ -235,9 +237,8 @@ target_link_libraries(orthodocs
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
-set_target_properties(orthodocs PROPERTIES POSITION_INDEPENDENT_CODE 1)
 cmake_print_properties(
-    TARGETS orthodocs
+    TARGETS orthodocs commons spdx::parser
     PROPERTIES POSITION_INDEPENDENT_CODE
 )
 install(

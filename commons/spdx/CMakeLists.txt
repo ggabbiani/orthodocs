@@ -1,4 +1,4 @@
-project(spdx VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
+project(spdx_prj VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
 
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)

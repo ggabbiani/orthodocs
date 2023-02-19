@@ -1,4 +1,4 @@
-project(commons VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
+project(commons_prj VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
 
 configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
 ###############################################################################

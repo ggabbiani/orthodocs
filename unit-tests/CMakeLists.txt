@@ -21,14 +21,18 @@ function (boost_test)
   if (DEFINED UNIT_TEST_INCLUDES)
     target_include_directories(${UNIT_TEST} PRIVATE ${UNIT_TEST_INCLUDES})
   endif()
+  target_compile_definitions(${UNIT_TEST}
+    PRIVATE
+      BOOST_TEST_DYN_LINK
+  )
   set_target_properties(${UNIT_TEST}
     PROPERTIES
       LINK_OPTIONS -fstack-protector
-#    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
   )
   target_link_libraries(${UNIT_TEST}
-    Boost::unit_test_framework
-    ${UNIT_TEST_LIBS}
+    PRIVATE
+      Boost::unit_test_framework
+      ${UNIT_TEST_LIBS}
   )
   add_test(NAME ${UNIT_TEST_NAME} COMMAND ${UNIT_TEST})
   # set_tests_properties(
