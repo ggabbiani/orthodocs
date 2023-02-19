@@ -19,9 +19,9 @@ install(
   FILES
     "${ODOX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
     "${ODOX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
-  DESTINATION "${ODOX_DATADIR}"
-  COMPONENT runtime
+  TYPE DATA
 )
+configure_file(spdx_config.h.in ${PROJECT_SOURCE_DIR}/include/commons/spdx_config.h @ONLY)
 
 # builds spdx parser
 add_subdirectory(spdx)

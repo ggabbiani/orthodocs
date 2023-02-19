@@ -15,6 +15,7 @@ git_branch_version(VARIABLE GIT_BRANCH_VERSION)
 project(OrthoDocs
   VERSION ${GIT_BRANCH_VERSION}
   DESCRIPTION "API documentation generator and static analysis tool"
+  LANGUAGES CXX
 )
 
 include(CMakeDependentOption)
@@ -34,16 +35,16 @@ option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
 
 option(OPTION_PKG             "Build of target platform packages"   OFF )
 
-# Check if PIE is supported on the build system
-check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
-if (NOT CMAKE_C_LINK_PIE_SUPPORTED)
-  message(AUTHOR_WARNING
-    "PIE is not supported at link time (${output}).\n"
-    "PIE link options will not be passed to linker."
-  )
-else()
-  set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-endif()
+# # Check if PIE is supported on the build system
+# check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
+# if (NOT CMAKE_C_LINK_PIE_SUPPORTED)
+#   message(AUTHOR_WARNING
+#     "PIE is not supported at link time:\n"
+#     "${output}\n"
+#   )
+# else()
+  # set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+# endif()
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,6 +55,38 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR “In-source build detected!”)
 endif()
+
+message(STATUS "Project will be installed to ${CMAKE_INSTALL_PREFIX}")
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
+
+# static libs in build/lib
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+# dynamic libs in build/lib
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+# binaries in build/bin
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+
+# Offer the user the choice of overriding the installation directories
+set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
+set(INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR} CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for header files")
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_INSTALL_CMAKEDIR CMake)
+else()
+  set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
+endif()
+set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory for CMake files")
+
+# Report to user
+foreach(p LIB BIN INCLUDE CMAKE)
+  file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
+  message(STATUS "Installing ${p} components to ${_path}")
+  unset(_path)
+endforeach()
 
 ###############################################################################
 # propedeutics for antrl4cpp
@@ -123,21 +156,33 @@ find_program(DIFF_EXE diff)
 ###############################################################################
 # commons
 ###############################################################################
-if (CMAKE_HOST_LINUX)
-  set(CPACK_PACKAGING_INSTALL_PREFIX /usr)
-# elseif(CMAKE_HOST_WIN32)
-#   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
-# elseif(CMAKE_HOST_APPLE)
-#   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
-else()
-  message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set for ${CMAKE_SYSTEM}")
-endif()
+# if (CMAKE_HOST_LINUX)
+#   set(CPACK_PACKAGING_INSTALL_PREFIX /usr)
+# # elseif(CMAKE_HOST_WIN32)
+# #   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
+# # elseif(CMAKE_HOST_APPLE)
+# #   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
+# else()
+#   message(AUTHOR_WARNING
+#     "No default CPACK_PACKAGING_INSTALL_PREFIX set for ${CMAKE_SYSTEM}\n"
+#     "CMAKE_INSTALL_DATADIR = ${CMAKE_INSTALL_DATADIR}"
+#   )
+# endif()
+
 # relative DATADIR for LOCAL install (cmake --install)
 set(ODOX_DATADIR "${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}")
 # default absolute datadir set in the config.h (fallback if no CLI option)
 set(ODOX_INSTALL_DATADIR "${CPACK_PACKAGING_INSTALL_PREFIX}/${ODOX_DATADIR}")
 # the following is used during built-in tests
 set(ODOX_BUILD_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/commons/data")
+
+cmake_print_variables(
+  CPACK_PACKAGING_INSTALL_PREFIX
+  CMAKE_INSTALL_DATADIR
+  ODOX_DATADIR
+  ODOX_INSTALL_DATADIR
+  ODOX_BUILD_DATADIR
+)
 
 add_subdirectory(commons)
 
@@ -190,16 +235,18 @@ target_link_libraries(orthodocs
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
-install(TARGETS orthodocs
-  # PERMISSIONS WORLD_EXECUTE
-  RUNTIME DESTINATION bin
-  COMPONENT runtime
+set_target_properties(orthodocs PROPERTIES POSITION_INDEPENDENT_CODE 1)
+cmake_print_properties(
+    TARGETS orthodocs
+    PROPERTIES POSITION_INDEPENDENT_CODE
 )
-# cmake_print_properties(
-#     TARGETS orthodocs
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-# )
-
+install(
+  TARGETS
+    orthodocs
+  RUNTIME
+    DESTINATION ${INSTALL_BINDIR}
+    COMPONENT bin
+)
 ###############################################################################
 # uninstall target
 ###############################################################################
@@ -224,32 +271,40 @@ if (OPTION_UNIT_TESTS)
   add_subdirectory(unit-tests)
 endif()
 
+include(CMakeCPack.cmake)
+
 # ############################################################################
 # New CPACK section, please see the README file inside cpack.d directory.
-if (OPTION_PKG)
-  set(CPACK_VERBATIM_VARIABLES TRUE)
-  cpackd(
-    DESCRIPTION
-      "OrthoDocs is an API documentation generator and static"
-      "analysis tool for the OpenSCAD scripting language"
-    REPORT
-      OPTION_FUNC_TESTS
-      OPTION_LANGUAGE_SCAD
-      OPTION_OTHER_TESTS
-      OPTION_UNIT_TESTS
-      OPTION_WRITER_MARKDOWN
-      OPTION_SCAD_VISITORS
-      CMAKE_C_LINK_PIE_SUPPORTED
-    CONTACT
-      "https://github.com/ggabbiani/orthodocs/issues"
-    URL
-      "https://github.com/ggabbiani/orthodocs"
-    README
-      README.md
-    LICENSE
-      "GPL-3.0-or-later"
-    VERBOSE
-  )
-else()
-  message(AUTHOR_WARNING "OPTION_PKG is disabled")
-endif()
+# if (OPTION_PKG)
+#   set(CPACK_VERBATIM_VARIABLES TRUE)
+#   cpackd(
+#     NAME
+#       "orthodocs"
+#     DESCRIPTION
+#       "OrthoDocs is an API documentation generator and static"
+#       "analysis tool for the OpenSCAD scripting language"
+#     REPORT
+#       OPTION_FUNC_TESTS
+#       OPTION_LANGUAGE_SCAD
+#       OPTION_OTHER_TESTS
+#       OPTION_UNIT_TESTS
+#       OPTION_WRITER_MARKDOWN
+#       OPTION_SCAD_VISITORS
+#       CMAKE_C_LINK_PIE_SUPPORTED
+#     CONTACT
+#       "https://github.com/ggabbiani/orthodocs/issues"
+#     URL
+#       "https://github.com/ggabbiani/orthodocs"
+#     README
+#       README.md
+#     LICENSE
+#       "GPL-3.0-or-later"
+#     LICENSE_FILE
+#       "LICENSE"
+#     VERBOSE
+#     VENDOR
+#       "GabbiX"
+#   )
+# else()
+#   message(AUTHOR_WARNING "OPTION_PKG is disabled")
+# endif()
