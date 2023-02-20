@@ -32,17 +32,22 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
+option(OPTION_ANTLR4_STATIC   "STATIC vs SHARED ANTLR4 runtime"     ON  )
 
 option(OPTION_PKG             "Build of target platform packages"   OFF )
 
-# Check if PIE is supported on the build system
-check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
-set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-if (NOT CMAKE_CXX_LINK_PIE_SUPPORTED)
-  message(AUTHOR_WARNING
-    "PIE is not supported at link time:\n"
-    "${output}\n"
-  )
+if (NOT OPTION_ANTLR4_STATIC)
+  # Check if PIE is supported on the build system
+  check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
+  set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+  if (NOT CMAKE_CXX_LINK_PIE_SUPPORTED)
+    message(AUTHOR_WARNING
+      "PIE is not supported at link time:\n"
+      "${output}\n"
+    )
+  endif()
+else()
+  set(CMAKE_POSITION_INDEPENDENT_CODE FALSE)
 endif()
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -62,20 +67,25 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 
-# static libs in build/lib
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-# dynamic libs in build/lib
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-# binaries in build/bin
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
-
 # static library as default in case of add_library() with no type specifier
 set(BUILD_SHARED_LIBS OFF)
 
+# override to set data in project specific directory
+set(CMAKE_INSTALL_DATADIR           "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"      )
+
+# build directories
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}" )
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}" )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}" )
+# used during tests
+set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
+
 # Offer the user the choice of overriding the installation directories
-set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
-set(INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR} CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for header files")
+# These variables are used during install()
+set(INSTALL_DATADIR     "${CMAKE_INSTALL_DATADIR}"    CACHE PATH "Installation directory for data")
+set(INSTALL_LIBDIR      "${CMAKE_INSTALL_LIBDIR}"     CACHE PATH "Installation directory for libraries")
+set(INSTALL_BINDIR      "${CMAKE_INSTALL_BINDIR}"     CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDEDIR  "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "Installation directory for header files")
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKEDIR CMake)
 else()
@@ -83,8 +93,13 @@ else()
 endif()
 set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory for CMake files")
 
+cmake_print_variables(
+  CMAKE_INSTALL_DATADIR
+  ODOX_DATA_OUTPUT_DIRECTORY
+)
+
 # Report to user
-foreach(p LIB BIN INCLUDE CMAKE)
+foreach(p LIB BIN INCLUDE CMAKE DATA)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
   message(STATUS "Installing ${p} components to ${_path}")
   unset(_path)
@@ -93,8 +108,13 @@ endforeach()
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
-# required if linking to static library
-add_definitions(-DANTLR4CPP_STATIC)
+if (OPTION_ANTLR4_STATIC)
+  # required if linking to static library
+  add_definitions(-DANTLR4CPP_STATIC)
+  set(ODOX_ANTLR_LIB  antlr4_static)
+else()
+  set(ODOX_ANTLR_LIB  antlr4_shared)
+endif()
 # required on Windows
 if (CMAKE_HOST_WIN32)
   add_definitions(-DNOGDI)
@@ -109,11 +129,11 @@ endif()
 # to a zip file containing the libary source.
 #set(ANTLR4_TAG 4.11.1)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
-set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.10.1.zip)
+set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 # set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
-set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.10.1-complete.jar)
+set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.12.0-complete.jar)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -158,34 +178,6 @@ find_program(DIFF_EXE diff)
 ###############################################################################
 # commons
 ###############################################################################
-# if (CMAKE_HOST_LINUX)
-#   set(CPACK_PACKAGING_INSTALL_PREFIX /usr)
-# # elseif(CMAKE_HOST_WIN32)
-# #   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
-# # elseif(CMAKE_HOST_APPLE)
-# #   message(AUTHOR_WARNING "No default CPACK_PACKAGING_INSTALL_PREFIX set")
-# else()
-#   message(AUTHOR_WARNING
-#     "No default CPACK_PACKAGING_INSTALL_PREFIX set for ${CMAKE_SYSTEM}\n"
-#     "CMAKE_INSTALL_DATADIR = ${CMAKE_INSTALL_DATADIR}"
-#   )
-# endif()
-
-# relative DATADIR for LOCAL install (cmake --install)
-set(ODOX_DATADIR "${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}")
-# default absolute datadir set in the config.h (fallback if no CLI option)
-set(ODOX_INSTALL_DATADIR "${CPACK_PACKAGING_INSTALL_PREFIX}/${ODOX_DATADIR}")
-# the following is used during built-in tests
-set(ODOX_BUILD_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/commons/data")
-
-cmake_print_variables(
-  CPACK_PACKAGING_INSTALL_PREFIX
-  CMAKE_INSTALL_DATADIR
-  ODOX_DATADIR
-  ODOX_INSTALL_DATADIR
-  ODOX_BUILD_DATADIR
-)
-
 add_subdirectory(commons)
 
 ###############################################################################
@@ -237,29 +229,35 @@ target_link_libraries(orthodocs
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
-cmake_print_properties(
-    TARGETS orthodocs commons spdx::parser
-    PROPERTIES POSITION_INDEPENDENT_CODE
-)
 install(
   TARGETS
     orthodocs
+  LIBRARY
+    DESTINATION "${INSTALL_LIBDIR}"
+    COMPONENT lib
   RUNTIME
-    DESTINATION ${INSTALL_BINDIR}
+    DESTINATION "${INSTALL_BINDIR}"
     COMPONENT bin
 )
-###############################################################################
-# uninstall target
-###############################################################################
-if(NOT TARGET uninstall)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-
-  add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-endif()
+# install(
+#   FILES
+#     ${ANTLR4_RUNTIME_LIBRARIES}
+#   TYPE LIB
+#   COMPONENT lib
+# )
+cmake_print_properties(
+    TARGETS orthodocs commons spdx::parser ${ORTHODOCS_LIBS} antlr4_static antlr4_shared
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE
+      IMPORTED_LOCATION IMPORTED_IMPLIB
+)
+cmake_print_variables(
+  ANTLR4_RUNTIME_LIBRARIES
+  ANTLR4_SHARED_LIBRARIES
+  ANTLR4_STATIC_LIBRARIES
+  ANTLR4_TAG
+  ORTHODOCS_LIBS
+)
 
 ###############################################################################
 # tests
