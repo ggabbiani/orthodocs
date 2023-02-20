@@ -47,6 +47,7 @@ if (CMAKE_POSITION_INDEPENDENT_CODE)
     )
   endif()
 endif()
+message(STATUS "Position Independent Code ${CMAKE_POSITION_INDEPENDENT_CODE}")
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -90,11 +91,6 @@ else()
   set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
 endif()
 set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory for CMake files")
-
-cmake_print_variables(
-  CMAKE_INSTALL_DATADIR
-  ODOX_DATA_OUTPUT_DIRECTORY
-)
 
 # Report to user
 foreach(p LIB BIN INCLUDE CMAKE DATA)
@@ -168,7 +164,7 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(cli11 json indicators spdlog)
 
-find_package(Boost 1.76 REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost 1.74 REQUIRED COMPONENTS unit_test_framework)
 find_package(Python 3.10 COMPONENTS Interpreter)
 if (NOT Python_FOUND)
   message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
@@ -240,25 +236,19 @@ install(
     DESTINATION "${INSTALL_BINDIR}"
     COMPONENT bin
 )
-# install(
-#   FILES
-#     ${ANTLR4_RUNTIME_LIBRARIES}
-#   TYPE LIB
-#   COMPONENT lib
+# cmake_print_properties(
+#     TARGETS orthodocs commons spdx::parser ${ORTHODOCS_LIBS} antlr4_static antlr4_shared
+#     PROPERTIES
+#       POSITION_INDEPENDENT_CODE
+#       IMPORTED_LOCATION IMPORTED_IMPLIB
 # )
-cmake_print_properties(
-    TARGETS orthodocs commons spdx::parser ${ORTHODOCS_LIBS} antlr4_static antlr4_shared
-    PROPERTIES
-      POSITION_INDEPENDENT_CODE
-      IMPORTED_LOCATION IMPORTED_IMPLIB
-)
-cmake_print_variables(
-  ANTLR4_RUNTIME_LIBRARIES
-  ANTLR4_SHARED_LIBRARIES
-  ANTLR4_STATIC_LIBRARIES
-  ANTLR4_TAG
-  ORTHODOCS_LIBS
-)
+# cmake_print_variables(
+#   ANTLR4_RUNTIME_LIBRARIES
+#   ANTLR4_SHARED_LIBRARIES
+#   ANTLR4_STATIC_LIBRARIES
+#   ANTLR4_TAG
+#   ORTHODOCS_LIBS
+# )
 
 ###############################################################################
 # tests
@@ -272,39 +262,3 @@ if (OPTION_UNIT_TESTS)
 endif()
 
 include(CMakeCPack.cmake)
-
-# ############################################################################
-# New CPACK section, please see the README file inside cpack.d directory.
-# if (OPTION_PKG)
-#   set(CPACK_VERBATIM_VARIABLES TRUE)
-#   cpackd(
-#     NAME
-#       "orthodocs"
-#     DESCRIPTION
-#       "OrthoDocs is an API documentation generator and static"
-#       "analysis tool for the OpenSCAD scripting language"
-#     REPORT
-#       OPTION_FUNC_TESTS
-#       OPTION_LANGUAGE_SCAD
-#       OPTION_OTHER_TESTS
-#       OPTION_UNIT_TESTS
-#       OPTION_WRITER_MARKDOWN
-#       OPTION_SCAD_VISITORS
-#       CMAKE_C_LINK_PIE_SUPPORTED
-#     CONTACT
-#       "https://github.com/ggabbiani/orthodocs/issues"
-#     URL
-#       "https://github.com/ggabbiani/orthodocs"
-#     README
-#       README.md
-#     LICENSE
-#       "GPL-3.0-or-later"
-#     LICENSE_FILE
-#       "LICENSE"
-#     VERBOSE
-#     VENDOR
-#       "GabbiX"
-#   )
-# else()
-#   message(AUTHOR_WARNING "OPTION_PKG is disabled")
-# endif()
