@@ -101,5 +101,5 @@ target_include_directories(${LANGUAGE_LIB}
 )
 target_link_libraries(${LANGUAGE_LIB}
   PUBLIC
-    ${ODOX_ANTLR_LIB}
+    antlr4::runtime
 )

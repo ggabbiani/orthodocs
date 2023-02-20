@@ -29,5 +29,4 @@ target_include_directories(${WRITER_LIB}
 target_link_libraries(${WRITER_LIB}
   PUBLIC # clients and library dependencies
     commons
-    language::scad
 )

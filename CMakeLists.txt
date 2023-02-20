@@ -32,22 +32,20 @@ option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
 option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
-option(OPTION_ANTLR4_STATIC   "STATIC vs SHARED ANTLR4 runtime"     ON  )
+option(OPTION_ANTLR4_SHARED   "SHARED vs STATIC ANTLR4 runtime"     OFF )
 
 option(OPTION_PKG             "Build of target platform packages"   OFF )
 
-if (NOT OPTION_ANTLR4_STATIC)
+set(CMAKE_POSITION_INDEPENDENT_CODE ${OPTION_ANTLR4_SHARED})
+if (CMAKE_POSITION_INDEPENDENT_CODE)
   # Check if PIE is supported on the build system
   check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
-  set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
   if (NOT CMAKE_CXX_LINK_PIE_SUPPORTED)
     message(AUTHOR_WARNING
       "PIE is not supported at link time:\n"
       "${output}\n"
     )
   endif()
-else()
-  set(CMAKE_POSITION_INDEPENDENT_CODE FALSE)
 endif()
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
@@ -108,12 +106,9 @@ endforeach()
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
-if (OPTION_ANTLR4_STATIC)
-  # required if linking to static library
+if (NOT OPTION_ANTLR4_SHARED)
+  # required if linking to antlr4 static library
   add_definitions(-DANTLR4CPP_STATIC)
-  set(ODOX_ANTLR_LIB  antlr4_static)
-else()
-  set(ODOX_ANTLR_LIB  antlr4_shared)
 endif()
 # required on Windows
 if (CMAKE_HOST_WIN32)
@@ -144,6 +139,12 @@ include(ExternalAntlr4Cpp)
 ###############################################################################
 # propedeutics for orthodocs
 ###############################################################################
+
+if (OPTION_ANTLR4_SHARED)
+  add_library(antlr4::runtime ALIAS antlr4_shared)
+else()
+  add_library(antlr4::runtime ALIAS antlr4_static)
+endif()
 
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
