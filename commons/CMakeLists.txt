@@ -26,7 +26,7 @@ configure_file(spdx_config.h.in ${PROJECT_SOURCE_DIR}/include/commons/spdx_confi
 # builds spdx parser
 add_subdirectory(spdx)
 
-add_library(commons
+add_library(commons STATIC
   src/document.cpp
   src/extensions.cpp
   src/globals.cpp
