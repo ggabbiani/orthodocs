@@ -10,3 +10,5 @@ tests-other/spdx/.antlr/SPDXParser.java
 tests-other/spdx/.antlr/SPDXParser.tokens
 commons/include/commons/config.h
 commons/include/commons/spdx_config.h
+commons/data/exceptions.json
+commons/data/licenses.json

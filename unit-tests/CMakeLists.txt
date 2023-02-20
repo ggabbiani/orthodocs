@@ -80,7 +80,7 @@ function (doc_test)
   batch_test(
     NAME ${DOC_NAME}
     SERIAL ${DOC_SERIAL}
-    CMD1 "$<TARGET_FILE:orthodocs> --data-dir \"${ODOX_BUILD_DATADIR}\" --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
+    CMD1 "$<TARGET_FILE:orthodocs> --data-dir \"${ODOX_DATA_OUTPUT_DIRECTORY}\" --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
     CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
   # set_property(TEST ${DOC_NAME} PROPERTY LABELS DOCUMENT DIFF)

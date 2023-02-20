@@ -7,18 +7,18 @@ configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
 set(SPDX_LICENSES_JSON licenses.json)
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json
-  "${ODOX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
+  "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_LICENSES_JSON}"
 )
 set(SPDX_EXCEPTIONS_JSON exceptions.json)
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/exceptions.json
-  "${ODOX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
+  "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_EXCEPTIONS_JSON}"
 )
 
 install(
   FILES
-    "${ODOX_BUILD_DATADIR}/${SPDX_LICENSES_JSON}"
-    "${ODOX_BUILD_DATADIR}/${SPDX_EXCEPTIONS_JSON}"
+    "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_LICENSES_JSON}"
+    "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_EXCEPTIONS_JSON}"
   TYPE DATA
 )
 configure_file(spdx_config.h.in ${PROJECT_SOURCE_DIR}/include/commons/spdx_config.h @ONLY)

@@ -50,8 +50,7 @@ target_include_directories(${LANGUAGE_LIB}
 target_link_libraries(${LANGUAGE_LIB}
   PUBLIC
     commons
-  PRIVATE
-    antlr4_static
+    ${ODOX_ANTLR_LIB}
 )
 # cmake_print_variables(
 #   ANTLR_${LEXER}_CXX_OUTPUTS
