@@ -127,6 +127,9 @@ set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
 set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.12.0-complete.jar)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
+# add macros to generate ANTLR Cpp code from grammar
+# this is needed for all client code
+find_package(ANTLR REQUIRED)
 # add antrl4cpp artifacts to project environment
 #include_directories(${ANTLR4_INCLUDE_DIRS})
 # cmake_print_variables(ANTLR4_INCLUDE_DIRS)
