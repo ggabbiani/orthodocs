@@ -28,7 +28,7 @@ option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"         ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
 option(BUILD_SHARED_LIBS      "SHARED vs STATIC ANTLR4 runtime"     OFF )
 
-option(OPTION_TESTS                       "Enable tests"            ON  )
+option(OPTION_TESTS                       "Enable tests"            OFF )
 cmake_dependent_option(OPTION_FUNC_TESTS  "Functional tests"        ON "OPTION_TESTS" OFF)
 cmake_dependent_option(OPTION_OTHER_TESTS "More experimental tests" ON "OPTION_TESTS" OFF)
 cmake_dependent_option(OPTION_UNIT_TESTS  "Unit tests"              ON "OPTION_TESTS" OFF)
