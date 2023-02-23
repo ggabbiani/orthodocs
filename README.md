@@ -85,10 +85,14 @@ For more complex tasks consult the full command option list:
 | Option             | Description
 | ------------------ | -----------
 | -a,--admonitions   | **FLAG** - When this flag is enabled any admonition found in annotations will be enriched with a corresponding emoji
+| --data-dir         | **OPTION** - Absolute path to data directory: touch only if you know what you do
+| --decorations      | **OPTION** - Defines the prefix used inside comments to distinguish a simple comment from an annotation. Set to '' means no decorations, and all the comments are interpreted as annotations.
 | -d,--doc-root      | **OPTION** - Specifies the target document tree root either as absolute or current directory relative path. It is a **mandatory directory** parameter and - if not existing - it will be automatically created.
 | -g,--graphs        | **OPTION** - List of root relative directories where placing dependency graphs. Needs --src-root.
 | -h,--help          | **FLAG** - Print the help message and exit
 | -i,--ignore-prefix | **OPTION** - Ignore this prefix in the Table of Contents when sorting
+| -o,--orthodox      | **FLAG** - Comments for parameters are **preceding** their formal definition.
+| --unorthodox       | **FLAG** - Comments for parameters are **following** their formal definition.
 | -p,--private       | **OPTION** - Every documentation item (variable, function or module) prefixed with this string will not be published.
 | --pd,--pkg-deps    | **OPTION** - Set package dependencies representation by text list or by a dependency graph (possible value **text**/**graph**, default to **text**)
 | -s,--src-root      | **OPTION** - Source tree root - either an absolute or current directory relative path. It is a **mandatory existing directory** parameter.

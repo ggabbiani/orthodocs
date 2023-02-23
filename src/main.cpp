@@ -82,8 +82,8 @@ string sroot_relative(string &sub) {
 
 enum {
   ADMONITIONS,
-  ANNO_PROLOG,
   DATA_DIR,
+  DECORATIONS,
   DOC_ROOT,
   GRAPHS,
   IGNORE,
@@ -102,15 +102,15 @@ struct {
   const char *desc;
 } const opt[] = {
   {"-a,--admonitions",            "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"--decorations",               "defines the prefix used inside comments for distinguish a simple comment from an annotation"
-                                  " Set to '' means no decorations, and all the comments are interpreted as annotations."       },
   {"--data-dir",                  "absolute path to data directory: touch only if you know what you do"                         },
+  {"--decorations",               "defines the prefix used inside comments to distinguish a simple comment from an annotation"
+                                  " Set to '' means no decorations, and all the comments are interpreted as annotations."       },
   {"-d,--doc-root",               "document tree root - either an absolute or current directory relative path"                  },
   {"-g,--graphs",                 "list of root relative directories where placing graphs"                                      },
   {"-i,--ignore-prefix",          "ignore this package prefix in the Table of Contents sort"                                    },
   {"-p,--private",                "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
-  {"--pd,--pkg-deps",             "set package dependecies representation by text list or by a dependency graph (default TEXT)" },
-  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceeding their formal definition"                              },
+  {"--pd,--pkg-deps",             "set package dependencies representation by text list or by a dependency graph (default TEXT)"},
+  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceding their formal definition"                               },
   {"sources",                     "«source root» sub-trees and/or files - either as absolute or «source root» relative path."
                                   " If missing all the «source root» content sources will be scanned"                           },
   {"-s,--src-root",               "source tree root - either an absolute or current directory relative path"                    },
@@ -152,7 +152,7 @@ int main(int argc, const char *argv[]) {
     auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
-    app.add_option(opt[ANNO_PROLOG].name, Option::_decorations, opt[ANNO_PROLOG].desc)
+    app.add_option(opt[DECORATIONS].name, Option::_decorations, opt[DECORATIONS].desc)
       ->default_val("!");
     app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
       ->required()
