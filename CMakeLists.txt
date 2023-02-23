@@ -69,6 +69,7 @@ message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 
 # override to set data in project specific directory
 set(CMAKE_INSTALL_DATADIR           "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"      )
+set(CMAKE_INSTALL_FULL_DATADIR      "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}"      )
 
 # build directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}" )

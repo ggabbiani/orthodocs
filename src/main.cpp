@@ -186,7 +186,7 @@ int main(int argc, const char *argv[]) {
     app.add_flag(opt[ORTHODOX].name, Option::_orthodox,opt[ORTHODOX].desc)
       ->default_val(true);
     app.add_option(opt[DATA_DIR].name, Option::_data_dir, opt[DATA_DIR].desc)
-      ->default_val(ODOX_INSTALL_DATADIR)
+      ->default_val(ODOX_INSTALL_FULL_DATADIR)
       ->check(CLI::ExistingDirectory);
 
     sources_opt->needs(sroot_opt);
