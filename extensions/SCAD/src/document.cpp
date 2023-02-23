@@ -105,9 +105,9 @@ bool Single::check(const string &text) {
 
 bool Fine::check(const string &text) {
   // text in caption group #2
-  // Option::decorations()=="@" ⟹ (/\*@\s*\n)((\s*\*\s.*\n)*)(\s*\*/)
-  // Option::decorations()==""  ⟹ (/\*\s*\n)((\s*\*\s.*\n)*)(\s*\*/)
-  static const regex re{R"((/\*)"+Option::decorations()+R"(\s*\n)((\s*\*\s.*\n)*)(\s*\*/))"};
+  // Option::decorations()=="@" ⟹ (/\*@\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
+  // Option::decorations()==""  ⟹ (/\*\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
+  static const regex re{R"((/\*)"+Option::decorations()+R"(\s*\n)((\s*\*\s?.*\n)*)(\s*\*/))"};
   smatch match;
   auto success  = regex_search(text,match,re);
   if (success) {
