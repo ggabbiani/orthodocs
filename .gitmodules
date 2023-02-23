@@ -1,3 +1,0 @@
-[submodule "cpack.d"]
-	path = cpack.d
-	url = https://github.com/ggabbiani/cpack.d.git
