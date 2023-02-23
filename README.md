@@ -4,7 +4,7 @@
 
 ![Package output example](docs/package.png "Package output example")
 
-OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status).
+OrthoDocs is an API documentation generator and static analysis tool for the OpenSCAD scripting language. For the list of the feature planned and their status see [Project status](#project-status). For an example of the produced documentation see [OFL Table of Contents](https://github.com/ggabbiani/OFL/blob/main/orthodocs/toc.md) or browse the [OFL documentation tree](https://github.com/ggabbiani/OFL/tree/main/orthodocs).
 
 ## How to document
 
