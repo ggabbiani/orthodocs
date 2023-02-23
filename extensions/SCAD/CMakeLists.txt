@@ -13,13 +13,6 @@ antlr_target(${PARSER}
   COMPILE_FLAGS -lib ${ANTLR_${LEXER}_OUTPUT_DIR}
 )
 
-# cmake_print_variables(
-#   ANTLR_${LEXER}_CXX_OUTPUTS
-#   ANTLR_${PARSER}_CXX_OUTPUTS
-#   ANTLR_${LEXER}_OUTPUT_DIR
-#   ANTLR_${PARSER}_OUTPUT_DIR
-# )
-
 ###############################################################################
 # C++ client application lib
 add_library(${LANGUAGE_LIB} STATIC
@@ -44,15 +37,8 @@ target_include_directories(${LANGUAGE_LIB}
 target_link_libraries(${LANGUAGE_LIB}
   PUBLIC
     commons
+    antlr4::runtime
 )
-# cmake_print_variables(
-#   ANTLR_${LEXER}_CXX_OUTPUTS
-#   ANTLR_${PARSER}_CXX_OUTPUTS
-# )
-# cmake_print_properties(
-#     TARGETS ${LANGUAGE_LIB}
-#     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES PUBLIC_INCLUDE_DIRECTORIES PRIVATE_INCLUDE_DIRECTORIES
-# )
 
 ###############################################################################
 # Java split parser for testing grammars via grun
