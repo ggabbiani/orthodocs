@@ -48,8 +48,8 @@ public:
 
 private:
 
-  template <class ANNOTABLE>
-  void annotate(ANNOTABLE *item, const Token *comment) const {
+  template <class NOTABLE>
+  void annotate(NOTABLE *item, const Token *comment) const {
     static doc::style::Factory factory;
     auto anno = comment->getText();
     if (auto style = factory(anno)) {

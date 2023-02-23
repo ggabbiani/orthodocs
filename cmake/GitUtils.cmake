@@ -63,3 +63,46 @@ function(git_repo_name)
   cmake_path(GET repo_name STEM git_repo_name)
   set(GIT_REPO_NAME ${git_repo_name} PARENT_SCOPE)
 endfunction(git_repo_name)
+
+# sets the number of commits since last tag in the passed VARIABLE name
+#
+# git describe --tags returns two kind of output depending on the git repo status:
+# x.y.x (in case of tagged commit)
+# x.y.z-n-hhhhhhhh (n-th commit after x.y.z tag, hash hhhhhhhh)
+# Returns «n» in the second case and 0 in the first.
+# it is assumed that the version of the package is aligned with the last repo tag
+function(git_commits)
+  set(opts)
+  set(ones VARIABLE)
+  set(multi)
+  cmake_parse_arguments(arg "${opts}" "${ones}" "${multi}" ${ARGN})
+  if (NOT arg_VARIABLE)
+    message(FATAL_ERROR "Missing output variable name")
+  endif()
+  # check if GIT_EXECUTABLE is a python2 script and change it accordingly
+  if (MSYS OR MINGW)
+    execute_process(
+      COMMAND file ${GIT_EXECUTABLE}
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      OUTPUT_VARIABLE git_file_type
+    )
+    if ("${git_file_type}" MATCHES "Python script")
+      set(GIT_COMMAND python2 ${GIT_EXECUTABLE})
+    endif()
+  else()
+    set(GIT_COMMAND ${GIT_EXECUTABLE})
+  endif()
+  execute_process(
+    COMMAND ${GIT_COMMAND} describe --tags --long
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE VERSION_TAG
+  )
+  string(REGEX MATCHALL "^[^-]*-([0-9]*)-.*$" dummy ${VERSION_TAG})
+  if (CMAKE_MATCH_COUNT)
+    set(${arg_VARIABLE} "${CMAKE_MATCH_1}" PARENT_SCOPE)
+  else()
+    set(${arg_VARIABLE} 0 PARENT_SCOPE)
+  endif()
+endfunction(git_commits)

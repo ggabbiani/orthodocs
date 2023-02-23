@@ -11,7 +11,7 @@ and build and install with:
 cmake --build build --target install
 ```
 
-If for any reason you want to regenerate the source `.tar.gz` and `.zip` packages:
+To regenerate the source `.tar.gz` and `.zip` packages:
 ```
 cmake --build build --target package_source
 ```

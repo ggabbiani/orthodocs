@@ -7,36 +7,37 @@ cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0083 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cpack.d/cmake")
 
 include(GitUtils)
 git_branch_version(VARIABLE GIT_BRANCH_VERSION)
 
 project(OrthoDocs
-  VERSION ${GIT_BRANCH_VERSION}
+  VERSION     ${GIT_BRANCH_VERSION}
   DESCRIPTION "API documentation generator and static analysis tool"
-  LANGUAGES CXX
+  LANGUAGES   CXX
 )
 
 include(CMakeDependentOption)
 include(CMakePrintHelpers)
 include(CheckPIESupported)
-include(CPack.d)
 include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
 
-option(OPTION_FUNC_TESTS      "Functional tests"                    ON  )
 option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"         ON  )
-option(OPTION_OTHER_TESTS     "Other more experimental tests"       OFF )
-option(OPTION_UNIT_TESTS      "Unit tests"                          ON  )
 option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
-option(OPTION_SCAD_VISITORS   "Implements parsing through visitors" OFF )
-option(OPTION_ANTLR4_SHARED   "SHARED vs STATIC ANTLR4 runtime"     OFF )
+option(BUILD_SHARED_LIBS      "SHARED vs STATIC ANTLR4 runtime"     OFF )
 
-option(OPTION_PKG             "Build of target platform packages"   OFF )
+option(OPTION_TESTS                       "Enable tests"            ON  )
+cmake_dependent_option(OPTION_FUNC_TESTS  "Functional tests"        ON "OPTION_TESTS" OFF)
+cmake_dependent_option(OPTION_OTHER_TESTS "More experimental tests" ON "OPTION_TESTS" OFF)
+cmake_dependent_option(OPTION_UNIT_TESTS  "Unit tests"              ON "OPTION_TESTS" OFF)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ${OPTION_ANTLR4_SHARED})
+option(OPTION_EARLY_STAGE                   "Not yet ready features"          OFF )
+cmake_dependent_option(OPTION_PKG           "Platform specific package build" OFF "OPTION_EARLY_STAGE" OFF)
+cmake_dependent_option(OPTION_SCAD_VISITORS "Alternative AST walkers"         OFF "OPTION_EARLY_STAGE" OFF)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 if (CMAKE_POSITION_INDEPENDENT_CODE)
   # Check if PIE is supported on the build system
   check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
@@ -65,9 +66,6 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
-
-# static library as default in case of add_library() with no type specifier
-set(BUILD_SHARED_LIBS OFF)
 
 # override to set data in project specific directory
 set(CMAKE_INSTALL_DATADIR           "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"      )
@@ -102,7 +100,7 @@ endforeach()
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
-if (NOT OPTION_ANTLR4_SHARED)
+if (NOT BUILD_SHARED_LIBS)
   # required if linking to antlr4 static library
   add_definitions(-DANTLR4CPP_STATIC)
 endif()
@@ -139,7 +137,7 @@ find_package(ANTLR REQUIRED)
 # propedeutics for orthodocs
 ###############################################################################
 
-if (OPTION_ANTLR4_SHARED)
+if (BUILD_SHARED_LIBS)
   add_library(antlr4::runtime ALIAS antlr4_shared)
 else()
   add_library(antlr4::runtime ALIAS antlr4_static)
@@ -239,19 +237,6 @@ install(
     DESTINATION "${INSTALL_BINDIR}"
     COMPONENT bin
 )
-# cmake_print_properties(
-#     TARGETS orthodocs commons spdx::parser ${ORTHODOCS_LIBS} antlr4_static antlr4_shared
-#     PROPERTIES
-#       POSITION_INDEPENDENT_CODE
-#       IMPORTED_LOCATION IMPORTED_IMPLIB
-# )
-# cmake_print_variables(
-#   ANTLR4_RUNTIME_LIBRARIES
-#   ANTLR4_SHARED_LIBRARIES
-#   ANTLR4_STATIC_LIBRARIES
-#   ANTLR4_TAG
-#   ORTHODOCS_LIBS
-# )
 
 ###############################################################################
 # tests
@@ -264,4 +249,6 @@ if (OPTION_UNIT_TESTS)
   add_subdirectory(unit-tests)
 endif()
 
-include(CMakeCPack.cmake)
+if (OPTION_PKG)
+  include(CMakeCPack.cmake)
+endif()
