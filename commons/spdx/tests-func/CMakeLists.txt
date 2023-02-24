@@ -12,9 +12,9 @@ function(parse_spdx)
   # the CLASS_PATH has a different separator in Windows so we set it accordingly
   get_target_property(JAR_DIRECTORY ${LANGUAGE_JAR} BINARY_DIR)
   if (WIN32)
-    set(CLASS_PATH "${JAR_DIRECTORY}/${LANGUAGE_JAR}.jar;${CMAKE_HOME_DIRECTORY}/tools/antlr-4.10.1-complete.jar")
+    set(CLASS_PATH "${JAR_DIRECTORY}/${LANGUAGE_JAR}.jar;${ANTLR_EXECUTABLE}")
   else()
-    set(CLASS_PATH "${JAR_DIRECTORY}/${LANGUAGE_JAR}.jar:${CMAKE_HOME_DIRECTORY}/tools/antlr-4.10.1-complete.jar")
+    set(CLASS_PATH "${JAR_DIRECTORY}/${LANGUAGE_JAR}.jar:${ANTLR_EXECUTABLE}")
   endif()
   # cmake_print_variables(TEST_NAME CLASS_PATH)
   add_test(
