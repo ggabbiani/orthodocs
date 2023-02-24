@@ -48,4 +48,6 @@ target_link_libraries(commons
     spdx::parser
 )
 
-add_subdirectory(tests)
+if (OPTION_TESTS)
+  add_subdirectory(tests)
+endif()
