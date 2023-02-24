@@ -27,16 +27,21 @@ else()
   set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
 endif()
 
+set(static_lib_suffix "")
+if (WIN32)
+  set(static_lib_suffix "-static")
+endif()
+
 if(MSVC)
   set(ANTLR4_STATIC_LIBRARIES
-      ${ANTLR4_OUTPUT_DIR}/antlr4-runtime-static.lib)
+      ${ANTLR4_OUTPUT_DIR}/antlr4-runtime${static_lib_suffix}.lib)
   set(ANTLR4_SHARED_LIBRARIES
       ${ANTLR4_OUTPUT_DIR}/antlr4-runtime.lib)
   set(ANTLR4_RUNTIME_LIBRARIES
       ${ANTLR4_OUTPUT_DIR}/antlr4-runtime.dll)
 else()
   set(ANTLR4_STATIC_LIBRARIES
-      ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.a)
+      ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime${static_lib_suffix}.a)
   if(MINGW)
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)

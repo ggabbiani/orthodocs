@@ -107,10 +107,10 @@ if (NOT ODOX_SHARED_LIBS)
   # required if linking to antlr4 static library
   add_definitions(-DANTLR4CPP_STATIC)
 endif()
-# # required on Windows
-# if (CMAKE_HOST_WIN32)
-#   add_definitions(-DNOGDI)
-# endif()
+# required on Windows
+if (CMAKE_HOST_WIN32)
+  add_definitions(-DNOGDI)
+endif()
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 set(ANTLR4_WITH_STATIC_CRT OFF)
