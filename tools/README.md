@@ -2,5 +2,5 @@
 
 This directory contains two local files:
 
-- antlr4 c++ runtime sources (zip file): a full copy of the antr4 C++ runtime as [available from github](https://github.com/antlr/antlr4/archive/refs/tags/x.y.z.zip)
-- antlr4 runtime (jar file): the complete antlr4 build for Java as [available from antlr4.org](https://www.antlr.org/download/antlr-x.y.z-complete.jar)
+- ANTLR4 C++ runtime sources (zip file): a full copy of the [ANTLR4 C++ runtime](https://www.antlr.org/download/antlr4-cpp-runtime-4.12.0-source.zip)
+- ANTLR4 java binaries (jar file): the complete [ANTLR4 build for Java](https://www.antlr.org/download/antlr-4.12.0-complete.jar)

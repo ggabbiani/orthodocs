@@ -141,12 +141,6 @@ find_package(ANTLR REQUIRED)
 ###############################################################################
 # propedeutics for orthodocs
 ###############################################################################
-cmake_print_properties(
-  TARGETS
-    antlr4_static
-  PROPERTIES
-    OUTPUT_NAME
-)
 if (ODOX_SHARED_LIBS)
   add_library(antlr4::runtime ALIAS antlr4_shared)
 else()
