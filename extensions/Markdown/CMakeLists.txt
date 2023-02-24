@@ -8,7 +8,7 @@ set(WRITER_INCS
 )
 set(WRITER_LIBS indicators::indicators spdlog::spdlog)
 
-if (OPTION_LANGUAGE_SCAD)
+if (ODOX_LANGUAGE_SCAD)
   list(APPEND WRITER_INCS ${PROJECT_SOURCE_DIR}/extensions/${LANGUAGE}/include)
 endif()
 

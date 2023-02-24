@@ -103,7 +103,7 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   // parsing
   auto tree = parser.pkg();
 
-  #ifndef OPTION_SCAD_VISITORS
+  #ifndef ODOX_SCAD_VISITORS
 
   // source parse listener
   Listener  listener(source,&tokens);
@@ -113,13 +113,13 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   walker.walk(&listener,tree);
   return listener.releaseDocument();
 
-  #else // OPTION_SCAD_VISITORS
+  #else // ODOX_SCAD_VISITORS
 
   Visitor visitor(source,&tokens);
   visitor.visitPkg(tree);
   return visitor.releaseDocument();
 
-  #endif // OPTION_SCAD_VISITORS
+  #endif // ODOX_SCAD_VISITORS
 }
 
 const char *Extension::sourcePostfix() const {

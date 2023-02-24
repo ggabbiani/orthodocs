@@ -24,20 +24,20 @@ include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
 
-option(OPTION_LANGUAGE_SCAD   "OpenSCAD language extension"         ON  )
-option(OPTION_WRITER_MARKDOWN "Markdown writer extension"           ON  )
-option(BUILD_SHARED_LIBS      "SHARED vs STATIC ANTLR4 runtime"     OFF )
+option(ODOX_LANGUAGE_SCAD   "OpenSCAD language extension"     ON  )
+option(ODOX_WRITER_MARKDOWN "Markdown writer extension"       ON  )
+option(ODOX_SHARED_LIBS     "SHARED vs STATIC ANTLR4 runtime" OFF )
 
-option(OPTION_TESTS                       "Enable tests"            OFF )
-cmake_dependent_option(OPTION_FUNC_TESTS  "Functional tests"        ON "OPTION_TESTS" OFF)
-cmake_dependent_option(OPTION_OTHER_TESTS "More experimental tests" ON "OPTION_TESTS" OFF)
-cmake_dependent_option(OPTION_UNIT_TESTS  "Unit tests"              ON "OPTION_TESTS" OFF)
+option(ODOX_TESTS                       "Enable tests"            OFF )
+cmake_dependent_option(ODOX_FUNC_TESTS  "Functional tests"        ON "ODOX_TESTS" OFF)
+cmake_dependent_option(ODOX_OTHER_TESTS "More experimental tests" ON "ODOX_TESTS" OFF)
+cmake_dependent_option(ODOX_UNIT_TESTS  "Unit tests"              ON "ODOX_TESTS" OFF)
 
-option(OPTION_EARLY_STAGE                   "Not yet ready features"          OFF )
-cmake_dependent_option(OPTION_PKG           "Platform specific package build" OFF "OPTION_EARLY_STAGE" OFF)
-cmake_dependent_option(OPTION_SCAD_VISITORS "Alternative AST walkers"         OFF "OPTION_EARLY_STAGE" OFF)
+option(ODOX_EARLY_STAGE                   "Not yet ready features"          OFF )
+cmake_dependent_option(ODOX_PKG           "Platform specific package build" OFF "ODOX_EARLY_STAGE" OFF)
+cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers"         OFF "ODOX_EARLY_STAGE" OFF)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
+set(CMAKE_POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS})
 if (CMAKE_POSITION_INDEPENDENT_CODE)
   # Check if PIE is supported on the build system
   check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
@@ -101,44 +101,53 @@ endforeach()
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
-if (NOT BUILD_SHARED_LIBS)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/antlr4/cmake")
+
+if (NOT ODOX_SHARED_LIBS)
   # required if linking to antlr4 static library
   add_definitions(-DANTLR4CPP_STATIC)
 endif()
-# required on Windows
-if (CMAKE_HOST_WIN32)
-  add_definitions(-DNOGDI)
-endif()
+# # required on Windows
+# if (CMAKE_HOST_WIN32)
+#   add_definitions(-DNOGDI)
+# endif()
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
-# set(ANTLR4_WITH_STATIC_CRT OFF)
+set(ANTLR4_WITH_STATIC_CRT OFF)
 
 # Specify the version of the antlr4 library needed for this project.
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
 # to a zip file containing the libary source.
-#set(ANTLR4_TAG 4.11.1)
+set(ANTLR4_TAG 4.12.0)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
-set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
+# set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
+# set(ANTLR4_ZIP_REPOSITORY "${PROJECT_SOURCE_DIR}/tools/antlr4-cpp-runtime-4.12.0-source.zip")
+
+# add external build for antlrcpp
+include(ExternalAntlr4Cpp)
+# add antrl4cpp artifacts to project environment
+include_directories(${ANTLR4_INCLUDE_DIRS})
+
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 # set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
 set(ANTLR_EXECUTABLE ${PROJECT_SOURCE_DIR}/tools/antlr-4.12.0-complete.jar)
-# add external build for antlrcpp
-include(ExternalAntlr4Cpp)
 # add macros to generate ANTLR Cpp code from grammar
 # this is needed for all client code
 find_package(ANTLR REQUIRED)
-# add antrl4cpp artifacts to project environment
-#include_directories(${ANTLR4_INCLUDE_DIRS})
-# cmake_print_variables(ANTLR4_INCLUDE_DIRS)
 ###############################################################################
 
 ###############################################################################
 # propedeutics for orthodocs
 ###############################################################################
-
-if (BUILD_SHARED_LIBS)
+cmake_print_properties(
+  TARGETS
+    antlr4_static
+  PROPERTIES
+    OUTPUT_NAME
+)
+if (ODOX_SHARED_LIBS)
   add_library(antlr4::runtime ALIAS antlr4_shared)
 else()
   add_library(antlr4::runtime ALIAS antlr4_static)
@@ -188,7 +197,7 @@ list(PREPEND ORTHODOCS_LIBS factories)
 ###############################################################################
 # SCAD language extension
 ###############################################################################
-if (OPTION_LANGUAGE_SCAD)
+if (ODOX_LANGUAGE_SCAD)
   set(LANGUAGE      SCAD)
   set(LEXER         ${LANGUAGE}Lexer)
   set(PARSER        ${LANGUAGE}Parser)
@@ -203,7 +212,7 @@ endif()
 ###############################################################################
 # Markdown writer extension
 ###############################################################################
-if (OPTION_WRITER_MARKDOWN)
+if (ODOX_WRITER_MARKDOWN)
   set(WRITER      Markdown)
   set(WRITER_LIB  Markdown)
 
@@ -242,14 +251,14 @@ install(
 ###############################################################################
 # tests
 ###############################################################################
-if (OPTION_OTHER_TESTS)
+if (ODOX_OTHER_TESTS)
   add_subdirectory(tests-other)
 endif()
 
-if (OPTION_UNIT_TESTS)
+if (ODOX_UNIT_TESTS)
   add_subdirectory(unit-tests)
 endif()
 
-if (OPTION_PKG)
+if (ODOX_PKG)
   include(CMakeCPack.cmake)
 endif()

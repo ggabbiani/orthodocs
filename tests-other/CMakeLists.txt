@@ -1,4 +1,4 @@
-if (OPTION_LANGUAGE_SCAD)
+if (ODOX_LANGUAGE_SCAD)
   add_executable(licenses licenses.cpp)
   target_include_directories(licenses PRIVATE ${PROJECT_SOURCE_DIR}/src)
   target_link_libraries(licenses PRIVATE commons spdlog::spdlog ${LANGUAGE_LIB})

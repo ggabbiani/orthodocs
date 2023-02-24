@@ -20,7 +20,7 @@ add_library(${LANGUAGE_LIB} STATIC
   src/document.cpp
   src/extension.cpp
   src/listener.cpp
-  $<$<BOOL:${OPTION_SCAD_VISITORS}>:src/visitor.cpp>
+  $<$<BOOL:${ODOX_SCAD_VISITORS}>:src/visitor.cpp>
   ${ANTLR_${LEXER}_CXX_OUTPUTS}
   ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
@@ -99,10 +99,10 @@ add_jar(
     INCLUDE_JARS ${ANTLR_EXECUTABLE}
 )
 
-if (OPTION_FUNC_TESTS)
+if (ODOX_FUNC_TESTS)
   add_subdirectory(tests-func)
 endif()
 
-if (OPTION_OTHER_TESTS)
+if (ODOX_OTHER_TESTS)
   add_subdirectory(tests-other)
 endif()

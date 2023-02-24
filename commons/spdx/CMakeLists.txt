@@ -65,7 +65,7 @@ add_jar(
     INCLUDE_JARS ${ANTLR_EXECUTABLE}
 )
 
-if (OPTION_FUNC_TESTS)
+if (ODOX_FUNC_TESTS)
   add_subdirectory(tests-func)
 endif()
 
