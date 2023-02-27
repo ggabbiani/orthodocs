@@ -56,7 +56,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # disable in-source builds
-if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR “In-source build detected!”)
 endif()
 
@@ -101,7 +101,52 @@ endforeach()
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/antlr4/cmake")
+find_program(PATCH patch)
+
+# Specify the version of the antlr4 library needed for this project.
+# By default the latest version of antlr4 will be used.  You can specify a
+# specific, stable version by setting a repository tag value or a link
+# to a zip file containing the libary source.
+set(ANTLR4_TAG 4.12.0)
+
+# prepares the structure for using the CMake macros provided
+# by antlr4 Cpp runtime enriching the build directory:
+#
+# build
+# ├── antlr4_cmake
+# │   ├── antlr4-generator.cmake.in
+# │   ├── Antlr4Package.md
+# │   ├── antlr4-runtime.cmake.in
+# │   ├── ExternalAntlr4Cpp.cmake   <=== this file must be patched for building under Windows systems
+# │   ├── FindANTLR.cmake
+# │   └── README.md
+set(ODOX_ANTLR4_CPP_CMAKE_DIR "${CMAKE_BINARY_DIR}/antlr4_cmake")
+if (NOT EXISTS "${ODOX_ANTLR4_CPP_CMAKE_DIR}")
+  file(MAKE_DIRECTORY "${ODOX_ANTLR4_CPP_CMAKE_DIR}")
+  execute_process(
+    COMMAND
+      "${CMAKE_COMMAND}" -E tar xzf "${CMAKE_SOURCE_DIR}/tools/antlr4-cpp-runtime-${ANTLR4_TAG}-cmake.tgz"
+    WORKING_DIRECTORY
+      "${ODOX_ANTLR4_CPP_CMAKE_DIR}"
+  )
+  message(STATUS "Created antlr4 Cpp source directory ${ODOX_ANTLR4_CPP_CMAKE_DIR}")
+  if (WIN32)
+    if (PATCH)
+      execute_process(
+        COMMAND
+          "${PATCH}" -u -b "${ODOX_ANTLR4_CPP_CMAKE_DIR}/ExternalAntlr4Cpp.cmake" -i tools/ExternalAntlr4Cpp.patch
+        WORKING_DIRECTORY
+          ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND_ERROR_IS_FATAL
+          ANY
+      )
+      message(STATUS "Patch applied to ${ODOX_ANTLR4_CPP_CMAKE_DIR}/ExternalAntlr4Cpp.cmake")
+    else()
+      message(WARNING "No patch command found, ANTLR4 Cpp runtime build could fail on Windows systems")
+    endif()
+  endif()
+endif()
+list(APPEND CMAKE_MODULE_PATH "${ODOX_ANTLR4_CPP_CMAKE_DIR}")
 
 if (NOT ODOX_SHARED_LIBS)
   # required if linking to antlr4 static library
@@ -115,11 +160,6 @@ endif()
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 set(ANTLR4_WITH_STATIC_CRT OFF)
 
-# Specify the version of the antlr4 library needed for this project.
-# By default the latest version of antlr4 will be used.  You can specify a
-# specific, stable version by setting a repository tag value or a link
-# to a zip file containing the libary source.
-set(ANTLR4_TAG 4.12.0)
 # set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
 # set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
 # set(ANTLR4_ZIP_REPOSITORY "${PROJECT_SOURCE_DIR}/tools/antlr4-cpp-runtime-4.12.0-source.zip")
