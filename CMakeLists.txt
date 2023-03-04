@@ -60,43 +60,39 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR “In-source build detected!”)
 endif()
 
-message(STATUS "Project will be installed to ${CMAKE_INSTALL_PREFIX}")
-
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 
-# override to set data in project specific directory
-set(CMAKE_INSTALL_DATADIR           "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"      )
-set(CMAKE_INSTALL_FULL_DATADIR      "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}"      )
-
 # build directories
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}" )
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}" )
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}" )
-# used during tests
-set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/bin" )
 
-# Offer the user the choice of overriding the installation directories
-# These variables are used during install()
-set(INSTALL_DATADIR     "${CMAKE_INSTALL_DATADIR}"    CACHE PATH "Installation directory for data")
-set(INSTALL_LIBDIR      "${CMAKE_INSTALL_LIBDIR}"     CACHE PATH "Installation directory for libraries")
-set(INSTALL_BINDIR      "${CMAKE_INSTALL_BINDIR}"     CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDEDIR  "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "Installation directory for header files")
+message(STATUS "BUILD INSTALL: ${CMAKE_INSTALL_PREFIX}")
+
+# BUILD INSTALL LOCATIONS (for PACKAGE INSTALL LOCATIONS see CMakeCPack.cmake)
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKEDIR CMake)
 else()
   set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
 endif()
-set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory for CMake files")
+set(CMAKE_INSTALL_CMAKEDIR "${DEF_INSTALL_CMAKEDIR}")
+set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDIR}")
+
+set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 
 # Report to user
 foreach(p LIB BIN INCLUDE CMAKE DATA)
-  file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
+  file(TO_NATIVE_PATH ${CMAKE_INSTALL_FULL_${p}DIR} _path )
   message(STATUS "Installing ${p} components to ${_path}")
   unset(_path)
 endforeach()
+
+# used during tests
+set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
 
 ###############################################################################
 # propedeutics for antrl4cpp
@@ -275,10 +271,10 @@ install(
   TARGETS
     orthodocs
   LIBRARY
-    DESTINATION "${INSTALL_LIBDIR}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     COMPONENT lib
   RUNTIME
-    DESTINATION "${INSTALL_BINDIR}"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}"
     COMPONENT bin
 )
 
