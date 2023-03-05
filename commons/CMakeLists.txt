@@ -20,6 +20,7 @@ install(
     "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_LICENSES_JSON}"
     "${ODOX_DATA_OUTPUT_DIRECTORY}/${SPDX_EXCEPTIONS_JSON}"
   TYPE DATA
+  COMPONENT runtime
 )
 configure_file(spdx_config.h.in ${PROJECT_SOURCE_DIR}/include/commons/spdx_config.h @ONLY)
 

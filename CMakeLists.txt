@@ -65,12 +65,15 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 
+if (UNIX)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}")
+endif()
+message(STATUS "BUILD INSTALL: ${CMAKE_INSTALL_PREFIX}")
+
 # build directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/bin" )
-
-message(STATUS "BUILD INSTALL: ${CMAKE_INSTALL_PREFIX}")
 
 # BUILD INSTALL LOCATIONS (for PACKAGE INSTALL LOCATIONS see CMakeCPack.cmake)
 if(WIN32 AND NOT CYGWIN)
@@ -81,18 +84,20 @@ endif()
 set(CMAKE_INSTALL_CMAKEDIR "${DEF_INSTALL_CMAKEDIR}")
 set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDIR}")
 
-set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
-set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+# set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+# set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 
 # Report to user
 foreach(p LIB BIN INCLUDE CMAKE DATA)
-  file(TO_NATIVE_PATH ${CMAKE_INSTALL_FULL_${p}DIR} _path )
+  file(TO_NATIVE_PATH ${CMAKE_INSTALL_${p}DIR} _path )
   message(STATUS "Installing ${p} components to ${_path}")
   unset(_path)
 endforeach()
 
 # used during tests
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
+
+# set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME runtime)
 
 ###############################################################################
 # propedeutics for antrl4cpp
@@ -258,6 +263,10 @@ add_executable(orthodocs
   src/analyzer.cpp
   src/main.cpp
 )
+# set_target_properties(orthodocs
+#   PROPERTIES
+    # INSTALL_RPATH @executable_path/../Frameworks
+# )
 target_include_directories(orthodocs
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -272,10 +281,10 @@ install(
     orthodocs
   LIBRARY
     DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    COMPONENT lib
+    COMPONENT dev
   RUNTIME
     DESTINATION "${CMAKE_INSTALL_BINDIR}"
-    COMPONENT bin
+    COMPONENT runtime
 )
 
 ###############################################################################
