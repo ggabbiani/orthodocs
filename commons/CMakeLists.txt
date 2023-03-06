@@ -34,6 +34,10 @@ add_library(commons STATIC
   src/spdx.cpp
   src/utils.cpp
 )
+set_target_properties(commons
+  PROPERTIES
+    POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS}
+)
 target_include_directories(commons
   PUBLIC
     $<INSTALL_INTERFACE:include>
@@ -48,7 +52,6 @@ target_link_libraries(commons
     spdlog::spdlog
     spdx::parser
 )
-
 if (ODOX_TESTS)
   add_subdirectory(tests)
 endif()

@@ -24,6 +24,10 @@ add_library(${LANGUAGE_LIB} STATIC
   ${ANTLR_${LEXER}_CXX_OUTPUTS}
   ${ANTLR_${PARSER}_CXX_OUTPUTS}
 )
+set_target_properties(${LANGUAGE_LIB}
+  PROPERTIES
+    POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS}
+)
 add_library(language::scad ALIAS ${LANGUAGE_LIB})
 target_include_directories(${LANGUAGE_LIB}
   PUBLIC

@@ -12,9 +12,10 @@ include(GitUtils)
 git_branch_version(VARIABLE GIT_BRANCH_VERSION)
 
 project(OrthoDocs
-  VERSION     ${GIT_BRANCH_VERSION}
-  DESCRIPTION "API documentation generator and static analysis tool"
-  LANGUAGES   CXX
+  VERSION       ${GIT_BRANCH_VERSION}
+  DESCRIPTION   "OpenSCAD documentation generator"
+  HOMEPAGE_URL  "https://github.com/ggabbiani/orthodocs"
+  LANGUAGES     CXX
 )
 
 include(CMakeDependentOption)
@@ -37,18 +38,24 @@ option(ODOX_EARLY_STAGE                   "Not yet ready features"          OFF 
 cmake_dependent_option(ODOX_PKG           "Platform specific package build" OFF "ODOX_EARLY_STAGE" OFF)
 cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers"         OFF "ODOX_EARLY_STAGE" OFF)
 
+string(CONCAT ODOX_PACKAGE_DESCRIPTION
+  "${PROJECT_NAME} is an API documentation generator and static analysis tool for the\n"
+  "OpenSCAD scripting language"
+)
+string(REPLACE "\n" "\n;" ODOX_PACKAGE_DESCRIPTION_LIST "${ODOX_PACKAGE_DESCRIPTION}")
+configure_file(README.md.in "${PROJECT_SOURCE_DIR}/README.md" @ONLY)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS})
 if (CMAKE_POSITION_INDEPENDENT_CODE)
   # Check if PIE is supported on the build system
   check_pie_supported(OUTPUT_VARIABLE output LANGUAGES CXX)
   if (NOT CMAKE_CXX_LINK_PIE_SUPPORTED)
-    message(AUTHOR_WARNING
-      "PIE is not supported at link time:\n"
+    message(FATAL_ERROR
+      "PIE is required but not supported:\n"
       "${output}\n"
     )
   endif()
 endif()
-message(STATUS "Position Independent Code ${CMAKE_POSITION_INDEPENDENT_CODE}")
 # compiler must be 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -62,13 +69,8 @@ endif()
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+  message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 endif()
-message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
-
-if (UNIX)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}")
-endif()
-message(STATUS "BUILD INSTALL: ${CMAKE_INSTALL_PREFIX}")
 
 # build directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
@@ -84,20 +86,19 @@ endif()
 set(CMAKE_INSTALL_CMAKEDIR "${DEF_INSTALL_CMAKEDIR}")
 set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDIR}")
 
-# set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
-# set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 
 # Report to user
-foreach(p LIB BIN INCLUDE CMAKE DATA)
+message(STATUS "Build install prefix: ${CMAKE_INSTALL_PREFIX}")
+foreach(p LIB BIN INCLUDE CMAKE DATA DOC)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_${p}DIR} _path )
-  message(STATUS "Installing ${p} components to ${_path}")
+  message(STATUS "${p} path: ${_path}")
   unset(_path)
 endforeach()
 
 # used during tests
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
-
-# set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME runtime)
 
 ###############################################################################
 # propedeutics for antrl4cpp
@@ -160,16 +161,10 @@ endif()
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 set(ANTLR4_WITH_STATIC_CRT OFF)
-
-# set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
-# set(ANTLR4_ZIP_REPOSITORY ${PROJECT_SOURCE_DIR}/tools/antlr4-4.12.0.zip)
-# set(ANTLR4_ZIP_REPOSITORY "${PROJECT_SOURCE_DIR}/tools/antlr4-cpp-runtime-4.12.0-source.zip")
-
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
 include_directories(${ANTLR4_INCLUDE_DIRS})
-
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 # set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
@@ -276,6 +271,10 @@ target_link_libraries(orthodocs
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
+set_target_properties(orthodocs
+  PROPERTIES
+    POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS}
+)
 install(
   TARGETS
     orthodocs
@@ -287,6 +286,14 @@ install(
     COMPONENT runtime
 )
 
+install(
+  FILES
+    README.md
+  TYPE
+    DOC
+  COMPONENT
+    runtime
+)
 ###############################################################################
 # tests
 ###############################################################################

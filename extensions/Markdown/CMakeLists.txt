@@ -18,6 +18,10 @@ add_library(${WRITER_LIB} STATIC
   src/markdown/graph.cpp
   src/markdown/extension.cpp
 )
+set_target_properties(${WRITER_LIB}
+  PROPERTIES
+    POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS}
+)
 add_library(writer::markdown ALIAS ${WRITER_LIB})
 target_include_directories(${WRITER_LIB}
   PUBLIC
