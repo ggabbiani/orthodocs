@@ -79,6 +79,7 @@ function(git_commits)
   if (NOT arg_VARIABLE)
     message(FATAL_ERROR "Missing output variable name")
   endif()
+  set(GIT_COMMAND ${GIT_EXECUTABLE})
   # check if GIT_EXECUTABLE is a python2 script and change it accordingly
   if (MSYS OR MINGW)
     execute_process(
@@ -90,8 +91,6 @@ function(git_commits)
     if ("${git_file_type}" MATCHES "Python script")
       set(GIT_COMMAND python2 ${GIT_EXECUTABLE})
     endif()
-  else()
-    set(GIT_COMMAND ${GIT_EXECUTABLE})
   endif()
   execute_process(
     COMMAND ${GIT_COMMAND} describe --tags --long
