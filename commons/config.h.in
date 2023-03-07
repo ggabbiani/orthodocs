@@ -18,8 +18,12 @@
 #define ODOX_VERSION        ((ODOX_VERSION_MAJOR << 16) | (ODOX_VERSION_MINOR << 8) | ODOX_VERSION_PATCH)
 #define ODOX_VERSION_STR    ODOX_XSTR(ODOX_VERSION_MAJOR) "." ODOX_XSTR(ODOX_VERSION_MINOR) "." ODOX_XSTR(ODOX_VERSION_PATCH)
 
-#define ODOX_INSTALL_FULL_DATADIR   "@CMAKE_INSTALL_FULL_DATADIR@"
+// ODOX_DATADIR environment variable name containing the data directory
+#define ODOX_DATADIR_ENV    "ODOX_DATADIR"
+// used if the ODOX_DATADIR_ENV environment variable is set (package install case)
 #define ODOX_INSTALL_DATADIR        "@CMAKE_INSTALL_DATADIR@"
+// used if the ODOX_DATADIR_ENV environment variable is unset (build tree install case)
+#define ODOX_INSTALL_FULL_DATADIR   "@CMAKE_INSTALL_FULL_DATADIR@"
 
 #cmakedefine ODOX_LANGUAGE_SCAD
 #cmakedefine ODOX_WRITER_MARKDOWN

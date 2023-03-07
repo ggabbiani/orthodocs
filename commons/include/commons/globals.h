@@ -36,9 +36,13 @@ public:
    */
   static bool admonitions() {return _admonitions;}
   /**
-   * data dir in canonical form
+   * data dir in canonical form in the following order of evaluation:
+   *
+   * * the value passed in the command line if any
+   * * ${ODOX_DATADIR_ENV}/ODOX_INSTALL_DATADIR if ODOX_DATADIR_ENV is set
+   * * otherwise ODOX_INSTALL_FULL_DATADIR
    */
-  static const std::filesystem::path &dataDir() {return _data_dir;}
+  static std::filesystem::path dataDir();
   /**
    * document root in canonical form
    */

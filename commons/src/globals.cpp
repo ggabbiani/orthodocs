@@ -8,7 +8,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <commons/config.h>
 #include <commons/globals.h>
+
+#include <cstdlib>
 
 using namespace std;
 namespace fs=std::filesystem;
@@ -39,4 +42,13 @@ string Option::prefix_abbreviation(const string &name) {
     }
   }
   return abbreviated;
+}
+
+fs::path Option::dataDir() {
+  if (!_data_dir.empty())
+    return _data_dir;
+  else if (const char* p = getenv(ODOX_DATADIR_ENV))
+    return fs::path(p);
+  else
+    return fs::path(ODOX_INSTALL_FULL_DATADIR);
 }
