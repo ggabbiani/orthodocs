@@ -7,14 +7,14 @@ configure_file(
   "${PROJECT_BINARY_DIR}/packaging/macos/Welcome.txt"
   @ONLY
 )
-
 file(WRITE
   "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt"
   ${ODOX_PACKAGE_DESCRIPTION_LIST}
 )
+string(TOLOWER "${PROJECT_NAME}" __lower_project_name__)
+git_commits(VARIABLE __package_release__)
+string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}" __lower_host_system_name__)
 
-# set(CPACK_PACKAGE_NAME                "${PROJECT_NAME}")
-string(TOLOWER "${PROJECT_NAME}" CPACK_PACKAGE_NAME)
 set(CPACK_PACKAGE_VENDOR              "${PACKAGE_CONTACT}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       "${PROJECT_VERSION_MAJOR}")
@@ -36,24 +36,19 @@ endif()
 # UNIX
 #############################################################################
 if (UNIX)
-  # set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
   #############################################################################
   # LINUX
   #############################################################################
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
     set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 
-    list(APPEND CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${PACKAGE_CONTACT}")
-    set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+    # list(APPEND CPACK_GENERATOR "DEB")
+    # set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${PACKAGE_CONTACT}")
+    # set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 
     list(APPEND CPACK_GENERATOR "RPM")
-    git_commits(VARIABLE CPACK_RPM_PACKAGE_RELEASE)
-    # cmake_print_variables(CPACK_RPM_PACKAGE_RELEASE)
-
-    string(TOLOWER "${PROJECT_NAME}" CPACK_PACKAGE_FILE_NAME)
-    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_RELEASE}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
-
+    set(CPACK_RPM_PACKAGE_RELEASE ${__package_release__})
+    set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_RELEASE}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
     set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
     set(CPACK_RPM_PACKAGE_GROUP         Unspecified)  # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
     set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
@@ -62,6 +57,13 @@ if (UNIX)
   # MACOS
   #############################################################################
   elseif(APPLE)
+    set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}-${__lower_host_system_name__}")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
+    configure_file(
+      packaging/macos/INSTALL_NOTES.txt.in
+      "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt"
+      @ONLY
+    )
     # currently only .rtfd, .rtf, .html, and .txt files are allowed on macOS.
     # to avoid a bad file extension error we rename the existing files accordingly
     configure_file(
@@ -70,7 +72,7 @@ if (UNIX)
       COPYONLY
     )
 
-    set(CPACK_RESOURCE_FILE_README    "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
+    set(CPACK_RESOURCE_FILE_README    "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt")
     set(CPACK_RESOURCE_FILE_LICENSE   "${PROJECT_BINARY_DIR}/packaging/macos/LICENSE.txt")
     set(CPACK_RESOURCE_FILE_WELCOME   "${PROJECT_BINARY_DIR}/packaging/macos/Welcome.txt")
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.${PROJECT_NAME}")
@@ -79,21 +81,7 @@ if (UNIX)
     # productbuild
     #############################################################################
     list(APPEND CPACK_GENERATOR "productbuild")
-
-    #############################################################################
-    # DragNDrop
-    #############################################################################
-    # list(APPEND CPACK_GENERATOR "DragNDrop")
-
-    #############################################################################
-    # Bundle
-    #############################################################################
-    #list(APPEND CPACK_GENERATOR "Bundle")
-    # set(CPACK_BUNDLE_NAME "${PROJECT_NAME}")
-    # set(CPACK_DMG_SLA_USE_RESOURCE_FILE_LICENSE ON)
-    # configure_file(${PROJECT_SOURCE_DIR}/packaging/macos/Info.plist.in Info.plist @ONLY)
-    # set(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-    # set(CPACK_BUNDLE_ICON ${PROJECT_SOURCE_DIR}/packaging/macos/coffee.icns)
+    set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
 #############################################################################
 # WINDOWS
