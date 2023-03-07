@@ -124,4 +124,4 @@ The list of features expected in the v1 release with their current status:
 | --------- | ----- | ---   | -------
 | Linux     | ✔     | ✔     | ✔
 | macOS     | ✔     | ✔     | ✔
-| Windows   | ✔     | ✔     | ❌
+| Windows   | ✔     | ✔     | ✔
