@@ -35,6 +35,10 @@ function (boost_test)
       ${UNIT_TEST_LIBS}
   )
   add_test(NAME ${UNIT_TEST_NAME} COMMAND ${UNIT_TEST})
+  set_tests_properties(${UNIT_TEST_NAME}
+    PROPERTIES
+      LABELS "UNIT_TEST"
+  )
   # set_tests_properties(
   # Baluba Baluba1 etc etc ...
   # PROPERTIES

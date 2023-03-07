@@ -25,6 +25,7 @@
 class Option {
   #ifdef BOOST_TEST_MODULE
   friend int main(int argc, char *argv[]);
+  friend struct ut_custom_datadir;
   #else
   friend int main(int argc, const char *argv[]);
   #endif
@@ -39,7 +40,7 @@ public:
    * data dir in canonical form in the following order of evaluation:
    *
    * * the value passed in the command line if any
-   * * ${ODOX_DATADIR_ENV}/ODOX_INSTALL_DATADIR if ODOX_DATADIR_ENV is set
+   * * ${ODOX_DATADIR_ENV} if ODOX_DATADIR_ENV is set
    * * otherwise ODOX_INSTALL_FULL_DATADIR
    */
   static std::filesystem::path dataDir();
