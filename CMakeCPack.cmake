@@ -22,6 +22,8 @@ set(CPACK_PACKAGE_VERSION_MINOR       "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH       "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
+set(CPACK_RESOURCE_FILE_LICENSE       "${PROJECT_SOURCE_DIR}/LICENSE")
+
 if (CMAKE_BUILD_TYPE STREQUAL Release)
   set(CPACK_STRIP_FILES TRUE)
   message(STATUS "Packaged executable strip: ${CPACK_STRIP_FILES}")
@@ -40,8 +42,6 @@ if (UNIX)
   # LINUX
   #############################################################################
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
-
     # list(APPEND CPACK_GENERATOR "DEB")
     # set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${PACKAGE_CONTACT}")
     # set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
@@ -88,12 +88,14 @@ if (UNIX)
 #############################################################################
 elseif(WIN32 OR MINGW)
   list(APPEND CPACK_GENERATOR "NSIS")
-  set(CPACK_NSIS_PACKAGE_NAME "message")
+
+  set(CPACK_NSIS_MODIFY_PATH ON)
+  set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")
   set(CPACK_NSIS_CONTACT "${PACKAGE_CONTACT}")
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 endif()
 
-message(STATUS "Package install prefix: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
+message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 message(STATUS "CPack generators: ${CPACK_GENERATOR}")
 
 include(CPack)
