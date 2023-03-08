@@ -35,7 +35,7 @@ cmake_dependent_option(ODOX_OTHER_TESTS "More experimental tests" ON "ODOX_TESTS
 cmake_dependent_option(ODOX_UNIT_TESTS  "Unit tests"              ON "ODOX_TESTS" OFF)
 
 option(ODOX_EARLY_STAGE                   "Not yet ready features"          OFF )
-cmake_dependent_option(ODOX_PKG           "Platform specific package build" OFF "ODOX_EARLY_STAGE" OFF)
+cmake_dependent_option(ODOX_PKG           "Platform specific package build" ON  "ODOX_EARLY_STAGE" OFF)
 cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers"         OFF "ODOX_EARLY_STAGE" OFF)
 
 string(CONCAT ODOX_PACKAGE_DESCRIPTION
