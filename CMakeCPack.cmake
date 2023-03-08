@@ -71,6 +71,22 @@ if (UNIX)
       COPYONLY
     )
 
+    configure_file(
+      packaging/orthodocs.in
+      packaging/orthodocs
+      @ONLY
+    )
+    install(
+      FILES
+        "${PROJECT_BINARY_DIR}/packaging/orthodocs"
+      TYPE
+        BIN
+      COMPONENT
+        runtime
+      PERMISSIONS
+        OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+    )
+
     set(CPACK_RESOURCE_FILE_README    "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt" )
     set(CPACK_RESOURCE_FILE_LICENSE   "${PROJECT_BINARY_DIR}/packaging/macos/LICENSE.txt"       )
     set(CPACK_RESOURCE_FILE_WELCOME   "${PROJECT_BINARY_DIR}/packaging/macos/Welcome.txt"       )

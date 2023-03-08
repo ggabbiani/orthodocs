@@ -254,30 +254,32 @@ endif()
 # main program
 ###############################################################################
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
-add_executable(orthodocs
+set(ODOX orthodocs.bin)
+
+add_executable(${ODOX}
   src/analyzer.cpp
   src/main.cpp
 )
-# set_target_properties(orthodocs
+# set_target_properties(${ODOX}
 #   PROPERTIES
     # INSTALL_RPATH @executable_path/../Frameworks
 # )
-target_include_directories(orthodocs
+target_include_directories(${ODOX}
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-target_link_libraries(orthodocs
+target_link_libraries(${ODOX}
   PRIVATE
     CLI11::CLI11
     ${ORTHODOCS_LIBS}
 )
-set_target_properties(orthodocs
+set_target_properties(${ODOX}
   PROPERTIES
     POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS}
 )
 install(
   TARGETS
-    orthodocs
+    ${ODOX}
   LIBRARY
     DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     COMPONENT dev
