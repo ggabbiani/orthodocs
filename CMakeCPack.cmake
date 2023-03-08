@@ -1,20 +1,22 @@
 get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
 message(STATUS "component to install: ${CPACK_COMPONENTS_ALL}")
+
 # configuration part
 file(WRITE
   "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt"
   ${ODOX_PACKAGE_DESCRIPTION_LIST}
 )
-string(TOLOWER "${PROJECT_NAME}" __lower_project_name__)
-git_commits(VARIABLE __package_release__)
-string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}" __lower_host_system_name__)
+string(TOLOWER "${PROJECT_NAME}"            __lower_project_name__)
+git_commits(VARIABLE                        __package_release__)
+string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}"  __lower_host_system_name__)
+
 # cross section
-set(CPACK_PACKAGE_VENDOR              "Giampiero Gabbiani (giampiero@gabbiani.org)")
+set(CPACK_PACKAGE_VENDOR              "${CPACK_PACKAGE_VENDOR}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH       ${PROJECT_VERSION_PATCH})
-set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${__package_release__})
+set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(CPACK_RESOURCE_FILE_LICENSE       "${PROJECT_SOURCE_DIR}/LICENSE")
 if (CMAKE_BUILD_TYPE STREQUAL Release)
   set(CPACK_STRIP_FILES TRUE)
@@ -23,6 +25,7 @@ else()
   message(AUTHOR_WARNING "Packaging a ${CMAKE_BUILD_TYPE} build")
 endif()
 
+# source generator
 set(CPACK_SOURCE_GENERATOR            "ZIP;TGZ")
 set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}")
@@ -37,7 +40,7 @@ if (UNIX)
     list(APPEND CPACK_GENERATOR         "RPM")
     set(CPACK_PACKAGING_INSTALL_PREFIX  "/usr")
     set(CPACK_RPM_PACKAGE_RELEASE       ${__package_release__})
-    set(CPACK_PACKAGE_FILE_NAME         "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    set(CPACK_PACKAGE_FILE_NAME         "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
     set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
     # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
     set(CPACK_RPM_PACKAGE_GROUP         Unspecified)
@@ -71,22 +74,6 @@ if (UNIX)
       COPYONLY
     )
 
-    configure_file(
-      packaging/orthodocs.in
-      packaging/orthodocs
-      @ONLY
-    )
-    install(
-      FILES
-        "${PROJECT_BINARY_DIR}/packaging/orthodocs"
-      TYPE
-        BIN
-      COMPONENT
-        runtime
-      PERMISSIONS
-        OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-    )
-
     set(CPACK_RESOURCE_FILE_README    "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt" )
     set(CPACK_RESOURCE_FILE_LICENSE   "${PROJECT_BINARY_DIR}/packaging/macos/LICENSE.txt"       )
     set(CPACK_RESOURCE_FILE_WELCOME   "${PROJECT_BINARY_DIR}/packaging/macos/Welcome.txt"       )
@@ -96,6 +83,24 @@ if (UNIX)
     list(APPEND CPACK_GENERATOR "productbuild")
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
+
+  # UNIX wrapper for main
+  configure_file(
+    packaging/orthodocs.in
+    packaging/orthodocs
+    @ONLY
+  )
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/packaging/orthodocs"
+    TYPE
+      BIN
+    COMPONENT
+      runtime
+    PERMISSIONS
+      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )
+
 # WINDOWS
 elseif(WIN32 OR MINGW)
   list(APPEND CPACK_GENERATOR                     "NSIS"                    )
