@@ -254,7 +254,7 @@ endif()
 # main program
 ###############################################################################
 # cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
-set(ODOX orthodocs.bin)
+set(ODOX orthodocs-main)
 
 add_executable(${ODOX}
   src/analyzer.cpp
