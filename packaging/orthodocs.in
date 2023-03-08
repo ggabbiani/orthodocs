@@ -1,2 +1,12 @@
 #!/bin/sh
+#
+# orthodocs wrapper
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 ODOX_DATADIR="@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@" @CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@ "$@"
