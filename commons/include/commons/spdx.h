@@ -11,6 +11,7 @@
 
 #include <commons/annotation.h>
 #include <commons/error_info.h>
+#include <commons/exceptions.h>
 #include <commons/spdx_config.h>
 #include <commons/utils.h>
 
@@ -315,6 +316,8 @@ public:
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
+      if (!std::filesystem::exists(std::filesystem::path(db_name)))
+        throw FileNotFound(db_name);
       file.open(db_name);
       nlohmann::json::sax_parse(file,&_consumer);
     } catch(...) {

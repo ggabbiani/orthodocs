@@ -29,6 +29,7 @@ add_subdirectory(spdx)
 
 add_library(commons STATIC
   src/document.cpp
+  src/exceptions.cpp
   src/extensions.cpp
   src/globals.cpp
   src/spdx.cpp
