@@ -14,7 +14,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH       ${PROJECT_VERSION_PATCH})
-set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${__package_release__})
 set(CPACK_RESOURCE_FILE_LICENSE       "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_GENERATOR                   "ZIP;TGZ")
 if (CMAKE_BUILD_TYPE STREQUAL Release)
@@ -26,7 +26,8 @@ endif()
 
 set(CPACK_SOURCE_GENERATOR            "ZIP;TGZ")
 set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}")
+
 # UNIX
 if (UNIX)
   # LINUX
@@ -37,7 +38,7 @@ if (UNIX)
     list(APPEND CPACK_GENERATOR         "RPM")
     set(CPACK_PACKAGING_INSTALL_PREFIX  "/usr")
     set(CPACK_RPM_PACKAGE_RELEASE       ${__package_release__})
-    set(CPACK_PACKAGE_FILE_NAME         "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${CPACK_RPM_PACKAGE_RELEASE}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    set(CPACK_PACKAGE_FILE_NAME         "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
     set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
     # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
     set(CPACK_RPM_PACKAGE_GROUP         Unspecified)
@@ -45,7 +46,7 @@ if (UNIX)
     set(CPACK_RESOURCE_FILE_README      "${PROJECT_SOURCE_DIR}/README.md")
   elseif(APPLE) # MACOS
     set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
-    set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}-${__lower_host_system_name__}")
+    set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__lower_host_system_name__}")
     configure_file(
       packaging/macos/INSTALL_NOTES.txt.in
       "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt"
@@ -75,6 +76,7 @@ if (UNIX)
 # WINDOWS
 elseif(WIN32 OR MINGW)
   list(APPEND CPACK_GENERATOR                     "NSIS"                    )
+  #set(CPACK_PACKAGE_FILE_NAME                     "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}")
   set(CPACK_NSIS_MODIFY_PATH                      ON                        )
   set(CPACK_NSIS_PACKAGE_NAME                     "${PROJECT_NAME}"         )
   set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}" )
