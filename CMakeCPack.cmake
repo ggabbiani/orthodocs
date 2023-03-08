@@ -16,7 +16,6 @@ set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH       ${PROJECT_VERSION_PATCH})
 set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${__package_release__})
 set(CPACK_RESOURCE_FILE_LICENSE       "${PROJECT_SOURCE_DIR}/LICENSE")
-set(CPACK_GENERATOR                   "ZIP;TGZ")
 if (CMAKE_BUILD_TYPE STREQUAL Release)
   set(CPACK_STRIP_FILES TRUE)
   message(STATUS "Packaged executable strip: ${CPACK_STRIP_FILES}")
@@ -47,6 +46,13 @@ if (UNIX)
   elseif(APPLE) # MACOS
     set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
     set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__lower_host_system_name__}")
+
+    # post-flight.sh will add system-wide PATH env
+    set(__path_entry__ "${PROJECT_BINARY_DIR}/packaging/macos/100-orthodocs")
+    configure_file(packaging/orthodocs-path.in "${__path_entry__}")
+    configure_file(packaging/macos/post-flight.sh.in packaging/macos/post-flight.sh @ONLY)
+    set(CPACK_POSTFLIGHT_RUNTIME_SCRIPT "${PROJECT_BINARY_DIR}/packaging/macos/post-flight.sh")
+
     configure_file(
       packaging/macos/INSTALL_NOTES.txt.in
       "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt"
@@ -64,6 +70,7 @@ if (UNIX)
       "${PROJECT_BINARY_DIR}/packaging/macos/LICENSE.txt"
       COPYONLY
     )
+
     set(CPACK_RESOURCE_FILE_README    "${PROJECT_BINARY_DIR}/packaging/macos/INSTALL_NOTES.txt" )
     set(CPACK_RESOURCE_FILE_LICENSE   "${PROJECT_BINARY_DIR}/packaging/macos/LICENSE.txt"       )
     set(CPACK_RESOURCE_FILE_WELCOME   "${PROJECT_BINARY_DIR}/packaging/macos/Welcome.txt"       )

@@ -1,0 +1,5 @@
+#!/bin/sh
+cp @__path_entry__@ /etc/paths.d/
+if [ -x /usr/libexec/path_helper ]; then
+	eval `/usr/libexec/path_helper -s`
+fi
