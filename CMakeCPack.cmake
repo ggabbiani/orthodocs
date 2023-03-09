@@ -11,7 +11,7 @@ git_commits(VARIABLE                        __package_release__)
 string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}"  __lower_host_system_name__)
 
 # cross section
-set(CPACK_PACKAGE_VENDOR              "${CPACK_PACKAGE_VENDOR}")
+set(CPACK_PACKAGE_VENDOR              "Giampiero Gabbiani")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
@@ -100,18 +100,54 @@ if (UNIX)
     PERMISSIONS
       OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
   )
+  message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 
 # WINDOWS
 elseif(WIN32 OR MINGW)
+  # won't work before project()!
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # 64 bits
+    set(CPACK_SYSTEM_NAME "win64")
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    # 32 bits
+    set(CPACK_SYSTEM_NAME "win32")
+  endif()
+
   list(APPEND CPACK_GENERATOR                     "NSIS"                    )
-  #set(CPACK_PACKAGE_FILE_NAME                     "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}")
-  set(CPACK_NSIS_MODIFY_PATH                      ON                        )
+  set(CPACK_PACKAGE_FILE_NAME                     "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}-${CPACK_SYSTEM_NAME}")
   set(CPACK_NSIS_PACKAGE_NAME                     "${PROJECT_NAME}"         )
+  set(CPACK_NSIS_MODIFY_PATH                      ON                        )
   set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}" )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL  ON                        )
+  set(CPACK_NSIS_MENU_LINKS                       "https://github.com/ggabbiani/orthodocs" "${PROJECT_NAME} Web Site")
+  set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}")
+  # The display name string that appears in the Windows Apps & features in Control Panel
+  SET(CPACK_NSIS_DISPLAY_NAME                     "${CPACK_NSIS_PACKAGE_NAME}")
+  SET(CPACK_PACKAGE_INSTALL_DIRECTORY             "Program Files\\\\${CPACK_NSIS_PACKAGE_NAME}")
+  SET(CPACK_NSIS_INSTALL_ROOT                     "C:")
+  set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY          "${CPACK_NSIS_PACKAGE_NAME}")
+
+  # WINDOWS wrapper for main
+  file(TO_NATIVE_PATH "${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}/${CMAKE_INSTALL_DATADIR}"  __native_datadir__)
+  configure_file(
+    packaging/windows/orthodocs.bat.in
+    packaging/windows/orthodocs.bat
+    @ONLY
+  )
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/packaging/windows/orthodocs.bat"
+    TYPE
+      BIN
+    COMPONENT
+      runtime
+    PERMISSIONS
+      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )
+  file(TO_NATIVE_PATH "${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}" __native_install_path__)
+  message(STATUS "Package install prefix: '${__native_install_path__}'")
 endif()
 
-message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 message(STATUS "CPack generators: ${CPACK_GENERATOR}")
 
 include(CPack)

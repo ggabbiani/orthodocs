@@ -90,7 +90,8 @@ set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
 set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 
 # Report to user
-message(STATUS "Build install prefix: '${CMAKE_INSTALL_PREFIX}'")
+file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" __native_cmake_install_prefix__)
+message(STATUS "Build install prefix: '${__native_cmake_install_prefix__}'")
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_${p}DIR} _path )
   message(STATUS "${p} path: ${_path}")
