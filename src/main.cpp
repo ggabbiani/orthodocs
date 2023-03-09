@@ -13,6 +13,7 @@
 // project components
 #include <commons/config.h>
 #include <commons/error_info.h>
+#include <commons/exceptions.h>
 #include <commons/extensions.h>
 #include <commons/globals.h>
 #include <commons/utils.h>
@@ -24,6 +25,10 @@
 #include <algorithm>
 #include <cassert>
 #include <map>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif  // defined(_WIN32)
 
 using namespace std;
 
@@ -81,20 +86,20 @@ string sroot_relative(string &sub) {
 }
 
 enum {
-  ADMONITIONS,
-  DATA_DIR,
-  DECORATIONS,
-  DOC_ROOT,
-  GRAPHS,
-  IGNORE,
-  PRIVATE,
-  DEPS,
-  ORTHODOX,
-  SOURCES,
-  SRC_ROOT,
-  TOC,
-  VERBOSITY,
-  VERSION,
+  FLG_ADMONITIONS,
+  OPT_DATA_DIR,
+  OPT_DECORATIONS,
+  OPT_DOC_ROOT,
+  OPT_GRAPHS,
+  OPT_IGNORE,
+  OPT_PRIVATE,
+  OPT_DEPS,
+  FLG_ORTHODOX,
+  OPT_SOURCES,
+  OPT_SRC_ROOT,
+  FLG_TOC,
+  OPT_VERBOSITY,
+  FLG_VERSION,
 };
 
 struct {
@@ -130,8 +135,6 @@ std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s
   else throw(domain_error(ERR_INFO+"unknown spdlog::level enumeration '"+string(s)+'\''));
 }
 
-/**
- */
 struct LogLevelLess {
   using is_transparent = void;
   inline bool operator() (std::string_view lhs, std::string_view rhs) const {
@@ -145,30 +148,48 @@ int main(int argc, const char *argv[]) {
   CLI::App  app{"Automatic documentation generation and static analysis tool.","orthodocs"};
   auto      result = EXIT_SUCCESS;
 
+#if defined(_WIN32)
+  HANDLE hOutput  = INVALID_HANDLE_VALUE;
+  DWORD oldDwMode = 0;
+#endif  // defined(_WIN32)
+
   try {
+#if defined(_WIN32)
+    hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOutput==INVALID_HANDLE_VALUE)
+      throw OsError("GetStdHandle() failed");
+
+    if (GetConsoleMode(hOutput, &oldDwMode)) {
+      if (!SetConsoleMode(hOutput, oldDwMode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING))
+        throw OsError("SetConsoleMode() failed");
+    } else {
+      spdlog::warn("GetConsoleMode() failed");
+    }
+#endif  // defined(_WIN32)
+
     spdlog::set_pattern("%^[%l]%$ %v");
 
-    app.add_flag(   opt[ADMONITIONS].name ,Option::_admonitions  ,opt[ADMONITIONS].desc);
-    auto sroot_opt = app.add_option( opt[SRC_ROOT].name    ,Option::_sroot        ,opt[SRC_ROOT].desc)
+    app.add_flag(   opt[FLG_ADMONITIONS].name ,Option::_admonitions  ,opt[FLG_ADMONITIONS].desc);
+    auto sroot_opt = app.add_option( opt[OPT_SRC_ROOT].name    ,Option::_sroot        ,opt[OPT_SRC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
-    app.add_option(opt[DECORATIONS].name, Option::_decorations, opt[DECORATIONS].desc)
+    app.add_option(opt[OPT_DECORATIONS].name, Option::_decorations, opt[OPT_DECORATIONS].desc)
       ->default_val("!");
-    app.add_option(opt[DOC_ROOT].name,Option::_droot, opt[DOC_ROOT].desc)
+    app.add_option(opt[OPT_DOC_ROOT].name,Option::_droot, opt[OPT_DOC_ROOT].desc)
       ->required()
       ->transform(CLI::Validator(canonical_dir,"DIR"));
-    auto sources_opt = app.add_option(opt[SOURCES].name, Option::_sources, opt[SOURCES].desc)
+    auto sources_opt = app.add_option(opt[OPT_SOURCES].name, Option::_sources, opt[OPT_SOURCES].desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-    app.add_flag(opt[TOC].name,Option::_toc,opt[TOC].desc);
-    app.add_option(opt[IGNORE].name,Option::_ignore_prefix,opt[IGNORE].desc);
-    app.add_option(opt[DEPS].name,Option::_pkg_deps,opt[DEPS].desc)
+    app.add_flag(opt[FLG_TOC].name,Option::_toc,opt[FLG_TOC].desc);
+    app.add_option(opt[OPT_IGNORE].name,Option::_ignore_prefix,opt[OPT_IGNORE].desc);
+    app.add_option(opt[OPT_DEPS].name,Option::_pkg_deps,opt[OPT_DEPS].desc)
       ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
-    auto graph_opt = app.add_option(opt[GRAPHS].name,Option::_graphs,opt[GRAPHS].desc)
+    auto graph_opt = app.add_option(opt[OPT_GRAPHS].name,Option::_graphs,opt[OPT_GRAPHS].desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-    app.add_option(opt[PRIVATE].name, Option::_private_prefix, opt[PRIVATE].desc)
+    app.add_option(opt[OPT_PRIVATE].name, Option::_private_prefix, opt[OPT_PRIVATE].desc)
       ->default_val("__");
-    app.set_version_flag(opt[VERSION].name, opt[VERSION].desc);
-    app.add_option(opt[VERBOSITY].name,Option::_verbosity,opt[VERBOSITY].desc)
+    app.set_version_flag(opt[FLG_VERSION].name, opt[FLG_VERSION].desc);
+    app.add_option(opt[OPT_VERBOSITY].name,Option::_verbosity,opt[OPT_VERBOSITY].desc)
       ->transform(
         CLI::CheckedTransformer(
           map<string, spdlog::level::level_enum, LogLevelLess >(
@@ -183,9 +204,9 @@ int main(int argc, const char *argv[]) {
             }
           )))
       ->default_val("error");
-    app.add_flag(opt[ORTHODOX].name, Option::_orthodox,opt[ORTHODOX].desc)
+    app.add_flag(opt[FLG_ORTHODOX].name, Option::_orthodox,opt[FLG_ORTHODOX].desc)
       ->default_val(true);
-    app.add_option(opt[DATA_DIR].name, Option::_data_dir, opt[DATA_DIR].desc)
+    app.add_option(opt[OPT_DATA_DIR].name, Option::_data_dir, opt[OPT_DATA_DIR].desc)
       ->check(CLI::ExistingDirectory);
 
     sources_opt->needs(sroot_opt);
@@ -222,5 +243,10 @@ int main(int argc, const char *argv[]) {
     print_exception(error);
     result  = EXIT_FAILURE;
   }
+#if defined(_WIN32)
+  // Restore input mode on exit.
+  if (oldDwMode)
+    SetConsoleMode(hOutput, oldDwMode);
+#endif  // defined(_WIN32)
   return result;
 }

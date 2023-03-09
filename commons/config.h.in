@@ -21,9 +21,9 @@
 // ODOX_DATADIR environment variable name containing the data directory
 #define ODOX_DATADIR_ENV    "ODOX_DATADIR"
 // used if the ODOX_DATADIR_ENV environment variable is set (package install case)
-#define ODOX_INSTALL_DATADIR        "@CMAKE_INSTALL_DATADIR@"
+#define ODOX_INSTALL_DATADIR        R"(@__native_install_datadir__@)"
 // used if the ODOX_DATADIR_ENV environment variable is unset (build tree install case)
-#define ODOX_INSTALL_FULL_DATADIR   "@CMAKE_INSTALL_FULL_DATADIR@"
+#define ODOX_INSTALL_FULL_DATADIR   R"(@__native_install_full_datadir__@)"
 
 #cmakedefine ODOX_LANGUAGE_SCAD
 #cmakedefine ODOX_WRITER_MARKDOWN

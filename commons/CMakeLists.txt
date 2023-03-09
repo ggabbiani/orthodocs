@@ -1,5 +1,7 @@
 project(commons_prj VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
 
+file(TO_NATIVE_PATH "${CMAKE_INSTALL_DATADIR}"      __native_install_datadir__)
+file(TO_NATIVE_PATH "${CMAKE_INSTALL_FULL_DATADIR}" __native_install_full_datadir__)
 configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
 ###############################################################################
 # Jason resources from github spdx

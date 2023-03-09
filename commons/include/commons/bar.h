@@ -19,11 +19,16 @@
 template <class T>
 class Bar {
 public:
-  Bar(const T &container,const char *type,size_t width=50) : _end{"✔ "+std::to_string(std::size(container))+" "+type} {
+  Bar(const T &container,const char *type,size_t width=50)
+  : _bar{
+      indicators::option::BarWidth{width},
+      indicators::option::ShowPercentage{true},
+      indicators::option::MaxProgress{container.size()},
+      indicators::option::ForegroundColor{indicators::Color::green}
+    },
+    _end{"✔ "+std::to_string(std::size(container))+" "+type}
+  {
     indicators::show_console_cursor(false);
-    _bar.set_option(indicators::option::BarWidth{width});
-    _bar.set_option(indicators::option::MaxProgress{container.size()});
-    _bar.set_option(indicators::option::ForegroundColor{indicators::Color::green});
   }
   Bar(const Bar&) = delete;
   Bar(const Bar&&) = delete;
