@@ -1,5 +1,5 @@
 @echo off
 setlocal enableextensions
-set ODOX_DATADIR="@__native_datadir__@"
+set "ODOX_DATADIR=@__native_datadir__@"
 @ODOX@ %*
 endlocal

@@ -312,16 +312,16 @@ private:
 template <typename T>
 class db {
 public:
-  explicit db(const std::string &db_name) : _consumer(_db) {
+  explicit db(const std::filesystem::path &db) : _consumer(_db) {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
-      if (!std::filesystem::exists(std::filesystem::path(db_name)))
-        throw FileNotFound(db_name);
-      file.open(db_name);
+      if (!std::filesystem::exists(db))
+        throw FileNotFound(db);
+      file.open(db);
       nlohmann::json::sax_parse(file,&_consumer);
     } catch(...) {
-      throw_with_nested(std::runtime_error(ERR_CALL(db_name)));
+      throw_with_nested(std::runtime_error(ERR_CALL(db)));
     }
   }
   inline size_t size() const {return _db.size();}
