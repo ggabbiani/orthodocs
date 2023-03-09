@@ -21,6 +21,13 @@
 
 #include <commons/exceptions.h>
 
-FileNotFound::FileNotFound(const std::filesystem::path &fname)
+using namespace std;
+namespace fs = std::filesystem;
+
+FileNotFound::FileNotFound(const fs::path &fname)
   : std::runtime_error(fname.string()+std::string(" not found")) {
+}
+
+OsError::OsError(const string &message)
+  : std::runtime_error("OS Error: " + message) {
 }

@@ -27,3 +27,8 @@ class FileNotFound : public std::runtime_error {
 public:
   explicit FileNotFound(const std::filesystem::path &fname);
 };
+
+class OsError : public std::runtime_error {
+public:
+  explicit OsError(const std::string &message);
+};
