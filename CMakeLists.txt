@@ -1,3 +1,13 @@
+#
+# CMake build system for OrthoDocs
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
 # try to get rid of CMake Warning (dev) about policy CMP0135.
 # Unfortunately it seems not able to make it less verbouse for a bug on
@@ -26,17 +36,17 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 option(ODOX_LANGUAGE_SCAD   "OpenSCAD language extension"     ON  )
-option(ODOX_WRITER_MARKDOWN "Markdown writer extension"       ON  )
+option(ODOX_PKG             "Platform specific package build" ON  )
 option(ODOX_SHARED_LIBS     "SHARED vs STATIC ANTLR4 runtime" OFF )
+option(ODOX_WRITER_MARKDOWN "Markdown writer extension"       ON  )
 
 option(ODOX_TESTS                       "Enable tests"            OFF )
 cmake_dependent_option(ODOX_FUNC_TESTS  "Functional tests"        ON "ODOX_TESTS" OFF)
 cmake_dependent_option(ODOX_OTHER_TESTS "More experimental tests" ON "ODOX_TESTS" OFF)
 cmake_dependent_option(ODOX_UNIT_TESTS  "Unit tests"              ON "ODOX_TESTS" OFF)
 
-option(ODOX_EARLY_STAGE                   "Not yet ready features"          OFF )
-cmake_dependent_option(ODOX_PKG           "Platform specific package build" ON  "ODOX_EARLY_STAGE" OFF)
-cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers"         OFF "ODOX_EARLY_STAGE" OFF)
+option(ODOX_EXPERIMENTAL                  "Experimental features"   OFF )
+cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers" OFF "ODOX_EXPERIMENTAL" OFF)
 
 string(CONCAT ODOX_PACKAGE_DESCRIPTION
   "${PROJECT_NAME} is an API documentation generator and static analysis tool for the\n"
