@@ -87,7 +87,7 @@ if (UNIX)
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
 
-  # UNIX wrapper for main
+  # UNIX wrapper for main (build install, TODO: move to CMakeLists.txt)
   set(__full_datadir__  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
   set(__full_exe__      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}")
   set(__mode__          "user install")
@@ -110,18 +110,19 @@ if (UNIX)
 
 # WINDOWS
 elseif(WIN32 OR MINGW)
-  # won't work before project()!
+  list(APPEND CPACK_GENERATOR                     "NSIS"                    )
+  set(CPACK_NSIS_PACKAGE_NAME                     "${PROJECT_NAME}"         )
+  SET(CPACK_NSIS_INSTALL_ROOT                     "C:")
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     # 64 bits
     set(CPACK_SYSTEM_NAME "win64")
+    SET(CPACK_PACKAGE_INSTALL_DIRECTORY           "Program Files\\\\${CPACK_NSIS_PACKAGE_NAME}")
   elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     # 32 bits
     set(CPACK_SYSTEM_NAME "win32")
+    SET(CPACK_PACKAGE_INSTALL_DIRECTORY           "Program Files (x86)\\\\${CPACK_NSIS_PACKAGE_NAME}")
   endif()
-
-  list(APPEND CPACK_GENERATOR                     "NSIS"                    )
   set(CPACK_PACKAGE_FILE_NAME                     "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}-${CPACK_SYSTEM_NAME}")
-  set(CPACK_NSIS_PACKAGE_NAME                     "${PROJECT_NAME}"         )
   set(CPACK_NSIS_MODIFY_PATH                      ON                        )
   set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}" )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL  ON                        )
@@ -129,12 +130,12 @@ elseif(WIN32 OR MINGW)
   set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}")
   # The display name string that appears in the Windows Apps & features in Control Panel
   SET(CPACK_NSIS_DISPLAY_NAME                     "${CPACK_NSIS_PACKAGE_NAME}")
-  SET(CPACK_PACKAGE_INSTALL_DIRECTORY             "Program Files\\\\${CPACK_NSIS_PACKAGE_NAME}")
-  SET(CPACK_NSIS_INSTALL_ROOT                     "C:")
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY          "${CPACK_NSIS_PACKAGE_NAME}")
 
-  # WINDOWS wrapper for main
-  file(TO_NATIVE_PATH "${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}/${CMAKE_INSTALL_DATADIR}"  __native_datadir__)
+  # WINDOWS wrapper for main (build install, TODO: move to CMakeLists.txt)
+  file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"  __full_datadir__)
+  set(__exe__         "${ODOX}")
+  set(__mode__        "user install")
   configure_file(
     packaging/windows/orthodocs.bat.in
     packaging/windows/orthodocs.bat

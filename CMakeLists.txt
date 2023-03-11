@@ -95,11 +95,7 @@ cmake_print_variables(
 if (UNIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 elseif(WIN32)
-  if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/${CMAKE_PROJECT_NAME}")
-  else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/${CMAKE_PROJECT_NAME}")
-  endif()
+  set(CMAKE_INSTALL_PREFIX "C:/Users/$ENV{USERNAME}/AppData/Local/${CMAKE_PROJECT_NAME}")
 endif()
 
 # BUILD INSTALL LOCATIONS (for PACKAGE INSTALL LOCATIONS see CMakeCPack.cmake)

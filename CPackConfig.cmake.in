@@ -29,4 +29,13 @@ if (UNIX)
     @PROJECT_BINARY_DIR@/packaging/orthodocs
     @ONLY
   )
+elseif(WIN32 OR MINGW)
+  file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"  __full_datadir__)
+  set(__exe__         "@ODOX@")
+  set(__mode__        "system install")
+  configure_file(
+    @PROJECT_SOURCE_DIR@/packaging/windows/orthodocs.bat.in
+    @PROJECT_BINARY_DIR@/packaging/windows/orthodocs.bat
+    @ONLY
+  )
 endif()

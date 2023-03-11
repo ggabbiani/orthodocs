@@ -1,5 +1,14 @@
+::
+:: orthodocs wrapper for @__mode__@
+::
+:: This file is part of the 'OrthoDocs' (ODOX) project.
+::
+:: Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+::
+:: SPDX-License-Identifier: GPL-3.0-or-later
+::
 @echo off
 setlocal enableextensions
-set "ODOX_DATADIR=@__native_datadir__@"
-@ODOX@ %*
+set "ODOX_DATADIR=@__full_datadir__@"
+@__exe__@ %*
 endlocal
