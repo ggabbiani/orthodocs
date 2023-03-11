@@ -20,11 +20,13 @@ if(EXISTS ${CPACK_PROPERTIES_FILE})
 endif()
 
 # UNIX wrapper for main
-set(__full_datadir__  "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@")
-set(__full_exe__      "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@")
-set(__mode__          "system install")
-configure_file(
-  @PROJECT_SOURCE_DIR@/packaging/orthodocs.in
-  @PROJECT_BINARY_DIR@/packaging/orthodocs
-  @ONLY
-)
+if (UNIX)
+  set(__full_datadir__  "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@")
+  set(__full_exe__      "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@")
+  set(__mode__          "system install")
+  configure_file(
+    @PROJECT_SOURCE_DIR@/packaging/orthodocs.in
+    @PROJECT_BINARY_DIR@/packaging/orthodocs
+    @ONLY
+  )
+endif()

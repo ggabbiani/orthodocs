@@ -93,10 +93,7 @@ cmake_print_variables(
   CMAKE_SYSTEM_NAME
 )
 if (UNIX)
-  if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
-  elseif(APPLE)
-  endif()
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 elseif(WIN32)
   if(CMAKE_SIZEOF_VOID_P MATCHES "8")
     set(CMAKE_INSTALL_PREFIX "C:/Program Files/${CMAKE_PROJECT_NAME}")

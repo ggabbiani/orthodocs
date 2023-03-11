@@ -32,6 +32,7 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE
 
 # UNIX
 if (UNIX)
+
   # LINUX
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
     # list(APPEND CPACK_GENERATOR "DEB")
@@ -46,7 +47,9 @@ if (UNIX)
     set(CPACK_RPM_PACKAGE_GROUP         Unspecified)
     set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
     set(CPACK_RESOURCE_FILE_README      "${PROJECT_SOURCE_DIR}/README.md")
-  elseif(APPLE) # MACOS
+
+  # MACOS
+  elseif(APPLE)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
     set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__lower_host_system_name__}")
 
