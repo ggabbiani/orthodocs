@@ -85,6 +85,9 @@ if (UNIX)
   endif()
 
   # UNIX wrapper for main
+  set(__full_datadir__  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+  set(__full_exe__      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}")
+  set(__mode__          "user install")
   configure_file(
     packaging/orthodocs.in
     packaging/orthodocs

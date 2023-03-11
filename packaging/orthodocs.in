@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# orthodocs wrapper
+# orthodocs wrapper for @__mode__@
 #
 # This file is part of the 'OrthoDocs' (ODOX) project.
 #
@@ -9,4 +9,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-ODOX_DATADIR="@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@" @CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@ "$@"
+ODOX_DATADIR="@__full_datadir__@" @__full_exe__@ "$@"
