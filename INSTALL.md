@@ -26,7 +26,7 @@ If you think that this kind of installation is suitable for your needs, open a s
 # change directory where this repo is located
 cd /path/to/OrthoDocs/sources
 # configure the build
-cmake -H . -B build
+cmake -S . -B build
 # build and install
 cmake --build build --target install
 ```
@@ -64,7 +64,7 @@ To generate the OS dependant package usable for system-wide installation open a 
 # change directory where this repo is located
 cd /path/to/OrthoDocs/sources
 # configure the build
-cmake -H . -B build
+cmake -S . -B build
 # build and generate the package
 cmake --build build --target package
 ```
