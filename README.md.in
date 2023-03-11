@@ -8,6 +8,8 @@
 
 @ODOX_PACKAGE_DESCRIPTION@. For the list of the feature planned and their status see [Project status](#project-status). For an example of the produced documentation see [OFL Table of Contents](https://github.com/ggabbiani/OFL/blob/main/orthodocs/toc.md) or browse the [OFL documentation tree](https://github.com/ggabbiani/OFL/tree/main/orthodocs).
 
+For OrthoDocs installation see [Installing `OrthoDocs`](INSTALL.md).
+
 ## How to document
 
 @PROJECT_NAME@ is able to recognize all the public global functions, modules and variables found in the source tree, complete with parameters and their default values. Sources can be passed as files, directories or both. Each source file (here referred to as *package*) will produce a corresponding API document.
@@ -21,7 +23,7 @@
 
 @PROJECT_NAME@ is a CLI only utility, the basic invocation is:
 
-    $ orthodocs --src-root «path to source-root directory» --doc-root «path to document-root» «list of files and/or directory relative to source-root»
+    orthodocs --src-root «path to source-root directory» --doc-root «path to document-root» «list of files and/or directory relative to source-root»
 
 @PROJECT_NAME@ will search in all the input directories for any scad file, the resulting file list being merged with the files eventually passed as positional and analyzed.
 The analysis results will be used for producing a number of Markdown documents (one for each

@@ -71,7 +71,7 @@ cmake --build build --target package
 
 [^1]: on Linux systems `$HOME/.local/bin` and `/usr/bin` are assumed to be in system path **by default**
 
-[^2]: on macOS systems `$HOME/.local/bin` is not in user path, the installer will modify the **user default-shell profile**
+[^2]: on macOS systems `$HOME/.local/bin` is not in user path, to use `orthodocs` either call its full path or modify the **user default-shell profile**
 
 [^3]: on macOS `/opt/OrthoDocs` is not in system path, the installer will modify system PATH populating the `/etc/paths.d/` drop-in directory
 
