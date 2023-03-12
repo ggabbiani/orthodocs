@@ -310,6 +310,47 @@ install(
     COMPONENT runtime
 )
 
+# main wrapper
+if (UNIX)
+  set(__full_datadir__  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+  set(__full_exe__      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}")
+  set(__mode__          "user install")
+  configure_file(
+    packaging/unix/orthodocs.in
+    packaging/unix/orthodocs
+    @ONLY
+  )
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/packaging/unix/orthodocs"
+    TYPE
+      BIN
+    COMPONENT
+      runtime
+    PERMISSIONS
+      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )
+elseif(WIN32 OR MINGW)
+  file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"  __full_datadir__)
+  set(__exe__         "${ODOX}")
+  set(__mode__        "user install")
+  configure_file(
+    packaging/windows/orthodocs.bat.in
+    packaging/windows/orthodocs.bat
+    @ONLY
+  )
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/packaging/windows/orthodocs.bat"
+    TYPE
+      BIN
+    COMPONENT
+      runtime
+    PERMISSIONS
+      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )
+endif()
+
 install(
   FILES
     README.md

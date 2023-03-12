@@ -55,7 +55,7 @@ if (UNIX)
 
     # post-flight.sh will add system-wide PATH env
     set(__path_entry__ "${PROJECT_BINARY_DIR}/packaging/macos/100-orthodocs")
-    configure_file(packaging/orthodocs-path.in "${__path_entry__}")
+    configure_file(packaging/macos/orthodocs-path.in "${__path_entry__}")
     configure_file(packaging/macos/post-flight.sh.in packaging/macos/post-flight.sh @ONLY)
     set(CPACK_POSTFLIGHT_RUNTIME_SCRIPT "${PROJECT_BINARY_DIR}/packaging/macos/post-flight.sh")
 
@@ -86,26 +86,6 @@ if (UNIX)
     list(APPEND CPACK_GENERATOR "productbuild")
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
-
-  # UNIX wrapper for main (build install, TODO: move to CMakeLists.txt)
-  set(__full_datadir__  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
-  set(__full_exe__      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}")
-  set(__mode__          "user install")
-  configure_file(
-    packaging/orthodocs.in
-    packaging/orthodocs
-    @ONLY
-  )
-  install(
-    FILES
-      "${PROJECT_BINARY_DIR}/packaging/orthodocs"
-    TYPE
-      BIN
-    COMPONENT
-      runtime
-    PERMISSIONS
-      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
   message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 
 # WINDOWS
@@ -132,25 +112,6 @@ elseif(WIN32 OR MINGW)
   SET(CPACK_NSIS_DISPLAY_NAME                     "${CPACK_NSIS_PACKAGE_NAME}")
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY          "${CPACK_NSIS_PACKAGE_NAME}")
 
-  # WINDOWS wrapper for main (build install, TODO: move to CMakeLists.txt)
-  file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"  __full_datadir__)
-  set(__exe__         "${ODOX}")
-  set(__mode__        "user install")
-  configure_file(
-    packaging/windows/orthodocs.bat.in
-    packaging/windows/orthodocs.bat
-    @ONLY
-  )
-  install(
-    FILES
-      "${PROJECT_BINARY_DIR}/packaging/windows/orthodocs.bat"
-    TYPE
-      BIN
-    COMPONENT
-      runtime
-    PERMISSIONS
-      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
   file(TO_NATIVE_PATH "${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}" __native_install_path__)
   message(STATUS "Package install prefix: '${__native_install_path__}'")
 endif()
