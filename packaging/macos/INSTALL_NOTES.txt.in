@@ -2,10 +2,8 @@ INSTALLATION NOTES
 
 you are executing a system wide package install onto @CPACK_PACKAGING_INSTALL_PREFIX@, the following directories will host @PROJECT_NAME@ @CPACK_COMPONENTS_ALL@ artifacts:
 
-executables     : @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_BINDIR@
-read-only data  : @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_DATADIR@
-docs            : @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_DOCDIR@
+executables	: @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_BINDIR@
+read-only data	: @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_DATADIR@
+docs			: @CPACK_PACKAGING_INSTALL_PREFIX@/@CPACK_PACKAGE_INSTALL_DIRECTORY@@CMAKE_INSTALL_DOCDIR@
 
-After a successful install, a new entry will be added to the system path (/etc/paths.d) but the system path will be updated only after a reboot.
-
-Before of that @PROJECT_NAME@ can be executed only through it full path (@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/orthodocs)
+After a successful install, a new entry will be added to the system path (/etc/paths.d) and the path_helper invoked for system refresh.
