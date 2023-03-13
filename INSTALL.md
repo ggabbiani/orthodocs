@@ -68,6 +68,6 @@ With this kind of installation remember that:
 
 [^3]: on macOS `/opt/OrthoDocs` is not in system path, the installer will modify system PATH populating the `/etc/paths.d/` drop-in directory and refreshing the system by calling the `path_helper`
 
-[^4]: On Windows %LOCALAPPDATA% corresponds to `C:\Users\{user name}\AppData\Local`. The bin directory `C:\Users\{user name}\AppData\Local\OrthoDocs\bin` will be set in **user path**
+[^4]: On Windows %LOCALAPPDATA% corresponds to `C:\Users\{user name}\AppData\Local`. The bin directory `C:\Users\{user name}\AppData\Local\OrthoDocs\bin` must be set manually in the **user path**
 
-[^5]: On Windows %PROGRAMFILES% corresponds to `C:\Program Files`. The bin directory `C:\Program Files\OrthoDocs\bin` will be set in **system path**
+[^5]: On Windows %PROGRAMFILES% corresponds to `C:\Program Files`. The bin directory `C:\Program Files\OrthoDocs\bin` can be set in **system path** during the package installation
