@@ -9,17 +9,21 @@ find_package(Git REQUIRED)
 ###############################################################################
 function(git_branch_version)
   set(options VERBOSE)
-  set(oneValueArgs VARIABLE)
+  set(oneValueArgs VARIABLE WORKING_DIRECTORY)
   set(multiValueArgs)
   cmake_parse_arguments(arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   if (NOT arg_VARIABLE)
     message(FATAL_ERROR "Missing output variable name")
+  endif()
+  if (NOT arg_WORKING_DIRECTORY)
+    message(FATAL_ERROR "Missing working directory")
   endif()
   execute_process(
     COMMAND ${GIT_EXECUTABLE} describe --abbrev=0
     OUTPUT_VARIABLE version
     COMMAND_ERROR_IS_FATAL ANY
     OUTPUT_STRIP_TRAILING_WHITESPACE
+    WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}"
   )
   # ignore leading "v" from version
   string(SUBSTRING ${version} 1 -1 version)

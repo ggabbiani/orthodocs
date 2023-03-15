@@ -1,0 +1,27 @@
+# this Dockerfile must be built with a source volume
+# podman build -v $(realpath path/to/sources):/sources:Z -f Dockerfile.ubuntu -t odox-ubuntu .
+FROM ubuntu
+LABEL org.opencontainers.image.authors="Giampiero Gabbiani (giampiero@gabbiani.org)"
+
+ARG src=/sources    # externally provided bind mount of sources
+ARG bld=/build
+###############################################################################
+# system pre requisites
+RUN ["apt", "update"]
+RUN ["apt", "upgrade", "-y"]
+RUN ["apt", "install", "-y", "cmake", "git", "vim", "build-essential", "default-jdk", "libboost-all-dev", "lintian"]
+###############################################################################
+# directory structure setup
+RUN mkdir -p $bld
+###############################################################################
+# build binaries, tests and packages
+WORKDIR ${bld}
+RUN cmake "$src" "-D" "ODOX_TESTS=ON"
+RUN ["make", "-j8"]
+RUN ["ctest"]
+RUN ["cpack"]
+###############################################################################
+# entrypoint
+# COPY entry-point.sh /usr/bin/entry-point
+# RUN chmod +x /usr/bin/entry-point
+# ENTRYPOINT [ "/usr/bin/entry-point" ]

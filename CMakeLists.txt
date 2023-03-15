@@ -8,18 +8,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-cmake_minimum_required(VERSION 3.24..3.25 FATAL_ERROR)
-# try to get rid of CMake Warning (dev) about policy CMP0135.
-# Unfortunately it seems not able to make it less verbouse for a bug on
-# cmake versions >= 3.24
-cmake_policy(SET CMP0135 NEW)
+cmake_minimum_required(VERSION 3.22..3.25 FATAL_ERROR)
 # NEW behavior is to add link flags if POSITION_INDEPENDENT_CODE is set
 cmake_policy(SET CMP0083 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GitUtils)
-git_branch_version(VARIABLE GIT_BRANCH_VERSION)
+message(STATUS "CMAKE_CURRENT_LIST_DIR: '${CMAKE_CURRENT_LIST_DIR}'")
+git_branch_version(VARIABLE GIT_BRANCH_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
 project(OrthoDocs
   VERSION       ${GIT_BRANCH_VERSION}
@@ -354,6 +351,17 @@ endif()
 install(
   FILES
     README.md
+  TYPE
+    DOC
+  COMPONENT
+    runtime
+)
+###############################################################################
+# docs
+###############################################################################
+install(
+  FILES
+    LICENSE
   TYPE
     DOC
   COMPONENT

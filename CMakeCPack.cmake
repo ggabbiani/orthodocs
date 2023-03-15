@@ -1,3 +1,5 @@
+include(LinuxDistro)
+
 get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
 message(STATUS "component to install: ${CPACK_COMPONENTS_ALL}")
 
@@ -11,7 +13,7 @@ git_commits(VARIABLE                        __package_release__)
 string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}"  __lower_host_system_name__)
 
 # cross section
-set(CPACK_PACKAGE_VENDOR              "Giampiero Gabbiani")
+set(CPACK_PACKAGE_VENDOR              "Giampiero Gabbiani <giampiero@gabbiani.org>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
@@ -27,27 +29,44 @@ endif()
 
 # source generator
 set(CPACK_SOURCE_GENERATOR            "ZIP;TGZ")
-set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}")
+# set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
+set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};.vscode/")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}")
 
 # UNIX
 if (UNIX)
-
   # LINUX
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    # list(APPEND CPACK_GENERATOR "DEB")
-    # set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
-    # set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
-    list(APPEND CPACK_GENERATOR         "RPM")
-    set(CPACK_PACKAGING_INSTALL_PREFIX  "/usr")
-    set(CPACK_RPM_PACKAGE_RELEASE       ${__package_release__})
-    set(CPACK_PACKAGE_FILE_NAME         "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}.${CMAKE_HOST_SYSTEM_PROCESSOR}")
-    set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
-    # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
-    set(CPACK_RPM_PACKAGE_GROUP         Unspecified)
-    set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
-    set(CPACK_RESOURCE_FILE_README      "${PROJECT_SOURCE_DIR}/README.md")
 
+  message(STATUS "Found Linux distro id: '${DISTRO_ID}'")
+    set(CPACK_PACKAGING_INSTALL_PREFIX  "/usr")
+    set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
+    list(APPEND CPACK_GENERATOR         ${DISTRO_CPACK})
+    distro_package_file_name(
+      NAME      ${__lower_project_name__}
+      VERSION   ${CPACK_PACKAGE_VERSION}
+      RELEASE   ${__package_release__}
+      VARIABLE  CPACK_PACKAGE_FILE_NAME
+    )
+    cmake_print_variables(
+      CPACK_PACKAGE_FILE_NAME
+    )
+
+    if (DISTRO_ID STREQUAL debian OR DISTRO_ID STREQUAL ubuntu)
+      set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
+      set(CPACK_DEBIAN_PACKAGE_SECTION    "devel")
+      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+    elseif (DISTRO_ID STREQUAL fedora)
+      set(CPACK_RPM_PACKAGE_RELEASE       ${__package_release__})
+      set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
+      # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
+      set(CPACK_RPM_PACKAGE_GROUP         Unspecified)
+      set(CPACK_RESOURCE_FILE_README      "${PROJECT_SOURCE_DIR}/README.md")
+
+    else()
+      message(AUTHOR_WARNING "Unmanaged distro id: ${DISTRO_ID}")
+    endif()
   # MACOS
   elseif(APPLE)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
