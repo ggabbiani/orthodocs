@@ -50,6 +50,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Collect system infos
+      run: system_profiler SPSoftwareDataType SPHardwareDataType
     - uses: actions/checkout@v3
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags.
