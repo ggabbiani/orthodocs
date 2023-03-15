@@ -56,6 +56,11 @@ jobs:
       run: |
         system_profiler SPSoftwareDataType SPHardwareDataType
         /usr/libexec/java_home -V
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        check-latest: true
     - uses: actions/checkout@v3
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags.
