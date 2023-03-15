@@ -48,6 +48,8 @@ jobs:
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: macos-latest
+    env:
+      JAVA_HOME: $(/usr/libexec/java_home -v 17.0.6)
 
     steps:
     - name: Collect system infos
@@ -62,7 +64,6 @@ jobs:
     - name: Install pre-requisites
       run: |
         brew install boost
-        export JAVA_HOME=$(/usr/libexec/java_home -v 17.0.6)
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
