@@ -56,7 +56,7 @@ jobs:
         /usr/libexec/java_home -V
     - uses: actions/setup-java@v3
       with:
-        distribution: 'temurin'
+        # distribution: 'temurin'
         java-version: '17'
         check-latest: true
     - uses: actions/checkout@v3
