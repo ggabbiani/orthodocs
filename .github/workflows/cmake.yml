@@ -48,6 +48,12 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack
 
+    # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
+    - uses: shogo82148/actions-upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{github.workspace}}/build/*.deb
+
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -94,4 +100,9 @@ jobs:
     - name: Create package
       working-directory: ${{github.workspace}}/build
       run: cpack
+
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
+    - uses: shogo82148/actions-upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{github.workspace}}/build/*.pkg
