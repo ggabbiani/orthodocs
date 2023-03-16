@@ -25,9 +25,12 @@ jobs:
         # Default: 1
         fetch-depth: '0'
 
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.3.2
+    - name: Get latest release
+      id: latest_release
+      uses: kaliber5/action-get-release@v1
+      with:
+        token: ${{ env.GITHUB_TOKEN }}
+        latest: true
 
     - name: Install pre-requisites
       run: |
@@ -63,7 +66,7 @@ jobs:
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        upload_url: ${{ steps.latest_release.outputs.upload_url }}
         asset_path: ${{github.workspace}}/build/*.deb
 
   macos:
@@ -94,9 +97,12 @@ jobs:
         # Default: 1
         fetch-depth: '0'
 
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.3.2
+    - name: Get latest release
+      id: latest_release
+      uses: kaliber5/action-get-release@v1
+      with:
+        token: ${{ env.GITHUB_TOKEN }}
+        latest: true
 
     - name: Install pre-requisites
       run: brew install boost ninja
@@ -130,5 +136,5 @@ jobs:
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        upload_url: ${{ steps.latest_release.outputs.upload_url }}
         asset_path: ${{github.workspace}}/build/*.pkg
