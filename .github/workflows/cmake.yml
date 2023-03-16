@@ -43,6 +43,11 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
+    # creates binary package
+    - name: Create package
+      working-directory: ${{github.workspace}}/build
+      run: cpack
+
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -54,7 +59,7 @@ jobs:
       run: |
         system_profiler SPSoftwareDataType SPHardwareDataType
         /usr/libexec/java_home -V
-    # antlr-4.12.0-complete.jar has been compiled with a bytecode version v55.
+    # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
     # this correspond to a java v11 that we require because the default provided
     # is java 8 (so bytecode v52)
@@ -85,3 +90,8 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
+    # creates binary package
+    - name: Create package
+      working-directory: ${{github.workspace}}/build
+      run: cpack
+    # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
