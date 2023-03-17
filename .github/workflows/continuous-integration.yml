@@ -43,6 +43,7 @@ jobs:
     - name: eccheccazzo
       run: |
         echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
+        ls -la ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
     - name: Install Ninja
       id: ninja
