@@ -19,11 +19,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.73.0
+        # OPTIONAL: Specify a platform version
+        # platform_version: 18.04
+        # OPTIONAL: Specify a custom install location
+        # boost_install_dir: /home/runner/some_directory
+        # OPTIONAL: Specify a toolset
+        # toolset: gcc
+        # OPTIONAL: Specify an architecture
+        # arch: x86
+
+        # NOTE: If a boost version matching all requirements cannot be found,
+        # this build step will fail
+
     - uses: actions/checkout@v3
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags.
         # Default: 1
         fetch-depth: '0'
+
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Get last tag
       id: git_tag
@@ -39,11 +63,11 @@ jobs:
         token: ${{ env.GITHUB_TOKEN }}
         # latest: true
 
-    - name: Install pre-requisites
-      run: |
-        sudo apt update
-        sudo apt upgrade -y
-        sudo apt install -y default-jdk libboost-all-dev lintian ninja-build
+    # - name: Install pre-requisites
+    #   run: |
+    #     sudo apt update
+    #     sudo apt upgrade -y
+    #     sudo apt install -y default-jdk libboost-all-dev lintian ninja-build
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -93,6 +117,24 @@ jobs:
         system_profiler SPSoftwareDataType SPHardwareDataType
         /usr/libexec/java_home -V
 
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.73.0
+        # OPTIONAL: Specify a platform version
+        platform_version: 10.15
+        # OPTIONAL: Specify a custom install location
+        boost_install_dir: /home/runner/some_directory
+        # OPTIONAL: Specify a toolset
+        toolset: clang
+
+        # NOTE: If a boost version matching all requirements cannot be found,
+        # this build step will fail
+
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
     # this correspond to a java v11 that we require because the default provided
@@ -102,6 +144,9 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         check-latest: true
+
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - uses: actions/checkout@v3
       with:
@@ -123,8 +168,8 @@ jobs:
         token: ${{ env.GITHUB_TOKEN }}
         # latest: true
 
-    - name: Install pre-requisites
-      run: brew install boost ninja
+    # - name: Install pre-requisites
+    #   run: brew install boost ninja
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -182,6 +227,27 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         check-latest: true
+
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.73.0
+        # OPTIONAL: Specify a custon install location
+        # boost_install_dir: C:\some_directory
+        # OPTIONAL: Specify a platform version
+        # platform_version: 2019
+        # OPTIONAL: Specify a toolset
+        toolset: msvc
+
+      # NOTE: If a boost version matching all requirements cannot be found,
+      # this build step will fail
+
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - uses: actions/checkout@v3
       with:
