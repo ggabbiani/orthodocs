@@ -40,11 +40,21 @@ jobs:
         # NOTE: If a boost version matching all requirements cannot be found,
         # this build step will fail
 
-    - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@master
-      with:
-        # ninja version to download. Default: 1.10.0
-        version: 1.10.2
+    - name: Install Ninja
+      id: ninja
+      uses: turtlesec-no/get-ninja@main
+
+    - name: Ninja version
+      run: |
+        echo "${{ steps.ninja.outputs.version }}"
+        ninja --version
+
+    # - name: Setup Ninja
+    #   uses: ashutoshvarma/setup-ninja@master
+    #   with:
+    #     # ninja version to download. Default: 1.10.0
+    #     version: 1.10.2
+
     # # Ninja setup
     # - uses: seanmiddleditch/gha-setup-ninja@master
 
