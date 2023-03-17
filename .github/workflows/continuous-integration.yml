@@ -38,7 +38,7 @@ jobs:
       id: latest_release
       uses: kaliber5/action-get-release@v1
       with:
-        tag_name: ${{git_tag.outputs.tag}}
+        tag_name: ${{steps.git_tag.outputs.tag}}
         token: ${{ env.GITHUB_TOKEN }}
         # latest: true
 
