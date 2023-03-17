@@ -150,7 +150,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: artifacts-${{steps.git_tag.outputs.tag}}
-        path: ${{github.workspace}}/build/*.deb
+        path: ${{github.workspace}}/build/*.pkg
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     - uses: shogo82148/actions-upload-release-asset@v1
