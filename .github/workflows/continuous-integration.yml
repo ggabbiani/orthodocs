@@ -42,9 +42,9 @@ jobs:
 
     - name: Setup Ninja
       uses: ashutoshvarma/setup-ninja@master
-      # with:
+      with:
         # ninja version to download. Default: 1.10.0
-        # version: 1.10.0
+        version: 1.10.2
     # # Ninja setup
     # - uses: seanmiddleditch/gha-setup-ninja@master
 
