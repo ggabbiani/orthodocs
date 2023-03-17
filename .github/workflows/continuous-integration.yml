@@ -25,9 +25,6 @@ jobs:
         # Default: 1
         fetch-depth: '0'
 
-    - name: Docker Info
-      run: docker info
-
     - name: Get last tag
       id: git_tag
       uses: pavelsaman/git-nth-last-tag@v1
@@ -71,12 +68,12 @@ jobs:
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     # Upload assets only when pre-release
     - uses: shogo82148/actions-upload-release-asset@v1
+      if: ${{ steps.latest_release.outputs.prerelease }}
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
         upload_url: ${{ steps.latest_release.outputs.upload_url }}
         asset_path: ${{github.workspace}}/build/*.deb
-      if: ${{ steps.latest_release.outputs.prerelease }}
 
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
@@ -106,12 +103,19 @@ jobs:
         # Default: 1
         fetch-depth: '0'
 
+    - name: Get last tag
+      id: git_tag
+      uses: pavelsaman/git-nth-last-tag@v1
+
+    - run: echo ${{ steps.git_tag.outputs.tag }}
+
     - name: Get latest release
       id: latest_release
       uses: kaliber5/action-get-release@v1
       with:
+        tag_name: ${{steps.git_tag.outputs.tag}}
         token: ${{ env.GITHUB_TOKEN }}
-        latest: true
+        # latest: true
 
     - name: Install pre-requisites
       run: brew install boost ninja
@@ -138,6 +142,7 @@ jobs:
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     - uses: shogo82148/actions-upload-release-asset@v1
+      if: ${{ steps.latest_release.outputs.prerelease }}
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
