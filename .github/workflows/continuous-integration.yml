@@ -61,17 +61,15 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack
 
-    - name: check if pre-release
-      run: [[ "${{ steps.latest_release.outputs.prerelease }}" = true ]] && true || false
-
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
-    #
+    # Upload assets only when pre-release
     - uses: shogo82148/actions-upload-release-asset@v1
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
         upload_url: ${{ steps.latest_release.outputs.upload_url }}
         asset_path: ${{github.workspace}}/build/*.deb
+      if: ${{ steps.latest_release.outputs.prerelease }}
 
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
