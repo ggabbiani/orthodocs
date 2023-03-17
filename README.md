@@ -1,7 +1,6 @@
 # OrthoDocs
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ggabbiani_orthodocs&metric=alert_status)](https://sonarcloud.io/project/overview?id=ggabbiani_orthodocs)
-
 ![CI](https://github.com/ggabbiani/orthodocs/actions/workflows/continuous-integration.yml/badge.svg)
 
 ![Package output example](docs/package.png "Package output example")
