@@ -28,10 +28,17 @@ jobs:
     - name: Docker Info
       run: docker info
 
+    - name: Get last tag
+      id: git_tag
+      uses: pavelsaman/git-nth-last-tag@v1
+
+    - run: echo ${{ steps.git_tag.outputs.tag }}
+
     - name: Get latest release
       id: latest_release
       uses: kaliber5/action-get-release@v1
       with:
+        tag_name: ${{git_tag.outputs.tag}}
         token: ${{ env.GITHUB_TOKEN }}
         # latest: true
 
