@@ -53,10 +53,11 @@ if (UNIX)
     if (DISTRO_ID STREQUAL debian OR DISTRO_ID STREQUAL ubuntu)
       set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
       set(CPACK_DEBIAN_PACKAGE_SECTION    "devel")
-      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS  ON)
 
     elseif (DISTRO_ID STREQUAL fedora)
       set(CPACK_RPM_PACKAGE_RELEASE       ${__package_release__})
+      set(CPACK_RPM_PACKAGE_RELEASE_DIST  ".fc${DISTRO_VERSION_ID}")
       set(CPACK_RPM_PACKAGE_LICENSE       "GPL-3.0-or-later")
       # CPACK_RPM_PACKAGE_GROUP is deprecated on Fedora
       set(CPACK_RPM_PACKAGE_GROUP         Unspecified)

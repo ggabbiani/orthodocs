@@ -81,10 +81,12 @@ if (UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
   if(EXISTS /etc/os-release)
     distro_tag(ID         VARIABLE DISTRO_ID)
     distro_tag(VERSION_ID VARIABLE DISTRO_VERSION_ID)
+
     if (DISTRO_ID STREQUAL fedora)
       set(DISTRO_ARCHITECTURE "${CMAKE_HOST_SYSTEM_PROCESSOR}")
       set(DISTRO_CPACK        "RPM")
       # cmake_print_variables(DISTRO_ID DISTRO_VERSION_ID DISTRO_ARCHITECTURE DISTRO_CPACK)
+
     elseif (DISTRO_ID STREQUAL ubuntu)
       if (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL x86_64)
         set(DISTRO_ARCHITECTURE "amd64")
@@ -95,6 +97,7 @@ if (UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
       # see [Why are Debian package file names so long?](https://www.debian.org/doc/manuals/debian-faq/pkg-basics.en.html)
       # <foo>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
       # set(DISTRO_DIST         "ubuntu")
+
     else()
       message(FATAL_ERROR "Unknown distro id: ${DISTRO_ID}")
     endif()
