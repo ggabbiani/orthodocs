@@ -168,6 +168,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    # - name: Collect system infos
+    #   run: |
+    #     # system_profiler SPSoftwareDataType SPHardwareDataType
+    #     /usr/libexec/java_home -V
+
+    # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
+    # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
+    # this correspond to a java v11 that we require because the default provided
+    # is java 8 (so bytecode v52)
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        check-latest: true
+
     - uses: actions/checkout@v3
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags.
