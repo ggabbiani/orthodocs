@@ -1,4 +1,4 @@
-include(LinuxDistro)
+include(SupportedOs)
 
 get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
 message(STATUS "component to install: ${CPACK_COMPONENTS_ALL}")
@@ -12,7 +12,7 @@ string(TOLOWER "${PROJECT_NAME}"            __lower_project_name__)
 git_commits(VARIABLE                        __package_release__)
 string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}"  __lower_host_system_name__)
 
-# cross section
+# common section
 set(CPACK_PACKAGE_VENDOR              "Giampiero Gabbiani <giampiero@gabbiani.org>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
@@ -32,25 +32,25 @@ set(CPACK_SOURCE_GENERATOR            "ZIP;TGZ")
 # set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};/.git/;.gitignore;.vscode/")
 set(CPACK_SOURCE_IGNORE_FILES         "${PROJECT_BINARY_DIR};.vscode/")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME    "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}")
+list(APPEND CPACK_GENERATOR           ${OS_CPACK})
+os_package_file_name(
+  NAME      ${__lower_project_name__}
+  VERSION   ${CPACK_PACKAGE_VERSION}
+  RELEASE   ${__package_release__}
+  VARIABLE  CPACK_PACKAGE_FILE_NAME
+)
+cmake_print_variables(
+  CPACK_PACKAGE_FILE_NAME
+)
 
 # UNIX
 if (UNIX)
   # LINUX
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
 
-  message(STATUS "Found Linux distro id: '${DISTRO_ID}'")
-    set(CPACK_PACKAGING_INSTALL_PREFIX  "/usr")
+    message(STATUS "Found Linux distro id: '${DISTRO_ID}'")
+    set(CPACK_PACKAGING_INSTALL_PREFIX  "${OS_PACKAGE_INSTALL_PREFIX}")
     set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
-    list(APPEND CPACK_GENERATOR         ${DISTRO_CPACK})
-    distro_package_file_name(
-      NAME      ${__lower_project_name__}
-      VERSION   ${CPACK_PACKAGE_VERSION}
-      RELEASE   ${__package_release__}
-      VARIABLE  CPACK_PACKAGE_FILE_NAME
-    )
-    cmake_print_variables(
-      CPACK_PACKAGE_FILE_NAME
-    )
 
     if (DISTRO_ID STREQUAL debian OR DISTRO_ID STREQUAL ubuntu)
       set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
@@ -69,8 +69,7 @@ if (UNIX)
     endif()
   # MACOS
   elseif(APPLE)
-    set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
-    set(CPACK_PACKAGE_FILE_NAME "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__lower_host_system_name__}")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "OS_PACKAGE_INSTALL_PREFIX")
 
     # post-flight.sh will add system-wide PATH env
     set(__path_entry__ "${PROJECT_BINARY_DIR}/packaging/macos/100-orthodocs")
@@ -102,26 +101,15 @@ if (UNIX)
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.${PROJECT_NAME}"                            )
 
     # productbuild
-    list(APPEND CPACK_GENERATOR "productbuild")
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
   message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 
 # WINDOWS
 elseif(WIN32 OR MINGW)
-  list(APPEND CPACK_GENERATOR                     "NSIS"                    )
   set(CPACK_NSIS_PACKAGE_NAME                     "${PROJECT_NAME}"         )
   SET(CPACK_NSIS_INSTALL_ROOT                     "C:")
-  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    # 64 bits
-    set(CPACK_SYSTEM_NAME "win64")
-    SET(CPACK_PACKAGE_INSTALL_DIRECTORY           "Program Files\\\\${CPACK_NSIS_PACKAGE_NAME}")
-  elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    # 32 bits
-    set(CPACK_SYSTEM_NAME "win32")
-    SET(CPACK_PACKAGE_INSTALL_DIRECTORY           "Program Files (x86)\\\\${CPACK_NSIS_PACKAGE_NAME}")
-  endif()
-  set(CPACK_PACKAGE_FILE_NAME                     "${__lower_project_name__}-${CPACK_PACKAGE_VERSION}-${__package_release__}-${CPACK_SYSTEM_NAME}")
+  SET(CPACK_PACKAGE_INSTALL_DIRECTORY             "${OS_PACKAGE_INSTALL_PREFIX}")
   set(CPACK_NSIS_MODIFY_PATH                      ON                        )
   set(CPACK_NSIS_CONTACT                          "${CPACK_PACKAGE_VENDOR}" )
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL  ON                        )

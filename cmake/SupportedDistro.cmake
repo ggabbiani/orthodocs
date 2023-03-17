@@ -1,8 +1,9 @@
 # set the following variables depending on the hosting linux system:
-# DISTRO_ID           fedora,debian,ubuntu
+# DISTRO_ID                     fedora,debian,ubuntu
 # DISTRO_VERSION_ID
-# DISTRO_ARCHITECTURE hw architecture
-# DISTRO_CPACK        cpack generator
+# DISTRO_ARCHITECTURE           hw architecture
+# DISTRO_CPACK                  cpack generator
+# DISTRO_PACKAGE_INSTALL_PREFIX installation directory for packages
 
 include(CMakePrintHelpers)
 
@@ -76,13 +77,14 @@ function(distro_package_file_name)
 endfunction(distro_package_file_name)
 
 if (UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
+  set(DISTRO_PACKAGE_INSTALL_PREFIX /usr)
   if(EXISTS /etc/os-release)
     distro_tag(ID         VARIABLE DISTRO_ID)
     distro_tag(VERSION_ID VARIABLE DISTRO_VERSION_ID)
     if (DISTRO_ID STREQUAL fedora)
       set(DISTRO_ARCHITECTURE "${CMAKE_HOST_SYSTEM_PROCESSOR}")
       set(DISTRO_CPACK        "RPM")
-      cmake_print_variables(DISTRO_ID DISTRO_VERSION_ID DISTRO_ARCHITECTURE DISTRO_CPACK)
+      # cmake_print_variables(DISTRO_ID DISTRO_VERSION_ID DISTRO_ARCHITECTURE DISTRO_CPACK)
     elseif (DISTRO_ID STREQUAL ubuntu)
       if (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL x86_64)
         set(DISTRO_ARCHITECTURE "amd64")
@@ -94,9 +96,16 @@ if (UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
       # <foo>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
       # set(DISTRO_DIST         "ubuntu")
     else()
-      message(AUTHOR_WARNING "Unknown distro id: ${DISTRO_ID}")
+      message(FATAL_ERROR "Unknown distro id: ${DISTRO_ID}")
     endif()
   else()
-    message(AUTHOR_WARNING "No /etc/os-release found")
+    message(FATAL_ERROR "No /etc/os-release found")
   endif()
 endif()
+
+cmake_print_variables(
+  DISTRO_ID
+  DISTRO_ARCHITECTURE
+  DISTRO_CPACK
+  DISTRO_PACKAGE_INSTALL_PREFIX
+)
