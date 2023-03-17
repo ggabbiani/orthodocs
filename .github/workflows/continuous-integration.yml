@@ -28,19 +28,6 @@ jobs:
     - name: Docker Info
       run: docker info
 
-    - name: Get the last tag
-      id: git_tag
-      uses: pavelsaman/git-nth-last-tag@v1
-
-    # retrieve infos about the release eventually associated to tag
-    - uses: joutvhu/get-release@v1
-      id: get_release
-      with:
-        tag_name: ${{ steps.git_tag.outputs.tag }}
-
-    - run: echo ${{ steps.git_tag.outputs.tag }}
-    - run: echo ${{ steps.get_release.outputs.upload_url }}
-
     - name: Get latest release
       id: latest_release
       uses: kaliber5/action-get-release@v1
@@ -74,11 +61,11 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack
 
-    # - name: Gets latest created release info
-    #   id: latest_release
-    #   uses: jossef/action-latest-release-info@v1.2.2
+    - name: check if pre-release
+      run: [[ "${{ steps.latest_release.outputs.prerelease }}" = true ]] && true || false
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
+    #
     - uses: shogo82148/actions-upload-release-asset@v1
       with:
         # upload_url: ${{ github.event.release.upload_url }}
@@ -143,10 +130,6 @@ jobs:
     - name: Create package
       working-directory: ${{github.workspace}}/build
       run: cpack
-
-    # - name: Gets latest created release info
-    #   id: latest_release
-    #   uses: jossef/action-latest-release-info@v1.2.2
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     - uses: shogo82148/actions-upload-release-asset@v1
