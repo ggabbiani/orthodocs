@@ -27,7 +27,7 @@ jobs:
         # REQUIRED: Specify the required boost version
         # A list of supported versions can be found here:
         # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.73.0
+        boost_version: 1.76.0
         # OPTIONAL: Specify a platform version
         # platform_version: 18.04
         # OPTIONAL: Specify a custom install location
@@ -40,14 +40,14 @@ jobs:
         # NOTE: If a boost version matching all requirements cannot be found,
         # this build step will fail
 
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
+
     - uses: actions/checkout@v3
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags.
         # Default: 1
         fetch-depth: '0'
-
-    # Ninja setup
-    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Get last tag
       id: git_tag
@@ -124,16 +124,19 @@ jobs:
         # REQUIRED: Specify the required boost version
         # A list of supported versions can be found here:
         # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.73.0
+        boost_version: 1.76.0
         # OPTIONAL: Specify a platform version
-        platform_version: 10.15
+        # platform_version: 10.15
         # OPTIONAL: Specify a custom install location
-        boost_install_dir: /home/runner/some_directory
+        # boost_install_dir: /home/runner/some_directory
         # OPTIONAL: Specify a toolset
         toolset: clang
 
         # NOTE: If a boost version matching all requirements cannot be found,
         # this build step will fail
+
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -144,9 +147,6 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         check-latest: true
-
-    # Ninja setup
-    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - uses: actions/checkout@v3
       with:
@@ -213,6 +213,27 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.76.0
+        # OPTIONAL: Specify a custon install location
+        # boost_install_dir: C:\some_directory
+        # OPTIONAL: Specify a platform version
+        # platform_version: 2019
+        # OPTIONAL: Specify a toolset
+        toolset: msvc
+
+      # NOTE: If a boost version matching all requirements cannot be found,
+      # this build step will fail
+
+    # Ninja setup
+    - uses: seanmiddleditch/gha-setup-ninja@master
+
     # - name: Collect system infos
     #   run: |
     #     # system_profiler SPSoftwareDataType SPHardwareDataType
@@ -227,27 +248,6 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         check-latest: true
-
-    - name: Install boost
-      uses: MarkusJx/install-boost@v2.4.1
-      id: install-boost
-      with:
-        # REQUIRED: Specify the required boost version
-        # A list of supported versions can be found here:
-        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.73.0
-        # OPTIONAL: Specify a custon install location
-        # boost_install_dir: C:\some_directory
-        # OPTIONAL: Specify a platform version
-        # platform_version: 2019
-        # OPTIONAL: Specify a toolset
-        toolset: msvc
-
-      # NOTE: If a boost version matching all requirements cannot be found,
-      # this build step will fail
-
-    # Ninja setup
-    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - uses: actions/checkout@v3
       with:
