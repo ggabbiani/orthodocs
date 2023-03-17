@@ -33,7 +33,7 @@ jobs:
       uses: kaliber5/action-get-release@v1
       with:
         token: ${{ env.GITHUB_TOKEN }}
-        latest: true
+        # latest: true
 
     - name: Install pre-requisites
       run: |
