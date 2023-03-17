@@ -43,13 +43,11 @@ cmake_print_variables(
   CPACK_PACKAGE_FILE_NAME
 )
 
-# UNIX
 if (UNIX)
-  # LINUX
-  if(CMAKE_SYSTEM_NAME MATCHES Linux)
+  set(CPACK_PACKAGING_INSTALL_PREFIX  "${OS_PACKAGE_INSTALL_PREFIX}")
 
+  if(CMAKE_SYSTEM_NAME MATCHES Linux)
     message(STATUS "Found Linux distro id: '${DISTRO_ID}'")
-    set(CPACK_PACKAGING_INSTALL_PREFIX  "${OS_PACKAGE_INSTALL_PREFIX}")
     set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
 
     if (DISTRO_ID STREQUAL debian OR DISTRO_ID STREQUAL ubuntu)
@@ -67,10 +65,8 @@ if (UNIX)
     else()
       message(AUTHOR_WARNING "Unmanaged distro id: ${DISTRO_ID}")
     endif()
-  # MACOS
-  elseif(APPLE)
-    set(CPACK_PACKAGING_INSTALL_PREFIX "OS_PACKAGE_INSTALL_PREFIX")
 
+  elseif(APPLE)
     # post-flight.sh will add system-wide PATH env
     set(__path_entry__ "${PROJECT_BINARY_DIR}/packaging/macos/100-orthodocs")
     configure_file(packaging/macos/orthodocs-path.in "${__path_entry__}")
