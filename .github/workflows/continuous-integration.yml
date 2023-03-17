@@ -160,3 +160,68 @@ jobs:
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
         upload_url: ${{ steps.latest_release.outputs.upload_url }}
         asset_path: ${{github.workspace}}/build/*.pkg
+
+  windows:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        # Number of commits to fetch. 0 indicates all history for all branches and tags.
+        # Default: 1
+        fetch-depth: '0'
+
+    - name: Get last tag
+      id: git_tag
+      uses: pavelsaman/git-nth-last-tag@v1
+
+    - run: echo ${{ steps.git_tag.outputs.tag }}
+
+    - name: Get latest release
+      id: latest_release
+      uses: kaliber5/action-get-release@v1
+      with:
+        tag_name: ${{steps.git_tag.outputs.tag}}
+        token: ${{ env.GITHUB_TOKEN }}
+        # latest: true
+
+    # - name: Install pre-requisites
+    #   run: brew install boost ninja
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    # creates binary package
+    - name: Create package
+      working-directory: ${{github.workspace}}/build
+      run: cpack
+
+    # upload artifacts
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifacts-${{steps.git_tag.outputs.tag}}
+        path: ${{github.workspace}}/build/*.pkg
+
+    # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
+    - uses: shogo82148/actions-upload-release-asset@v1
+      if: ${{ steps.latest_release.outputs.prerelease }}
+      with:
+        # upload_url: ${{ github.event.release.upload_url }}
+        # upload_url: ${{ steps.latest_release.outputs.upload_url }}
+        upload_url: ${{ steps.latest_release.outputs.upload_url }}
+        asset_path: ${{github.workspace}}/build/*.pkg
