@@ -16,31 +16,26 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
-    - name: Collect system infos
-      run: |
-        cat /etc/os-release
-        exit 1
-
     - name: Install boost
       uses: MarkusJx/install-boost@v2.4.1
-      id: install-boost
+      id: boost-install
       with:
         # REQUIRED: Specify the required boost version
         # A list of supported versions can be found here:
         # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.76.0
+        boost_version: 1.80.0
         # OPTIONAL: Specify a platform version
-        # platform_version: 18.04
+        platform_version: 22.04
         # OPTIONAL: Specify a custom install location
         # boost_install_dir: /home/runner/some_directory
         # OPTIONAL: Specify a toolset
-        # toolset: gcc
+        toolset: gcc
         # OPTIONAL: Specify an architecture
-        # arch: x86
+        arch: x86
 
         # NOTE: If a boost version matching all requirements cannot be found,
         # this build step will fail
