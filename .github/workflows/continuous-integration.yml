@@ -21,9 +21,9 @@ jobs:
     steps:
 
     - name: Collect system infos
-    run: |
-      cat /etc/os-release
-      exit 1
+      run: |
+        cat /etc/os-release
+        exit 1
 
     - name: Install boost
       uses: MarkusJx/install-boost@v2.4.1
