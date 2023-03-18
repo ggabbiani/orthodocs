@@ -76,12 +76,12 @@ jobs:
         sudo apt install -y libboost-all-dev
         # sudo apt install -y default-jdk libboost-all-dev lintian ninja-build
 
-    - name: Boost directories
-      run: |
-        echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
-        ls -la ${{ steps.install-boost.outputs.BOOST_ROOT }}
-        ls -la ${{steps.install-boost.outputs.BOOST_ROOT}}/include
-        ls -la ${{steps.install-boost.outputs.BOOST_ROOT}}/include/boost
+    # - name: Boost directories
+    #   run: |
+    #     echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
+    #     ls -la ${{ steps.install-boost.outputs.BOOST_ROOT }}
+    #     ls -la ${{steps.install-boost.outputs.BOOST_ROOT}}/include
+    #     ls -la ${{steps.install-boost.outputs.BOOST_ROOT}}/include/boost
 
 
     - name: Configure CMake
