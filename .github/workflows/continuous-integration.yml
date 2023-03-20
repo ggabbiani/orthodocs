@@ -290,6 +290,7 @@ jobs:
     #     asset_path: ${{github.workspace}}/build/*.pkg
 
   upload-assets:
+    needs: ubuntu
     runs-on: ubuntu-latest
 
     steps:
