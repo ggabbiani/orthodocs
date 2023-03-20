@@ -10,7 +10,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   GITHUB_TOKEN: ${{ github.token }}
-  ARTIFACTS: artifacts
+  ARTIFACTS: packages
 
 jobs:
   linux-artifacts:
@@ -119,7 +119,7 @@ jobs:
       id: upload-artifacts
       with:
         name: ${{env.ARTIFACTS}}
-        path: ${{github.workspace}}/build/*.deb
+        path: ${{github.workspace}}/build/*.pkg
 
   windows:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
