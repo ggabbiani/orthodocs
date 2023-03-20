@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Integration and deployment
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
   ARTIFACTS: packages
 
 jobs:
-  linux-artifacts:
+  linux-integration:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -60,18 +60,13 @@ jobs:
         name: ${{env.ARTIFACTS}}
         path: ${{github.workspace}}/build/*.deb
 
-  macos-artifacts:
+  macos-integration:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: macos-latest
 
     steps:
-
-    - name: Collect system infos
-      run: |
-        system_profiler SPSoftwareDataType SPHardwareDataType
-        /usr/libexec/java_home -V
 
     - name: Project checkout
       uses: actions/checkout@v3
@@ -121,45 +116,19 @@ jobs:
         name: ${{env.ARTIFACTS}}
         path: ${{github.workspace}}/build/*.pkg
 
-  windows:
+  windows-integration:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
 
     steps:
-    - name: THIS STEP IS SUSPENDED
-      run: exit 1
-    - name: Install boost
-      uses: MarkusJx/install-boost@v2.4.1
-      id: install-boost
+
+    - name: Project checkout
+      uses: actions/checkout@v3
       with:
-        # REQUIRED: Specify the required boost version
-        # A list of supported versions can be found here:
-        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.76.0
-        # OPTIONAL: Specify a custon install location
-        # boost_install_dir: C:\some_directory
-        # OPTIONAL: Specify a platform version
-        # platform_version: 2019
-        # OPTIONAL: Specify a toolset
-        # toolset: msvc
-
-      # NOTE: If a boost version matching all requirements cannot be found,
-      # this build step will fail
-
-    - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@master
-      # with:
-        # ninja version to download. Default: 1.10.0
-        # version: 1.10.0
-    # # Ninja setup
-    # - uses: seanmiddleditch/gha-setup-ninja@master
-
-    # - name: Collect system infos
-    #   run: |
-    #     # system_profiler SPSoftwareDataType SPHardwareDataType
-    #     /usr/libexec/java_home -V
+        # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
+        fetch-depth: '0'
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -170,29 +139,6 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         check-latest: true
-
-    - uses: actions/checkout@v3
-      with:
-        # Number of commits to fetch. 0 indicates all history for all branches and tags.
-        # Default: 1
-        fetch-depth: '0'
-
-    - name: Get last tag
-      id: git_tag
-      uses: pavelsaman/git-nth-last-tag@v1
-
-    - run: echo ${{ steps.git_tag.outputs.tag }}
-
-    - name: Get latest release
-      id: latest_release
-      uses: kaliber5/action-get-release@v1
-      with:
-        tag_name: ${{steps.git_tag.outputs.tag}}
-        token: ${{ env.GITHUB_TOKEN }}
-        # latest: true
-
-    # - name: Install pre-requisites
-    #   run: brew install boost ninja
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -218,19 +164,10 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: artifacts-${{steps.git_tag.outputs.tag}}
-        path: ${{github.workspace}}/build/*.pkg
+        path: ${{github.workspace}}/build/*.exe
 
-    # # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
-    # - uses: shogo82148/actions-upload-release-asset@v1
-    #   if: ${{ steps.latest_release.outputs.prerelease }}
-    #   with:
-    #     # upload_url: ${{ github.event.release.upload_url }}
-    #     # upload_url: ${{ steps.latest_release.outputs.upload_url }}
-    #     upload_url: ${{ steps.latest_release.outputs.upload_url }}
-    #     asset_path: ${{github.workspace}}/build/*.pkg
-
-  upload-assets:
-    needs: [linux-artifacts, macos-artifacts]
+  deployment:
+    needs: [linux-integration, macos-integration, windows-integration]
     runs-on: ubuntu-latest
 
     steps:
