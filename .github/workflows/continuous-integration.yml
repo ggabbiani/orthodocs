@@ -141,7 +141,7 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: powershell
       run: |
-        Invoke-WebRequest https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe -OutFile boost_1_81_0-msvc-14.3-64.exe
+        (New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')
         dir
         .\boost_1_81_0-msvc-14.3-64.exe
 
