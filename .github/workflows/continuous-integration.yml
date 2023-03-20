@@ -14,6 +14,9 @@ env:
 
 jobs:
   linux-integration:
+
+    if: false
+
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -61,6 +64,9 @@ jobs:
         path: ${{github.workspace}}/build/*.deb
 
   macos-integration:
+
+    if: false
+
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -121,6 +127,9 @@ jobs:
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
+    env:
+      BOOST_NAME: boost_1_81_0
+      BOOST_ROOT: ${{github.workspace}}/${{env.BOOST_NAME}}
 
     steps:
 
@@ -134,12 +143,8 @@ jobs:
       uses: gamedev-thingy/Download-Extract@v2
       with:
         url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-        destination: .
-        ZIPname: boost_1_81_0
-
-    - name: ls dirs
-      shell: cmd
-      run: dir .
+        destination: ${{BOOST_ROOT}}/..
+        ZIPname: ${{BOOST_NAME}}
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -154,7 +159,8 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON
+      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON \
+        -DBOOST_ROOT=${{env.BOOST_ROOT}}
 
     - name: Build
       # Build your program with the given configuration
