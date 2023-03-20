@@ -71,7 +71,12 @@ jobs:
         name: artifacts-${{steps.git_tag.outputs.tag}}
         path: ${{github.workspace}}/build/*.deb
 
-    - name: are artifacts produced also locally?
+    - name: Download math result for job 1
+      uses: actions/download-artifact@v3
+      with:
+        name: I-am-your-artifact
+
+    - name: where artifacts are now?
       run: |
         ls -l ${{github.workspace}}/
         ls -l ${{github.workspace}}/build/
