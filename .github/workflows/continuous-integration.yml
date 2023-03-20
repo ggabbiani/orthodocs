@@ -140,7 +140,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
 
     - shell: msys2 {0}
-      run: pacman -S --needed mingw-w64-x86_64-boost
+      run: pacman -S --noconfirm --needed mingw-w64-x86_64-boost
 
     # - name: Boost installer download from SourceForge and execution
     #   working-directory: ${{github.workspace}}
