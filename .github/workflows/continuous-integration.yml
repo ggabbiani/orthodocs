@@ -137,13 +137,18 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
 
-    - name: Boost installer download from SourceForge and execution
-      working-directory: ${{github.workspace}}
-      shell: cmd
-      run: |
-        powershell -c "(New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')"
-        dir
-        start "Installer" /wait boost_1_81_0-msvc-14.3-64.exe /SILENT
+    - uses: msys2/setup-msys2@v2
+
+    - shell: msys2 {0}
+      run: pacman -S --needed mingw-w64-x86_64-boost
+
+    # - name: Boost installer download from SourceForge and execution
+    #   working-directory: ${{github.workspace}}
+    #   shell: cmd
+    #   run: |
+    #     powershell -c "(New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')"
+    #     dir
+    #     start "Installer" /wait boost_1_81_0-msvc-14.3-64.exe /SILENT
 
     # - name: Download and extract boost libraries
     #   uses: gamedev-thingy/Download-Extract@v2
@@ -165,7 +170,8 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=${{env.WIN_BOOST_ROOT}}
+      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON
+      # -DBOOST_ROOT=${{env.WIN_BOOST_ROOT}}
 
     - name: Build
       # Build your program with the given configuration
