@@ -72,15 +72,13 @@ jobs:
         name: artifacts-${{steps.git_tag.outputs.tag}}
         path: ${{github.workspace}}/build/*.deb
 
-    - name: Download math result for job 1
+    - name: Download artifacts locally
+      # setting no name will download all the produced artifacts
       uses: actions/download-artifact@v3
-      with:
-        name: ${{steps.upload-artifacts.inputs.name}}
 
     - name: where artifacts are now?
       run: |
-        ls -l ${{github.workspace}}/
-        ls -l ${{github.workspace}}/build/
+        ls -l ${{github.workspace}}/artifacts-${{steps.git_tag.outputs.tag}}/
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     # Automatic asset upload if pre-release
