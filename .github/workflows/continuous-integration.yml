@@ -11,7 +11,7 @@ env:
   BUILD_TYPE: Release
   GITHUB_TOKEN: ${{ github.token }}
   ARTIFACTS: packages
-  WIN_BOOST_ROOT: ${{github.workspace}}\boost_1_81_0
+  # WIN_BOOST_ROOT: ${{github.workspace}}\boost_1_81_0
 
 jobs:
   linux-integration:
@@ -137,12 +137,18 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
 
-    - name: Download and extract boost libraries
-      uses: gamedev-thingy/Download-Extract@v2
-      with:
-        url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-        destination: ${{github.workspace}}
-        ZIPname: boost_1_81_0
+    - name: Boost installer download from SourceForge and execution
+      working-directory: ${{github.workspace}}
+      run: |
+        bitsadmin.exe /transfer "Download Boost libraries" "https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe" "boost-install.exe"
+        boost-install.exe
+
+    # - name: Download and extract boost libraries
+    #   uses: gamedev-thingy/Download-Extract@v2
+    #   with:
+    #     url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
+    #     destination: ${{github.workspace}}
+    #     ZIPname: boost_1_81_0
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
