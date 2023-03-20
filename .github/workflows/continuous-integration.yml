@@ -132,10 +132,10 @@ jobs:
 
     - name: Download and extract boost libraries
       uses: actions/Download-Extract@v2
-        with:
-          url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-          destination: .
-          ZIPname: boost_1_81_0
+      with:
+        url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
+        destination: .
+        ZIPname: boost_1_81_0
 
     - name: ls dirs
       shell: cmd
