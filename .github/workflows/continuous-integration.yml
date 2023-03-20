@@ -12,7 +12,7 @@ env:
   GITHUB_TOKEN: ${{ github.token }}
   ARTIFACTS: packages
   WIN_BOOST_NAME: boost_1_81_0
-  WIN_BOOST_ROOT: ${{github.workspace}}/boost_1_81_0
+  WIN_BOOST_ROOT: ${{github.workspace}}\boost_1_81_0
 
 jobs:
   linux-integration:
@@ -142,7 +142,7 @@ jobs:
       uses: gamedev-thingy/Download-Extract@v2
       with:
         url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-        destination: ${{env.WIN_BOOST_ROOT}}/..
+        destination: ${{env.WIN_BOOST_ROOT}}\..
         ZIPname: ${{env.WIN_BOOST_NAME}}
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
