@@ -139,11 +139,11 @@ jobs:
 
     - name: Boost installer download from SourceForge and execution
       working-directory: ${{github.workspace}}
-      shell: powershell
+      shell: cmd
       run: |
-        (New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')
+        powershell -c "(New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')"
         dir
-        .\boost_1_81_0-msvc-14.3-64.exe
+        start "Installer" /wait boost_1_81_0-msvc-14.3-64.exe /SILENT
 
     # - name: Download and extract boost libraries
     #   uses: gamedev-thingy/Download-Extract@v2
