@@ -134,12 +134,12 @@ jobs:
       uses: actions/Download-Extract@v2
       with:
         url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-        destination: .
+        destination: boost
         ZIPname: boost_1_81_0
 
     - name: ls dirs
       shell: cmd
-      run: dir
+      run: dir . boost
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
