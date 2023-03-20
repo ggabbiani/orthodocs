@@ -143,7 +143,7 @@ jobs:
       run: |
         (New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')
         dir
-        .\boost_1_81_0-msvc-14.3-64.exe
+        boost_1_81_0-msvc-14.3-64.exe
 
     # - name: Download and extract boost libraries
     #   uses: gamedev-thingy/Download-Extract@v2
