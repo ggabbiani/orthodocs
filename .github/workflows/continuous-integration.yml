@@ -10,9 +10,10 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   GITHUB_TOKEN: ${{ github.token }}
+  ARTIFACTS: artifacts
 
 jobs:
-  ubuntu:
+  linux-artifacts:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -69,8 +70,7 @@ jobs:
       uses: actions/upload-artifact@v3
       id: upload-artifacts
       with:
-        # name: artifacts-${{steps.git_tag.outputs.tag}}
-        name: packages
+        name: ${{env.ARTIFACTS}}
         path: ${{github.workspace}}/build/*.deb
 
   macos:
@@ -290,7 +290,7 @@ jobs:
     #     asset_path: ${{github.workspace}}/build/*.pkg
 
   upload-assets:
-    needs: ubuntu
+    needs: linux-artifacts
     runs-on: ubuntu-latest
 
     steps:
@@ -318,7 +318,7 @@ jobs:
       # setting no name will download all the produced artifacts in the
       # workspace after creating a directory with their container name
       # in this case:
-      # ${{github.workspace}}/artifacts-${{steps.git_tag.outputs.tag}}/
+      # ${{github.workspace}}/${{env.ARTIFACTS}}/
       uses: actions/download-artifact@v3
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
@@ -330,4 +330,4 @@ jobs:
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
         upload_url: ${{ steps.latest_release.outputs.upload_url }}
         # asset_path: ${{github.workspace}}/build/*.deb
-        asset_path: ${{github.workspace}}/artifacts-${{steps.git_tag.outputs.tag}}/*
+        asset_path: ${{github.workspace}}/${{env.ARTIFACTS}}/*
