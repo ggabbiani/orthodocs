@@ -129,7 +129,7 @@ jobs:
     runs-on: windows-latest
     env:
       BOOST_NAME: boost_1_81_0
-      BOOST_ROOT: ${{github.workspace}}/${{jobs.windows-integration.env.BOOST_NAME}}
+      BOOST_ROOT: ${{github.workspace}}/boost_1_81_0
 
     steps:
 
