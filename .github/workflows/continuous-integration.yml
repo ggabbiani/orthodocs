@@ -130,6 +130,17 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
 
+    - name: Download and extract boost libraries
+      uses: actions/Download-Extract@v2
+        with:
+          url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
+          destination: .
+          ZIPname: boost_1_81_0
+
+    - name: ls dirs
+      shell: cmd
+      run: dir
+
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
     # this correspond to a java v11 that we require because the default provided
