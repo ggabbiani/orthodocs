@@ -143,6 +143,7 @@ jobs:
       run: |
         pacman -S --noconfirm --needed mingw-w64-x86_64-boost
         pacman -Ql mingw-w64-x86_64-boost
+        dir C:/msys64/mingw64/include/boost/
 #        type C:/msys64/mingw64/include/boost/version.hpp
 
     # - name: Boost installer download from SourceForge and execution
