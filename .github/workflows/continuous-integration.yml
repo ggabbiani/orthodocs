@@ -67,6 +67,7 @@ jobs:
 
     # Upload produced artifacts
     - uses: actions/upload-artifact@v3
+      id: upload-artifacts
       with:
         name: artifacts-${{steps.git_tag.outputs.tag}}
         path: ${{github.workspace}}/build/*.deb
@@ -74,7 +75,7 @@ jobs:
     - name: Download math result for job 1
       uses: actions/download-artifact@v3
       with:
-        name: I-am-your-artifact
+        name: ${{steps.upload-artifacts.inputs.name}}
 
     - name: where artifacts are now?
       run: |
