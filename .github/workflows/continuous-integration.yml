@@ -160,7 +160,9 @@ jobs:
         fetch-depth: '0'
 
     - name: Configure CMake
-      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
+      run: |
+        cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
+        cat "${{github.workspace}}/commons/include/commons/config.h"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
