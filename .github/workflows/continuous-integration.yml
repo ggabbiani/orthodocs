@@ -137,7 +137,7 @@ jobs:
         install: >-
           git
           base-devel
-          boost
+          mingw-w64-x86_64-boost
 
     - name: Project checkout
       uses: actions/checkout@v3
