@@ -149,6 +149,7 @@ jobs:
       run: |
         echo "let the Windows nightmare begin..."
         pacman -Ql mingw-w64-x86_64-boost
+        cygpath -m /mingw64/include/boost
         echo "... let the Windows nightmare came to an end"
         exit 1
 
