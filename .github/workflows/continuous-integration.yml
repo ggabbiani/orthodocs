@@ -145,11 +145,10 @@ jobs:
           mingw-w64-x86_64-gcc
 
     - name: Configure CMake
-      # shell: msys2 {0}
+      shell: msys2 {0}
       run: |
         echo "let the Windows nightmare begin..."
-        pacboy -Ql mingw-w64-x86_64-boost
-        ls c:\msys64\mingw64\include\boost
+        pacman -Ql mingw-w64-x86_64-boost
         echo "... let the Windows nightmare came to an end"
         exit 1
 
