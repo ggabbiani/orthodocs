@@ -144,14 +144,14 @@ jobs:
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-gcc
 
-    - name: Configure CMake
-      shell: msys2 {0}
-      run: |
-        echo "let the Windows nightmare begin..."
-        pacman -Ql mingw-w64-x86_64-boost
-        cygpath -m /mingw64/include/boost
-        echo "... let the Windows nightmare came to an end"
-        exit 1
+    # - name: Configure CMake
+    #   shell: msys2 {0}
+    #   run: |
+    #     echo "let the Windows nightmare begin..."
+    #     pacman -Ql mingw-w64-x86_64-boost
+    #     cygpath -m /mingw64/include/boost
+    #     echo "... let the Windows nightmare came to an end"
+    #     exit 1
 
     - name: Project checkout
       uses: actions/checkout@v3
@@ -188,7 +188,7 @@ jobs:
       # shell: msys2 {0}
       run: |
         ls c:/msys64/mingw64
-        cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=c:/msys64/mingw64
+        cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
 
     # - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
