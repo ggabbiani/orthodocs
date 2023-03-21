@@ -147,7 +147,9 @@ jobs:
     - name: Configure CMake
       # shell: msys2 {0}
       run: |
-        ls c:/msys64/mingw64/include
+        echo "let the Windows nightmare begin..."
+        ls c:\msys64\mingw64\include\boost
+        echo "... let the Windows nightmare came to an end"
         exit 1
 
     - name: Project checkout
