@@ -144,6 +144,13 @@ jobs:
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-gcc
 
+    - name: Configure CMake
+      # shell: msys2 {0}
+      run: |
+        ls c:/msys64/mingw64
+        ls c:/msys64/mingw64/include
+        exit 1
+
     - name: Project checkout
       uses: actions/checkout@v3
       with:
