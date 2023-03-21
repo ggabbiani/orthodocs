@@ -165,13 +165,15 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+    - name: Version test
+      working-directory: ${{github.workspace}}/build
+      run: D:/a/orthodocs/orthodocs/build/bin/orthodocs-main.exe --version
+
     - name: Test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: |
-        D:/a/orthodocs/orthodocs/build/bin/orthodocs-main.exe --version
-        ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
     # creates binary package
     - name: Create package
