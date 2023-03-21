@@ -133,8 +133,7 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
       with:
-        # update: true
-        # path-type: strict
+        update: true
         install: >-
           git
           base-devel
@@ -143,36 +142,6 @@ jobs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-gcc
-
-    # - name: Configure CMake
-    #   shell: msys2 {0}
-    #   run: |
-    #     echo "let the Windows nightmare begin..."
-    #     pacman -Ql mingw-w64-x86_64-boost
-    #     cygpath -m /mingw64/include/boost
-    #     echo "... let the Windows nightmare came to an end"
-    #     exit 1
-
-    - name: Project checkout
-      uses: actions/checkout@v3
-      with:
-        # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
-        fetch-depth: '0'
-
-    # - name: Boost installer download from SourceForge and execution
-    #   working-directory: ${{github.workspace}}
-    #   shell: cmd
-    #   run: |
-    #     powershell -c "(New-Object Net.WebClient).DownloadFile('https://sourceforge.net/projects/boost/files/boost-binaries/1.81.0/boost_1_81_0-msvc-14.3-64.exe', 'boost_1_81_0-msvc-14.3-64.exe')"
-    #     dir
-    #     start "Installer" /wait boost_1_81_0-msvc-14.3-64.exe /SILENT
-
-    # - name: Download and extract boost libraries
-    #   uses: gamedev-thingy/Download-Extract@v2
-    #   with:
-    #     url: "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip"
-    #     destination: ${{github.workspace}}
-    #     ZIPname: boost_1_81_0
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -184,30 +153,23 @@ jobs:
         java-version: '11'
         check-latest: true
 
-    - name: Configure CMake
-      # shell: msys2 {0}
-      run: |
-        ls c:/msys64/mingw64
-        cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
+    - name: Project checkout
+      uses: actions/checkout@v3
+      with:
+        # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
+        fetch-depth: '0'
 
-    # - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      # run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON
-      # -DBOOST_ROOT=/msys64/mingw64 -DBoost_INCLUDE_DIR=/msys64/mingw64/include
-      # -DBOOST_ROOT=${{env.WIN_BOOST_ROOT}}
+    - name: Configure CMake
+      run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
 
     - name: Build
-      # shell: msys2 {0}
-      # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Test
-      # shell: msys2 {0}
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
     # creates binary package
     - name: Create package
