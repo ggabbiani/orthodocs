@@ -133,8 +133,8 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
       with:
-        update: true
-        path-type: strict
+        # update: true
+        # path-type: strict
         install: >-
           git
           base-devel
@@ -176,7 +176,7 @@ jobs:
         check-latest: true
 
     - name: Configure CMake
-      shell: msys2 {0}
+      # shell: msys2 {0}
       run: cmake -GNinja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON
 
     # - name: Configure CMake
