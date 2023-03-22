@@ -64,6 +64,9 @@ if (UNIX)
     endif()
     set(OS_ARCHITECTURE "${CMAKE_HOST_SYSTEM_PROCESSOR}")
     set(OS_CPACK        "NSIS")
+
+  else()
+    message(FATAL_ERROR "Unmanaged Operative System")
   endif()
 endif()
 
