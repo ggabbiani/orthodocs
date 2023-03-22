@@ -2,33 +2,36 @@
 /*
  * Common used exceptions.
  *
- * Copyright © 2023 Giampiero Gabbiani (giampiero@gabbiani.org)
- *
  * This file is part of the 'OrthoDocs' (ODOX) project.
  *
- * ODOX is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
  *
- * ODOX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ODOX.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include <filesystem>
 #include <stdexcept>
 
-class FileNotFound : public std::runtime_error {
-public:
-  explicit FileNotFound(const std::filesystem::path &fname);
+/**
+ * On unattended systems can be difficult to have the what() text shown,
+ * the aim of this class is to provide also a custom return code to be
+ * used by the exception handler.
+ */
+struct RcException : virtual std::exception {
+  explicit RcException(int rc) : rc{rc} {}
+  const int rc;
 };
 
-class OsError : public std::runtime_error {
+class FileNotFound : public std::runtime_error, virtual RcException {
+public:
+  explicit FileNotFound(const std::filesystem::path &fname);
+
+  static constexpr int exit_code{-1};
+};
+
+class OsError : public std::runtime_error, virtual RcException {
 public:
   explicit OsError(const std::string &message);
+
+  static constexpr int exit_code{-2};
 };

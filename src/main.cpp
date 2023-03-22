@@ -239,6 +239,9 @@ int main(int argc, const char *argv[]) {
       writer->graphs(analyst.toc(),Option::graphs());
   } catch (const CLI::Error &error) {
     result  = app.exit(error);
+  } catch(const RcException &error) {
+    print_exception(error);
+    result  = error.rc;
   } catch(const exception &error) {
     print_exception(error);
     result  = EXIT_FAILURE;
