@@ -167,10 +167,6 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: base test
-      working-directory: ${{github.workspace}}/build
-      run: D:/a/orthodocs/orthodocs/build/bin/orthodocs-main.exe
-
     - name: Test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
