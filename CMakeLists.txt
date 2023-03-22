@@ -92,7 +92,9 @@ cmake_print_variables(
 if (UNIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 elseif(WIN32)
-  set(CMAKE_INSTALL_PREFIX "$ENV{LOCALAPPDATA}/${CMAKE_PROJECT_NAME}")
+  # value from Windows environment variable must be converted into a
+  # cmake-style path with forward-slashes (/).
+  file(TO_CMAKE_PATH "$ENV{LOCALAPPDATA}\\${CMAKE_PROJECT_NAME}" CMAKE_INSTALL_PREFIX)
 endif()
 
 # BUILD INSTALL LOCATIONS (for PACKAGE INSTALL LOCATIONS see CMakeCPack.cmake)
