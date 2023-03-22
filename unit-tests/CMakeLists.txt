@@ -133,6 +133,10 @@ boost_test(NAME UnitTests
 )
 # cmake_print_variables(ORTHODOCS_LIBS)
 
+cmake_print_variables(
+  ODOX_DATA_OUTPUT_DIRECTORY
+)
+
 if (Python_FOUND)
   doc_test(NAME ortho-lib-defdecorations
     SOURCES docu-styles/ortho/lib-defdecorations
