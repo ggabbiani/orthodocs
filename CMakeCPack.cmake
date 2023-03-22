@@ -24,7 +24,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Release)
   set(CPACK_STRIP_FILES TRUE)
   message(STATUS "Packaged executable strip: ${CPACK_STRIP_FILES}")
 else()
-  message(AUTHOR_WARNING "Packaging a ${CMAKE_BUILD_TYPE} build")
+  message(AUTHOR_WARNING "Packaging a ${CMAKE_BUILD_TYPE} build type: binaries will contain debug information")
 endif()
 
 # source generator
