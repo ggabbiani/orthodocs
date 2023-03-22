@@ -38,4 +38,7 @@ elseif(WIN32 OR MINGW)
     @PROJECT_BINARY_DIR@/packaging/windows/orthodocs.bat
     @ONLY
   )
+  # CPACK_PACKAGE_INSTALL_DIRECTORY is in cmake file system format
+  # ... but it seems that NSIS generator needs it in native one ...
+  file(TO_NATIVE_PATH "@CPACK_PACKAGE_INSTALL_DIRECTORY@"  CPACK_PACKAGE_INSTALL_DIRECTORY)
 endif()
