@@ -169,6 +169,7 @@ jobs:
 
     - name: Unit test
       working-directory: ${{github.workspace}}/build
+      shell: cmd
       run: .\bin\ut-unittests.exe
 
     - name: Test
