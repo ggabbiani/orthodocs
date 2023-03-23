@@ -41,7 +41,7 @@ jobs:
       # is java 8 (so bytecode v52)
       - name: Install correct Java version
         uses: actions/setup-java@v3
-        if: steps.sonar-cache.outputs.cache-hit != 'true'
+        # if: steps.sonar-cache.outputs.cache-hit != 'true'
         with:
           distribution: 'temurin'
           java-version: 11
