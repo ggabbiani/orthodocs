@@ -13,7 +13,7 @@ jobs:
     env:
       # Find the latest version in the "Linux" link on this page:
       # https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-cli/
-      SONAR_SCANNER_VERSION: 4.8
+      SONAR_SCANNER_VERSION: 4.7.0.2747
       SONAR_SERVER_URL: "https://sonarcloud.io"
       # Directory where build-wrapper output will be placed
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
@@ -41,7 +41,7 @@ jobs:
       # is java 8 (so bytecode v52)
       - name: Install correct Java version
         uses: actions/setup-java@v3
-        # if: steps.sonar-cache.outputs.cache-hit != 'true'
+        if: steps.sonar-cache.outputs.cache-hit != 'true'
         with:
           distribution: 'temurin'
           java-version: 11
