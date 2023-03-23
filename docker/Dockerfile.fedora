@@ -1,10 +1,28 @@
-# this Dockerfile must be built with a source volume
+#
+# The resulting image expects three parameters:
+#
+# - «source directory»  : mount point for the ODOX sources (def. /sources)
+# - «build directory»   : mount point for the build directory where the
+#                         package(s) will be produced (def. /build)
+# - «build type»        : the build type for CMake configuration and build
+#                         (def. Release)
+#
+# This means that the runner container will expect two volumes mounted
+# («source directory» «build directory»)
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 # podman build -v $(realpath path/to/sources):/sources:Z -f Dockerfile.ubuntu -t odox-ubuntu .
 FROM fedora:36
 LABEL org.opencontainers.image.authors="Giampiero Gabbiani (giampiero@gabbiani.org)"
 
 ARG src=/sources    # externally provided bind mount of sources
-ARG bld=/build      # externally provided bind mount for artifacts
+ARG bld=/build      # externally provided bind mount for packages
 ARG type=Release
 ###############################################################################
 # system pre requisites
@@ -15,10 +33,8 @@ RUN ["dnf", "install", "-y", "java-11-openjdk-devel", "cmake", "boost-devel", "r
 # directory structure setup
 RUN mkdir -p ${bld}
 ###############################################################################
-# build binaries, tests and packages
-WORKDIR ${bld}
-###############################################################################
 # entrypoint
+WORKDIR ${bld}
 COPY entry-point.sh /usr/bin/entry-point
 RUN chmod +x /usr/bin/entry-point
 ENTRYPOINT [ "/usr/bin/entry-point" ]
