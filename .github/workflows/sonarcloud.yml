@@ -11,30 +11,47 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
-      SONAR_SCANNER_VERSION: 4.7.0.2747 # Find the latest version in the "Linux" link on this page:
-                                        # https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-cli/
+      # Find the latest version in the "Linux" link on this page:
+      # https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-cli/
+      SONAR_SCANNER_VERSION: 4.8
       SONAR_SERVER_URL: "https://sonarcloud.io"
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+      # Directory where build-wrapper output will be placed
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
     steps:
+
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
       - name: Checkout submodules
         run: git submodule update --init --recursive
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
+
       - name: Cache SonarCloud packages
+        id: sonar-cache
         uses: actions/cache@v1
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: install propedeutics for building
+
+      # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
+      # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
+      # this correspond to a java v11 that we require because the default provided
+      # is java 8 (so bytecode v52)
+      - name: Install correct Java version
+        uses: actions/setup-java@v3
+        if: steps.sonar-cache.outputs.cache-hit != 'true'
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          check-latest: true
+
+      - name: install pre-requisites for building
         run: |
           sudo apt-get update
           sudo apt-get install libboost-all-dev
+
       - name: Download and set up sonar-scanner
         env:
           SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
@@ -43,6 +60,7 @@ jobs:
           curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
           unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
+
       - name: Download and set up build-wrapper
         env:
           BUILD_WRAPPER_DOWNLOAD_URL: ${{ env.SONAR_SERVER_URL }}/static/cpp/build-wrapper-linux-x86.zip
@@ -50,11 +68,13 @@ jobs:
           curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
+
       - name: Run build-wrapper
         run: |
           mkdir build
           cmake -S . -B build
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build/ --config Release
+
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
