@@ -124,7 +124,7 @@ The list of features expected in the v1 release with their current status:
 
 | OS            | Build | Run   | Package
 | ------------- | ----- | ---   | -------
-| Fedora Linux  | ❎    | ❎    | ❎
-| macOS         | ❎    | ❎    | ❎
-| Ubuntu Linux  | ❎    | ❎    | ❎
-| Windows       | ❎    | ❎    | ❎
+| Fedora Linux  | ✔    | ✔    | ✔
+| macOS         | ✔    | ✔    | ✔
+| Ubuntu Linux  | ✔    | ✔    | ✔
+| Windows       | ✔    | ✔    | ✔
