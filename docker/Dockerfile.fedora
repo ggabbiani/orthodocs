@@ -4,9 +4,8 @@ FROM fedora:36
 LABEL org.opencontainers.image.authors="Giampiero Gabbiani (giampiero@gabbiani.org)"
 
 ARG src=/sources    # externally provided bind mount of sources
-ARG bld=/build
+ARG bld=/build      # externally provided bind mount for artifacts
 ARG type=Release
-ARG out=/out        # externally provided bind mount for artifacts
 ###############################################################################
 # system pre requisites
 RUN ["dnf", "update", "-y"]
@@ -14,16 +13,13 @@ RUN ["dnf", "group", "install", "-y", "C Development Tools and Libraries", "Deve
 RUN ["dnf", "install", "-y", "java-11-openjdk-devel", "cmake", "boost-devel", "rpmlint", "ninja-build"]
 ###############################################################################
 # directory structure setup
-RUN mkdir -p $bld
+RUN mkdir -p ${bld}
 ###############################################################################
 # build binaries, tests and packages
 WORKDIR ${bld}
-# RUN cmake -GNinja -S ${src} -B ${bld} -DCMAKE_BUILD_TYPE=${type} -DODOX_TESTS=ON
-# RUN cmake --build ${bld} --config ${type}
-# RUN ctest
-# RUN cpack
 ###############################################################################
 # entrypoint
 COPY entry-point.sh /usr/bin/entry-point
 RUN chmod +x /usr/bin/entry-point
 ENTRYPOINT [ "/usr/bin/entry-point" ]
+CMD ["/sources", "/build", "Release"]
