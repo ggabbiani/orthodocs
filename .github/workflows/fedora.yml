@@ -27,4 +27,14 @@ jobs:
         fetch-depth: '0'
 
     - name: Test docker run
-      run: docker run -t fedora:latest cat /etc/os-release
+      working-directory: ${{github.workspace}}/docker
+      run: |
+        mkdir ${{github.workspace}}/build
+        docker build -v $(realpath ${{github.workspace}}):/sources -v $(realpath ${{github.workspace}})/build:/out -f Dockerfile.fedora .
+
+    - name: Upload produced artifacts
+      uses: actions/upload-artifact@v3
+      id: upload-artifacts
+      with:
+        name: ${{env.ARTIFACTS}}
+        path: ${{github.workspace}}/build/*.rpm
