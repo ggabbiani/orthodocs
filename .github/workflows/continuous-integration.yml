@@ -169,8 +169,9 @@ jobs:
 
     - name: Unit test
       working-directory: ${{github.workspace}}/build
-      shell: cmd
-      run: .\bin\ut-unittests.exe
+      run: |
+        set MSYSTEM=UCRT64
+        .\bin\ut-unittests.exe
 
     - name: Test
       working-directory: ${{github.workspace}}/build
