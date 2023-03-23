@@ -31,7 +31,8 @@ jobs:
       run: |
         docker build --help
         mkdir ${{github.workspace}}/build
-        docker build --volume $(realpath ${{github.workspace}}):/sources --volume $(realpath ${{github.workspace}})/build:/out -f Dockerfile.fedora .
+        docker build -t odox-fedora -f Dockerfile.fedora .
+        docker run -t --volume $(realpath ${{github.workspace}}):/in --volume $(realpath ${{github.workspace}})/build:/out odox-fedora
 
     - name: Upload produced artifacts
       uses: actions/upload-artifact@v3
