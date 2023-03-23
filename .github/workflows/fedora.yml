@@ -29,8 +29,9 @@ jobs:
     - name: Test docker run
       working-directory: ${{github.workspace}}/docker
       run: |
+        docker build --help
         mkdir ${{github.workspace}}/build
-        docker build -v $(realpath ${{github.workspace}}):/sources -v $(realpath ${{github.workspace}})/build:/out -f Dockerfile.fedora .
+        docker build --volume $(realpath ${{github.workspace}}):/sources --volume $(realpath ${{github.workspace}})/build:/out -f Dockerfile.fedora .
 
     - name: Upload produced artifacts
       uses: actions/upload-artifact@v3
