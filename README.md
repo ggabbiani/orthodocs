@@ -123,8 +123,9 @@ The list of features expected in the v1 release with their current status:
 
 ## Supported OSs
 
-| OS        | Build | Run   | Package
-| --------- | ----- | ---   | -------
-| Linux     | ✔     | ✔     | ✔
-| macOS     | ✔     | ✔     | ✔
-| Windows   | ✔     | ✔     | ✔
+| OS            | Build | Run   | Package
+| ------------- | ----- | ---   | -------
+| Linux Fedora  | ❎     | ❎   | 🚧
+| Linux Ubuntu  | ❎     | ❎   | ❎
+| macOS         | ❎     | ❎   | ❎
+| Windows       | ❎     | ❎   | ❎
