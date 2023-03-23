@@ -1,6 +1,8 @@
 name: Linux Fedora Integration
 
 on:
+  push:
+    branches: [ "trunk" ]
   workflow_dispatch:
     branches: [ "trunk" ]
 
@@ -29,10 +31,9 @@ jobs:
     - name: Test docker run
       working-directory: ${{github.workspace}}/docker
       run: |
-        docker build --help
         mkdir ${{github.workspace}}/build
         docker build -t odox-fedora -f Dockerfile.fedora .
-        docker run -t --volume $(realpath ${{github.workspace}}):/in --volume $(realpath ${{github.workspace}})/build:/out odox-fedora
+        docker run -t --volume $(realpath ${{github.workspace}}):/in:Z --volume $(realpath ${{github.workspace}})/build:/out odox-fedora
 
     - name: Upload produced artifacts
       uses: actions/upload-artifact@v3
