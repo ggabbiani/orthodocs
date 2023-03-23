@@ -170,8 +170,8 @@ jobs:
     - name: Unit test
       working-directory: ${{github.workspace}}\build
       run: |
-        set MSYSTEM=UCRT64
-        msys2 -c '.\bin\ut-unittests.exe'
+        set MSYSTEM=MINGW64
+        msys2 -c './bin/ut-unittests.exe'
 
     - name: Test
       working-directory: ${{github.workspace}}\build
