@@ -48,6 +48,7 @@ jobs:
           check-latest: true
 
       - name: install pre-requisites for building
+        if: steps.sonar-cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install libboost-all-dev
