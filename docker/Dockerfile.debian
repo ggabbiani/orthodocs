@@ -1,0 +1,38 @@
+#
+# The resulting image expects three parameters:
+#
+# - «source directory»  : mount point for the ODOX sources (def. /sources)
+# - «build directory»   : mount point for the build directory where the
+#                         package(s) will be produced (def. /build)
+# - «build type»        : the build type for CMake configuration and build
+#                         (def. Release)
+#
+# This means that the runner container will expect two volumes mounted
+# («source directory» «build directory»)
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# podman build -t odox-debian -f Dockerfile.debian .
+# podman run -t --volume $(realpath path/to/sources):/in --volume $(realpath /path/to/build)/build:/out odox-debian /in /out Release
+FROM ubuntu:latest
+LABEL org.opencontainers.image.authors="Giampiero Gabbiani (giampiero@gabbiani.org)"
+
+ARG src=/sources    # externally provided bind mount of sources
+ARG bld=/build      # externally provided bind mount for packages
+ARG type=Release
+###############################################################################
+# system pre requisites
+RUN ["apt", "update"]
+RUN ["apt", "upgrade", "-y"]
+RUN ["apt", "install", "-y", "cmake", "git", "vim", "build-essential", "default-jdk", "libboost-all-dev", "lintian", "ninja-build"]
+###############################################################################
+# entrypoint
+COPY entry-point.sh /usr/bin/entry-point
+RUN chmod +x /usr/bin/entry-point
+ENTRYPOINT [ "/usr/bin/entry-point" ]
+CMD ["/sources", "/build", "Release"]
