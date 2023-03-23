@@ -238,8 +238,8 @@ int main(int argc, const char *argv[]) {
     if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
   } catch (const CLI::Error &error) {
+    print_exception(error);
     result  = app.exit(error);
-    return 10001;
   } catch(const RcException &error) {
     print_exception(error);
     result  = error.rc;
