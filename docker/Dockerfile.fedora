@@ -17,7 +17,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-# podman build -v $(realpath path/to/sources):/sources:Z -f Dockerfile.ubuntu -t odox-ubuntu .
+# podman build -t odox-fedora -f Dockerfile.fedora .
+# podman run -t --volume $(realpath path/to/sources):/in --volume $(realpath /path/to/build)/build:/out odox-fedora /in /out Release
 FROM fedora:36
 LABEL org.opencontainers.image.authors="Giampiero Gabbiani (giampiero@gabbiani.org)"
 
@@ -30,11 +31,7 @@ RUN ["dnf", "update", "-y"]
 RUN ["dnf", "group", "install", "-y", "C Development Tools and Libraries", "Development Tools"]
 RUN ["dnf", "install", "-y", "java-11-openjdk-devel", "cmake", "boost-devel", "rpmlint", "ninja-build"]
 ###############################################################################
-# directory structure setup
-RUN mkdir -p ${bld}
-###############################################################################
 # entrypoint
-WORKDIR ${bld}
 COPY entry-point.sh /usr/bin/entry-point
 RUN chmod +x /usr/bin/entry-point
 ENTRYPOINT [ "/usr/bin/entry-point" ]
