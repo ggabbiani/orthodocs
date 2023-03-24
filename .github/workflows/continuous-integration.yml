@@ -1,3 +1,13 @@
+#
+# Integration and deployment workflow
+#
+# This file is part of the 'OrthoDocs' (ODOX) project.
+#
+# Copyright © 2022, Giampiero Gabbiani (giampiero@gabbiani.org)
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 name: Integration and deployment
 
 on:
@@ -252,9 +262,9 @@ jobs:
 
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     - name: Automatic asset upload if pre-release
-      uses: shogo82148/actions-upload-release-asset@v1
       # see also [If condition are always evaluated as true when containing expression syntax inside](https://github.com/actions/runner/issues/1173)
-      if: steps.latest_release.outputs.prerelease
+      if: steps.latest_release.outputs.prerelease == 'true'
+      uses: shogo82148/actions-upload-release-asset@v1
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
