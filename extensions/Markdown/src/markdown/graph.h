@@ -21,7 +21,7 @@ struct Node {
   using Map = std::map<std::string,Node,std::less<>>;
   Node(const std::filesystem::path &abstract_path, IncLabel &label) : labeller(&label),path(abstract_path) {}
 
-  std::ostream &write(std::ostream &os,Map &nodemap);
+  std::ostream &write(std::ostream &os,Map &node_map);
   std::string name() const {return (path.parent_path()/path.stem()).string();}
 
   bool                   defined = false;
@@ -34,7 +34,7 @@ struct Connection {
   enum class Type {inc,use};
 
   Connection(Node &source, Type type, Node &destination) : source(source),destination(destination),type(type) {}
-  std::ostream &write(std::ostream &os,Node::Map &nodemap);
+  std::ostream &write(std::ostream &os,Node::Map &node_map);
 
   Node  &source;
   Node  &destination;

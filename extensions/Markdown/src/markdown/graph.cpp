@@ -15,22 +15,22 @@ using namespace std;
 
 namespace graph {
 
-ostream &Connection::write(ostream &os,Node::Map &nodemap) {
+ostream &Connection::write(ostream &os,Node::Map &node_map) {
   os << "    ";
-  source.write(os,nodemap);
+  source.write(os,node_map);
   os << " --o|" << (type==Type::inc ? "include" : "use") << "| ";
-  destination.write(os,nodemap);
+  destination.write(os,node_map);
   os << endl;
   return os;
 }
 
-ostream &Node::write(ostream &os,Node::Map &nodemap) {
+ostream &Node::write(ostream &os,Node::Map &node_map) {
   if (!defined) {
     label = (++(*labeller)).string();
     os << label << '[' << name() << "]";
     defined = true;
-    if (auto [i,success] = nodemap.try_emplace(name(),*this); !success)
-      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same nodemap");
+    if (auto [i,success] = node_map.try_emplace(name(),*this); !success)
+      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same node map");
   } else
     os << label;
   return os;
