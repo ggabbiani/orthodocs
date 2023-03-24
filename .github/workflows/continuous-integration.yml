@@ -240,6 +240,11 @@ jobs:
         token: ${{ env.GITHUB_TOKEN }}
         # latest: true
 
+    - name: Dump release info
+      run: |
+        echo "Tag name: ${{ steps.git_tag.outputs.tag }}"
+        echo "Is pre-release: ${{ steps.latest_release.outputs.prerelease }}"
+
     - name: Download artifacts locally
       # setting no name will download all the produced artifacts in the
       # workspace after creating a directory with their container name
