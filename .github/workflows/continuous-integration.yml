@@ -187,10 +187,8 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
 
-    - name: Configure CMake
-      run: |
-        cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
-        ls -l "${{github.workspace}}\build\share\OrthoDocs"
+    - name: CMake configuration
+      run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
 
     - name: Build
       run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
@@ -255,7 +253,7 @@ jobs:
     # upload asset see [Yet Another Upload Release Asset Action](https://github.com/marketplace/actions/yet-another-upload-release-asset-action)
     - name: Automatic asset upload if pre-release
       uses: shogo82148/actions-upload-release-asset@v1
-      if: ${{ steps.latest_release.outputs.prerelease }}
+      if: ${{ steps.latest_release.outputs.prerelease }} == 'true'
       with:
         # upload_url: ${{ github.event.release.upload_url }}
         # upload_url: ${{ steps.latest_release.outputs.upload_url }}
