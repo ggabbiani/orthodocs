@@ -142,6 +142,13 @@ struct LogLevelLess {
   }
 };
 
+string diagnosis(string &level) {
+  // if (level=="debug") {
+    spdlog::debug("Data dir: {0}",Option::dataDir().string());
+  // }
+  return string();
+}
+
 }
 
 int main(int argc, const char *argv[]) {
@@ -217,6 +224,9 @@ int main(int argc, const char *argv[]) {
     assert(Option::_sroot.is_absolute());
     spdlog::set_level(Option::verbosity());
 
+    // in debug mode print some diagnosis infos
+    spdlog::debug("Data dir: '{0}'",Option::dataDir().string());
+
     // desired language extension for source analysis
     auto language = language::Extension::factory(Option::language());
     // language analyst setup
@@ -237,23 +247,19 @@ int main(int argc, const char *argv[]) {
     // save graphs
     if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
-  } catch (const CLI::Success &message) {
-    // typically version or help messages: these are managed internally by CLI
-    // and consequently printed on terminal during app.exit().
-    result  = app.exit(message);
   } catch (const CLI::Error &error) {
     // CLI parsing errors
-    print_exception(error);
     result  = app.exit(error);
   } catch(const RcException &error) {
     // OrthoDocs errors: return code is embedded
-    print_exception(error);
+    exceptions::print(error);
     result  = error.rc;
   } catch(const exception &error) {
     // system errors
-    print_exception(error);
+    exceptions::print(error);
     result  = EXIT_FAILURE;
   }
+
 #if defined(_WIN32)
   // Restore input mode on exit.
   if (oldDwMode)
