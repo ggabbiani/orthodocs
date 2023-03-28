@@ -9,29 +9,11 @@
  */
 
 #include <commons/error_info.h>
-#include <commons/globals.h>
 #include <commons/utils.h>
-
-#include <spdlog/spdlog.h>
-
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <set>
-#include <sstream>
 
 using namespace std;
 
 namespace fs=std::filesystem;
-
-void print_exception(const exception& e, int level) {
-  spdlog::error("{0}{1}",string(level, ' '),e.what());
-  try {
-    rethrow_if_nested(e);
-  } catch(const exception &nestedException) {
-    print_exception(nestedException, level+1);
-  } catch(...) {}
-}
 
 bool is_sub_of(const fs::path &sub, const fs::path &base) {
   for (auto b = base.begin(), s = sub.begin(); b != base.end(); ++b, ++s) {

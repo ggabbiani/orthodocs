@@ -51,12 +51,6 @@ inline std::u32string utf32(std::string const& utf8) {
 // TODO: move elsewhere
 using FileSet = std::vector<std::filesystem::path>;
 
-/*!
- * prints the explanatory string of an exception. If the exception is nested,
- * recurses to print the explanatory of the exception it holds
- */
-extern void print_exception(const std::exception& e, int level =  0);
-
 class cwd {
 public:
   explicit cwd(const std::filesystem::path &path);

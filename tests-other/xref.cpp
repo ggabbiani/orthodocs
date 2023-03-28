@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <commons/exceptions.h>
 #include <scad/document.h>
 
 #include <spdlog/spdlog.h>
@@ -139,7 +140,7 @@ int main() {
 
     return EXIT_SUCCESS;
   } catch(const exception &error) {
-    print_exception(error);
+    exceptions::print(error);
     return  EXIT_FAILURE;
   }
 }
