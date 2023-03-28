@@ -183,7 +183,7 @@ int main(int argc, const char *argv[]) {
     app.add_flag(opt[FLG_TOC].name,Option::_toc,opt[FLG_TOC].desc);
     app.add_option(opt[OPT_IGNORE].name,Option::_ignore_prefix,opt[OPT_IGNORE].desc);
     app.add_option(opt[OPT_DEPS].name,Option::_pkg_deps,opt[OPT_DEPS].desc)
-      ->check(CLI::IsMember({"GRAPH", "TEXT"}, CLI::ignore_case));
+      ->check(CLI::IsMember({"GRAPH", "TEXT", "SVG"}, CLI::ignore_case));
     auto graph_opt = app.add_option(opt[OPT_GRAPHS].name,Option::_graphs,opt[OPT_GRAPHS].desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
     app.add_option(opt[OPT_PRIVATE].name, Option::_private_prefix, opt[OPT_PRIVATE].desc)
@@ -221,7 +221,7 @@ int main(int argc, const char *argv[]) {
     auto language = language::Extension::factory(Option::language());
     // language analyst setup
     Analyzer analyst(language);
-    // in-memory source tree analysis prodution
+    // in-memory source tree analysis production
     analyst.buildDocuments();
     // populated cross-reference dictionary
     doc::xref::Dictionary  dict = analyst.populate();

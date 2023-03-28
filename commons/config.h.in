@@ -9,6 +9,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#cmakedefine ODOX_LANGUAGE_SCAD
+#cmakedefine ODOX_WRITER_MARKDOWN
+#cmakedefine ODOX_SCAD_VISITORS
+
 #define ODOX_XSTR(x)    ODOX_STR(x)
 #define ODOX_STR(x)     #x
 
@@ -25,6 +29,4 @@
 // used if the ODOX_DATADIR_ENV environment variable is unset (build tree install case)
 #define ODOX_INSTALL_FULL_DATADIR   R"(@__native_install_full_datadir__@)"
 
-#cmakedefine ODOX_LANGUAGE_SCAD
-#cmakedefine ODOX_WRITER_MARKDOWN
-#cmakedefine ODOX_SCAD_VISITORS
+#define ODOX_DOT_EXE    "@ODOX_DOT_EXE@"
