@@ -63,10 +63,10 @@ if (CMAKE_POSITION_INDEPENDENT_CODE)
     )
   endif()
 endif()
-# compiler must be 17
-set(CMAKE_CXX_STANDARD 17)
+# C++ standard features set to C++20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
+# disabling GNU extension make cmake use -std=c++20 and not -std=gnu++20
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # disable in-source builds
