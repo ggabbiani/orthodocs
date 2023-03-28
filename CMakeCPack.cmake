@@ -39,15 +39,13 @@ os_package_file_name(
   RELEASE   ${__package_release__}
   VARIABLE  CPACK_PACKAGE_FILE_NAME
 )
-cmake_print_variables(
-  CPACK_PACKAGE_FILE_NAME
-)
+message(STATUS "Package file name: '${CPACK_PACKAGE_FILE_NAME}'")
 
 if (UNIX)
   set(CPACK_PACKAGING_INSTALL_PREFIX  "${OS_PACKAGE_INSTALL_PREFIX}")
 
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    message(STATUS "Found Linux distro id: '${DISTRO_ID}'")
+    message(STATUS "Detected Linux distro: '${DISTRO_ID}'")
     set(CPACK_PACKAGE_DESCRIPTION_FILE  "${PROJECT_BINARY_DIR}/packaging/DESCRIPTION.txt")
 
     if (DISTRO_ID STREQUAL debian OR DISTRO_ID STREQUAL ubuntu)
