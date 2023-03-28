@@ -237,13 +237,20 @@ int main(int argc, const char *argv[]) {
     // save graphs
     if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
+  } catch (const CLI::Success &message) {
+    // typically version or help messages: these are managed internally by CLI
+    // and consequently printed on terminal during app.exit().
+    result  = app.exit(message);
   } catch (const CLI::Error &error) {
+    // CLI parsing errors
     print_exception(error);
     result  = app.exit(error);
   } catch(const RcException &error) {
+    // OrthoDocs errors: return code is embedded
     print_exception(error);
     result  = error.rc;
   } catch(const exception &error) {
+    // system errors
     print_exception(error);
     result  = EXIT_FAILURE;
   }
