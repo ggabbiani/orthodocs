@@ -1,0 +1,3 @@
+[submodule "cmake-sdk"]
+	path = cmake-sdk
+	url = git@bitbucket.org:ggabbiani/cmake-sdk.git
