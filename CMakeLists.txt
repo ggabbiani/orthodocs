@@ -234,7 +234,7 @@ find_package(Python 3.10 COMPONENTS Interpreter)
 
 # The ODOX_DOT variable is used while configuring commons/config.h.in
 # TODO: add this dependecy in the cpack section too
-find_program(ODOX_DOT_EXE dot REQUIRED)
+# find_program(ODOX_DOT_EXE dot REQUIRED)
 
 if (NOT Python_FOUND)
   message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
