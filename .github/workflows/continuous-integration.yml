@@ -39,6 +39,8 @@ jobs:
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - name: Install project pre-requisites
       # install Ninja 'cause of the automatic build parallelism tuned with the
@@ -87,6 +89,8 @@ jobs:
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - name: Docker build & run
       working-directory: ${{github.workspace}}/docker
@@ -118,6 +122,8 @@ jobs:
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - name: Install project pre-requisites
       # install Ninja 'cause of the automatic build parallelism tuned with the
@@ -196,6 +202,8 @@ jobs:
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags (default 1).
         fetch-depth: '0'
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - name: CMake configuration
       run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
