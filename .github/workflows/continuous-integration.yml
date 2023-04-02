@@ -188,6 +188,7 @@ jobs:
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-icu
           mingw-w64-x86_64-pkgconf
+          pacman
 
     - name: list installed packages
       run: pacman -Q
