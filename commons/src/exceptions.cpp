@@ -11,7 +11,10 @@
 #include <commons/exceptions.h>
 
 #include <spdlog/spdlog.h>
+
+#if defined(_WIN32)
 #include <utf8.h>
+#endif
 
 #include <cstring>
 
