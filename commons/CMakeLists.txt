@@ -54,6 +54,8 @@ target_link_libraries(commons
     nlohmann_json::nlohmann_json
     spdlog::spdlog
     spdx::parser
+  PRIVATE
+    $<$<PLATFORM_ID:Windows>:utf8::cpp>
 )
 if (ODOX_TESTS)
   add_subdirectory(tests)

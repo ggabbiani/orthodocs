@@ -9,6 +9,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <array>
 #include <filesystem>
 #include <stdexcept>
 
@@ -37,10 +38,17 @@ public:
 
 protected:
   void set(const char *s) noexcept;
+#if defined(_WIN32)
+  /*
+   * On Windows std::filesystem::path::c_str() return a pointer to an utf-16 string.
+   * This method is called in such a situation, actually transcoding utf-16 into utf-8.
+   */
+  void set(const wchar_t *s) noexcept;
+#endif
   virtual const char * prolog() const noexcept;
 
 private:
-  char _what[240];
+  std::array<char,240>  _what;
 };
 
 class FileNotFound : public virtual RcException {

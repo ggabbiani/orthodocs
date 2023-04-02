@@ -11,6 +11,7 @@
 #include <commons/exceptions.h>
 
 #include <spdlog/spdlog.h>
+#include <utf8.h>
 
 #include <cstring>
 
@@ -18,15 +19,22 @@ using namespace std;
 namespace fs = std::filesystem;
 
 const char * RcException::what() const noexcept {
-  return _what;
+  return _what.data();
 }
 
 const char * RcException::prolog() const noexcept {
   return "RcException";
 }
 
+#if defined(_WIN32)
+void RcException::set(const wchar_t *s) noexcept {
+  const auto *end = utf8::utf16to8(s,s+wcslen(s),begin(_what));
+  _what[min(static_cast<ptrdiff_t>(_what.max_size()),end-_what.data())]  = 0;
+}
+#endif
+
 void RcException::set(const char *s) noexcept {
-  strncpy(_what,s,sizeof _what -1);
+  strncpy(_what.data(),s,sizeof _what -1);
   _what[sizeof _what -1]  = 0;
 }
 
