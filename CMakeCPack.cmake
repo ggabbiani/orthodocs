@@ -9,7 +9,7 @@ file(WRITE
   ${ODOX_PACKAGE_DESCRIPTION_LIST}
 )
 string(TOLOWER "${PROJECT_NAME}"            __lower_project_name__)
-git_commits(VARIABLE                        __package_release__)
+git_commits(WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VARIABLE __package_release__)
 string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}"  __lower_host_system_name__)
 
 # common section
@@ -98,7 +98,7 @@ if (UNIX)
     # productbuild
     set(CPACK_PRODUCTBUILD_IDENTIFIER "org.gabbiani.orthodocs")
   endif()
-  message(STATUS "Package install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
+  message(STATUS "cpack-install prefix: '${CPACK_PACKAGING_INSTALL_PREFIX}'")
 
 # WINDOWS
 elseif(WIN32 OR MINGW)
@@ -114,7 +114,7 @@ elseif(WIN32 OR MINGW)
   SET(CPACK_NSIS_DISPLAY_NAME                     "${CPACK_NSIS_PACKAGE_NAME}")
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY          "${CPACK_NSIS_PACKAGE_NAME}")
 
-  message(STATUS "Package install prefix: '${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}'")
+  message(STATUS "cpack-install prefix: '${CPACK_NSIS_INSTALL_ROOT}/${CPACK_PACKAGE_INSTALL_DIRECTORY}'")
 endif()
 
 message(STATUS "CPack generators: ${CPACK_GENERATOR}")

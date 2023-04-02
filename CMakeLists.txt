@@ -12,11 +12,9 @@ cmake_minimum_required(VERSION 3.22..3.25 FATAL_ERROR)
 # NEW behavior is to add link flags if POSITION_INDEPENDENT_CODE is set
 cmake_policy(SET CMP0083 NEW)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-include(GitUtils)
-message(STATUS "CMAKE_CURRENT_LIST_DIR: '${CMAKE_CURRENT_LIST_DIR}'")
-git_branch_version(VARIABLE GIT_BRANCH_VERSION WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-sdk/modules;${CMAKE_MODULE_PATH}")
+include(cdk)
+cdk_setup(VARIABLE GIT WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 project(OrthoDocs
   VERSION       ${GIT_BRANCH_VERSION}
@@ -111,7 +109,7 @@ set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}
 
 # Report to user
 file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" __native_cmake_install_prefix__)
-message(STATUS "Build install prefix: '${__native_cmake_install_prefix__}'")
+message(STATUS "cmake-install prefix: '${__native_cmake_install_prefix__}'")
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_${p}DIR} _path )
   message(STATUS "${p} path: ${_path}")
@@ -120,7 +118,7 @@ endforeach()
 
 # used during tests
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
-
+message(STATUS "build-time data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
 ###############################################################################
 # propedeutics for antrl4cpp
 ###############################################################################
@@ -204,6 +202,11 @@ else()
   add_library(antlr4::runtime ALIAS antlr4_static)
 endif()
 
+FetchContent_Declare(cpptrace
+  GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
+  # GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
+  # CMAKE_ARGS -DBUILD_TESTING:BOOL=OFF
+)
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
   GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
@@ -224,7 +227,7 @@ FetchContent_Declare(json
   GIT_TAG        v3.11.2
 )
 
-FetchContent_MakeAvailable(cli11 json indicators spdlog)
+FetchContent_MakeAvailable(cli11 json indicators spdlog cpptrace)
 
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
 find_package(Python 3.10 COMPONENTS Interpreter)
