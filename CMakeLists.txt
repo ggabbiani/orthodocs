@@ -235,6 +235,9 @@ FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
 
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
 find_package(Python 3.10 COMPONENTS Interpreter)
+if (ODOX_TESTS)
+  find_package(ICU REQUIRED COMPONENTS dt in uc)
+endif()
 
 # The ODOX_DOT variable is used while configuring commons/config.h.in
 # TODO: add this dependecy in the cpack section too

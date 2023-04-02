@@ -130,6 +130,9 @@ boost_test(NAME UnitTests
   LIBS
     ${ORTHODOCS_LIBS}
     ${Boost_LIBRARIES}
+    ICU::in
+    ICU::dt
+    ICU::uc
 )
 # cmake_print_variables(ORTHODOCS_LIBS)
 
