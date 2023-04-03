@@ -202,6 +202,10 @@ else()
   add_library(antlr4::runtime ALIAS antlr4_static)
 endif()
 
+FetchContent_Declare(utfcpp
+  GIT_REPOSITORY  https://github.com/nemtrif/utfcpp.git
+  GIT_TAG         79835a5fa57271f07a90ed36123e30ae9741178e # v3.2.3
+)
 FetchContent_Declare(cpptrace
   GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
   # GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
@@ -227,10 +231,13 @@ FetchContent_Declare(json
   GIT_TAG        v3.11.2
 )
 
-FetchContent_MakeAvailable(cli11 json indicators spdlog cpptrace)
+FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
 
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
 find_package(Python 3.10 COMPONENTS Interpreter)
+if (ODOX_TESTS AND WIN32)
+  find_package(ICU REQUIRED COMPONENTS dt in uc)
+endif()
 
 # The ODOX_DOT variable is used while configuring commons/config.h.in
 # TODO: add this dependecy in the cpack section too

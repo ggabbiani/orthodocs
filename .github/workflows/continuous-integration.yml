@@ -173,6 +173,9 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
 
+    env:
+      INST_ROOT: D:/a/_temp/msys64/mingw64
+
     steps:
 
     - uses: msys2/setup-msys2@v2
@@ -186,6 +189,13 @@ jobs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-icu
+
+    # MINGW BIN DIRECTORY MUST BE IN COMMAND PATH and - for unknown reasons -
+    # it is NOT. So we have to set it up manually...
+    - name: modify system path
+      run: |
+        "${{env.INST_ROOT}}/bin" >> $env:GITHUB_PATH
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -205,8 +215,11 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
+    # GitHub install auxiliary components on a second disk D:, this is why
+    # CMake fails recognizing both Boost & ICU libraries UNLESS BOOST_ROOT and
+    # ICU_ROOT hints are passed along.
     - name: CMake configuration
-      run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64
+      run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=${{env.INST_ROOT}} -DICU_ROOT=${{env.INST_ROOT}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
