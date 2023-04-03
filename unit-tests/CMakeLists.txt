@@ -21,21 +21,17 @@ function (boost_test)
   if (DEFINED UNIT_TEST_INCLUDES)
     target_include_directories(${UNIT_TEST} PRIVATE ${UNIT_TEST_INCLUDES})
   endif()
-  # target_compile_definitions(${UNIT_TEST}
-  #   PRIVATE
-  #     BOOST_TEST_DYN_LINK
-  # )
   set_target_properties(${UNIT_TEST}
     PROPERTIES
       LINK_OPTIONS -fstack-protector
   )
-  if (ICU_ROOT)
-    cmake_print_variables(ICU_ROOT)
-    target_link_directories(${UNIT_TEST} BEFORE
-      PUBLIC
-        ${ICU_ROOT}/lib
-    )
-  endif()
+  # if (ICU_ROOT)
+  #   cmake_print_variables(ICU_ROOT)
+  #   target_link_directories(${UNIT_TEST} BEFORE
+  #     PUBLIC
+  #       ${ICU_ROOT}/lib
+  #   )
+  # endif()
   target_link_libraries(${UNIT_TEST}
     PRIVATE
       Boost::unit_test_framework
@@ -140,7 +136,7 @@ boost_test(NAME UnitTests
 #    ${ICU_IN_LIBRARIES} ${ICU_DT_LIBRARIES} ${ICU_UC_LIBRARIES}
 #    $<$<PLATFORM_ID:Windows>:ICU::in ICU::dt ICU::uc>
 )
-cmake_print_variables(Boost_LIBRARIES ICU_IN_LIBRARIES ICU_DT_LIBRARIES ICU_UC_LIBRARIES)
+#cmake_print_variables(Boost_LIBRARIES ICU_IN_LIBRARIES ICU_DT_LIBRARIES ICU_UC_LIBRARIES)
 
 cmake_print_variables(
   ODOX_DATA_OUTPUT_DIRECTORY
