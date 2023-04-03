@@ -29,6 +29,13 @@ function (boost_test)
     PROPERTIES
       LINK_OPTIONS -fstack-protector
   )
+  if (ICU_ROOT)
+    cmake_print_variables(ICU_ROOT)
+    target_link_directories(${UNIT_TEST} BEFORE
+      PUBLIC
+        ${ICU_ROOT}/lib
+    )
+  endif()
   target_link_libraries(${UNIT_TEST}
     PRIVATE
       Boost::unit_test_framework
@@ -130,7 +137,7 @@ boost_test(NAME UnitTests
   LIBS
     ${ORTHODOCS_LIBS}
     ${Boost_LIBRARIES}
-    ${ICU_IN_LIBRARIES} ${ICU_DT_LIBRARIES} ${ICU_UC_LIBRARIES}
+#    ${ICU_IN_LIBRARIES} ${ICU_DT_LIBRARIES} ${ICU_UC_LIBRARIES}
 #    $<$<PLATFORM_ID:Windows>:ICU::in ICU::dt ICU::uc>
 )
 cmake_print_variables(ICU_IN_LIBRARIES ICU_DT_LIBRARIES ICU_UC_LIBRARIES)
