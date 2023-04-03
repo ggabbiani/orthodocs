@@ -238,7 +238,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
 
 find_package(Python 3.10 COMPONENTS Interpreter)
-if (ODOX_TESTS)
+if (ODOX_TESTS AND WIN32)
   find_package(ICU REQUIRED COMPONENTS dt in uc)
 endif()
 
