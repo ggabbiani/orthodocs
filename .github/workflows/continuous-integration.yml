@@ -187,6 +187,82 @@ jobs:
         install: >-
           git
           base-devel
+          bash
+          bash-completion
+          binutils
+          bison
+          brotli
+          bsdtar
+          bzip2
+          ca-certificates
+          coreutils
+          curl
+          dash
+          db
+          diffstat
+          diffutils
+          dos2unix
+          file
+          filesystem
+          findutils
+          flex
+          gawk
+          gcc-libs
+          gdbm
+          getent
+          gettext
+          gmp
+          gnupg
+          gperf
+          grep
+          groff
+          gzip
+          heimdal-libs
+          inetutils
+          info
+          less
+          libargp
+          libasprintf
+          libassuan
+          libbz2
+          libcrypt
+          libcurl
+          libdb
+          libedit
+          libexpat
+          libffi
+          libgcrypt
+          libgdbm
+          libgettextpo
+          libgnutls
+          libgpg-error
+          libgpgme
+          libhogweed
+          libiconv
+          libidn2
+          libintl
+          libksba
+          liblz4
+          liblzma
+          libnettle
+          libnghttp2
+          libnpth
+          libopenssl
+          libp11-kit
+          libpcre
+          libpcre2_8
+          libpsl
+          libreadline
+          libsqlite
+          libssh2
+          libtasn1
+          libunistring
+          libutil-linux
+          libxml2
+          libxslt
+          libzstd
+          m4
+          make
           mingw-w64-x86_64-binutils
           mingw-w64-x86_64-boost
           mingw-w64-x86_64-brotli
@@ -248,6 +324,38 @@ jobs:
           mingw-w64-x86_64-xz
           mingw-w64-x86_64-zlib
           mingw-w64-x86_64-zstd
+          mintty
+          mpfr
+          msys2-keyring
+          msys2-launcher
+          msys2-runtime
+          nano
+          ncurses
+          nettle
+          openssl
+          p11-kit
+          pacman
+          pacman-contrib
+          pacman-mirrors
+          patch
+          perl
+          pinentry
+          pkgconf
+          rebase
+          sed
+          tar
+          tcl
+          texinfo
+          texinfo-tex
+          time
+          tzcode
+          util-linux
+          wget
+          which
+          winpty
+          xz
+          zlib
+          zstd
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
