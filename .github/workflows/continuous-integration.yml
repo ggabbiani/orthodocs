@@ -173,6 +173,9 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
 
+    env:
+      INST_ROOT: D:/a/_temp/msys64/mingw64
+
     steps:
 
           # mingw-w64-x86_64-boost
@@ -357,8 +360,14 @@ jobs:
           zlib
           zstd
 
-    - name: show system path
-      run: echo $Env:Path
+    - name: show system environment BEFORE
+      run: env
+
+    - name: modify systempath
+      run: "${{env.INST_ROOT}}/bin" >> $env:GITHUB_PATH
+
+    - name: show system environment AFTER
+      run: env
 
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
@@ -379,7 +388,7 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: CMake configuration
-      run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=D:/a/_temp/msys64/mingw64 -DICU_ROOT=D:/a/_temp/msys64/mingw64
+      run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=${{env.INST_ROOT}} -DICU_ROOT=${{env.INST_ROOT}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
