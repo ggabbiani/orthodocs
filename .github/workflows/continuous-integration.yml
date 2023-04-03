@@ -357,6 +357,9 @@ jobs:
           zlib
           zstd
 
+    - name: show system path
+      run: echo $Env:Path
+
     # antlr-4.12.0-complete.jar is compiled with a bytecode v55.
     # according to [Class File Versions](https://javaalmanac.io/bytecode/versions/)
     # this correspond to a java v11 that we require because the default provided
