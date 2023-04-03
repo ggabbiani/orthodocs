@@ -233,9 +233,12 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
 
+# SHARED version for boost libraries (it should be the default)
+set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
+
 find_package(Python 3.10 COMPONENTS Interpreter)
-if (ODOX_TESTS AND WIN32)
+if (ODOX_TESTS)
   find_package(ICU REQUIRED COMPONENTS dt in uc)
 endif()
 
