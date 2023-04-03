@@ -215,9 +215,9 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
-    # GitHub install auxiliary components on a second disk D:, this is the
-    # reason why CMake fails recognizing both Boost & ICU libraries UNLESS
-    # BOOST_ROOT and ICU_ROOT hints are passed along.
+    # GitHub install auxiliary components on a second disk D:, this is why
+    # CMake fails recognizing both Boost & ICU libraries UNLESS BOOST_ROOT and
+    # ICU_ROOT hints are passed along.
     - name: CMake configuration
       run: cmake -GNinja -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DODOX_TESTS=ON -DBOOST_ROOT=${{env.INST_ROOT}} -DICU_ROOT=${{env.INST_ROOT}}
 
