@@ -129,6 +129,7 @@ boost_test(NAME UnitTests
 )
 
 cmake_print_variables(
+  Boost_LIBRARIES
   ODOX_DATA_OUTPUT_DIRECTORY
 )
 
