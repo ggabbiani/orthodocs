@@ -2,10 +2,10 @@ project(commons_prj VERSION ${GIT_BRANCH_VERSION} LANGUAGES CXX)
 
 file(TO_NATIVE_PATH "${CMAKE_INSTALL_DATADIR}"      __native_install_datadir__)
 file(TO_NATIVE_PATH "${CMAKE_INSTALL_FULL_DATADIR}" __native_install_full_datadir__)
-configure_file(config.h.in ${PROJECT_SOURCE_DIR}/include/commons/config.h @ONLY)
+configure_file(config.h.in include/commons/config.h @ONLY)
+
 ###############################################################################
 # Jason resources from github spdx
-
 set(SPDX_LICENSES_JSON licenses.json)
 file(DOWNLOAD
   https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json
@@ -24,12 +24,13 @@ install(
   TYPE DATA
   COMPONENT runtime
 )
-configure_file(spdx_config.h.in ${PROJECT_SOURCE_DIR}/include/commons/spdx_config.h @ONLY)
+configure_file(spdx_config.h.in include/commons/spdx_config.h @ONLY)
 
 # builds spdx parser
 add_subdirectory(spdx)
 
 add_library(commons STATIC
+  src/dgraph.cpp
   src/document.cpp
   src/exceptions.cpp
   src/extensions.cpp
@@ -45,6 +46,7 @@ target_include_directories(commons
   PUBLIC
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   PRIVATE
     src
 )
