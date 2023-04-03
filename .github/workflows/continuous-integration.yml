@@ -364,7 +364,8 @@ jobs:
       run: env
 
     - name: modify systempath
-      run: "${{env.INST_ROOT}}/bin" >> $env:GITHUB_PATH
+      run: |
+        "${{env.INST_ROOT}}/bin" >> $env:GITHUB_PATH
 
     - name: show system environment AFTER
       run: env
