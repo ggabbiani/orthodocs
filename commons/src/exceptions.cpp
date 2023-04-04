@@ -12,10 +12,6 @@
 
 #include <spdlog/spdlog.h>
 
-#if defined(_WIN32)
-#include <utf8.h>
-#endif
-
 #include <cstring>
 
 using namespace std;
@@ -29,15 +25,21 @@ const char * RcException::prolog() const noexcept {
   return "RcException";
 }
 
-#if defined(_WIN32)
-void RcException::set(const wchar_t *s) noexcept {
-  const auto *end = utf8::utf16to8(s,s+wcslen(s),begin(_what));
-  _what[min(static_cast<ptrdiff_t>(_what.max_size()),end-_what.data())]  = 0;
+/*
+  * path::value_type represents the character type used by the native encoding
+  * of the filesystem:
+  * - char on POSIX/UTF-8
+  * - wchar_t on Windows/UTF-16
+  * See also [std::filesystem::path::string - cppreference.com](https://en.cppreference.com/w/cpp/filesystem/path/string)
+  * and [std::filesystem::path::generic_string](https://en.cppreference.com/w/cpp/filesystem/path/generic_string)
+  */
+void RcException::set(const fs::path &p) noexcept {
+  // native format path is automatically converted
+  set(p.generic_string());
 }
-#endif
 
-void RcException::set(const char *s) noexcept {
-  strncpy(_what.data(),s,sizeof _what -1);
+void RcException::set(const string &s) noexcept {
+  strncpy(_what.data(),s.c_str(),sizeof _what -1);
   _what[sizeof _what -1]  = 0;
 }
 
@@ -52,7 +54,7 @@ const char * FileNotFound::prolog() const noexcept {
 
 OsError::OsError(const string &message) noexcept
   : RcException{exit_code} {
-  set(message.c_str());
+  set(message);
 }
 
 const char * OsError::prolog() const noexcept {

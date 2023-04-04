@@ -37,14 +37,8 @@ public:
   const int rc;
 
 protected:
-  void set(const char *s) noexcept;
-#if defined(_WIN32)
-  /*
-   * On Windows std::filesystem::path::c_str() return a pointer to an utf-16 string.
-   * This method is called in such a situation, actually transcoding utf-16 into utf-8.
-   */
-  void set(const wchar_t *s) noexcept;
-#endif
+  void set(const std::filesystem::path &p) noexcept;
+  void set(const std::string &s) noexcept;
   virtual const char * prolog() const noexcept;
 
 private:
