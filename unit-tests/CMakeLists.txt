@@ -126,9 +126,11 @@ boost_test(NAME UnitTests
   LIBS
     ${ORTHODOCS_LIBS}
     ${Boost_LIBRARIES}
+    $<$<PLATFORM_ID:Windows>:ICU::in ICU::dt ICU::uc>
 )
 
 cmake_print_variables(
+  Boost_LIBRARIES
   ODOX_DATA_OUTPUT_DIRECTORY
 )
 

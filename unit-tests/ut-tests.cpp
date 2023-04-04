@@ -12,8 +12,7 @@
  * Static library usage variant as from [Usage variants - 1.81.0](https://www.boost.org/doc/libs/1_81_0/libs/test/doc/html/boost_test/usage_variants.html)
  */
 #define BOOST_TEST_MODULE orthodocs unit tests
-// #include <boost/test/included/unit_test.hpp>
-// #define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
 #include <commons/config.h>
