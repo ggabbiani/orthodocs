@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-name: Integration and deployment
+name: CI/CD
 
 on:
   push:
