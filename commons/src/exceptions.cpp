@@ -45,7 +45,7 @@ void RcException::set(const string &s) noexcept {
 
 FileNotFound::FileNotFound(const fs::path &fname) noexcept
   : RcException{exit_code} {
-  set(fname.c_str());
+  set(fname);
 }
 
 const char * FileNotFound::prolog() const noexcept {
