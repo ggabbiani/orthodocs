@@ -24,7 +24,7 @@ env:
 
 jobs:
   ubuntu-integration:
-
+    name: Ubuntu build and Unit Tests
 #    if: false
 
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
@@ -76,7 +76,7 @@ jobs:
         path: ${{github.workspace}}/build/*.deb
 
   fedora-integration:
-
+    name: Fedora build and Unit Tests
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -107,7 +107,7 @@ jobs:
         path: ${{github.workspace}}/build/*.rpm
 
   macos-integration:
-
+    name: macOS build and Unit Tests
 #    if: false
 
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
@@ -168,6 +168,7 @@ jobs:
         path: ${{github.workspace}}/build/*.pkg
 
   windows-integration:
+    name: Windows build and Unit Tests
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -244,9 +245,9 @@ jobs:
         name: ${{env.ARTIFACTS}}
         path: ${{github.workspace}}\build\*.exe
 
-  quality-assurance:
+  staging:
     needs: [fedora-integration, macos-integration, ubuntu-integration, windows-integration]
-    name: Quality Assurance
+    name: Staging
     runs-on: ubuntu-latest
     environment: dev
     env:
@@ -322,7 +323,7 @@ jobs:
           sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
 
   deployment:
-    needs: [ quality-assurance ]
+    needs: [ staging ]
     runs-on: ubuntu-latest
 
     steps:
