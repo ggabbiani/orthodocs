@@ -35,7 +35,7 @@ std::string parametrize(T *p) {
   return out.str();
 }
 
-inline std::string parametrize(const std::string &s) {
+inline std::string parametrize(std::string &&s) {
   // TR_FUNC;
   return '"'+s+'"';
 }
@@ -43,7 +43,17 @@ inline std::string parametrize(const std::string &s) {
 inline std::string parametrize(const std::filesystem::path &p) {
   // TR_FUNC;
   std::filesystem::path preferred{p};
-  return parametrize( preferred.make_preferred().generic_string());
+  return parametrize(preferred.make_preferred().generic_string());
+}
+
+/*
+ * this should not exists, but is a bizarre workaround to fix problems with gcc
+ * <v12.2.1 on fold expressions.
+ */
+inline std::string parametrize(std::filesystem::path &p) {
+//  TR_FUNC;
+  std::filesystem::path preferred{p};
+  return parametrize(preferred.make_preferred().generic_string());
 }
 
 template<typename ...Args>
