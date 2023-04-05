@@ -39,8 +39,19 @@ void RcException::set(const fs::path &p) noexcept {
 }
 
 void RcException::set(const string &s) noexcept {
-  strncpy(_what.data(),s.c_str(),sizeof _what -1);
-  _what[sizeof _what -1]  = 0;
+  const auto n = _what.max_size();
+  _what[n-1]  = 0;
+  strncpy(_what.data(),s.c_str(),n);
+  if (_what[n-1]!=0) {
+    // this works assuming sizeof _what >= 4
+    assert(n>=4);
+    // truncation occurred, just signal it appending an ellipsis and secure
+    // the solution zeroing the destination buffer
+    _what[n-4]  = '.';
+    _what[n-3]  = '.';
+    _what[n-2]  = '.';
+    _what[n-1]  = 0;
+  }
 }
 
 FileNotFound::FileNotFound(const fs::path &fname) noexcept
