@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+#include <debug/trace.h>
 
 #include <filesystem>
 #include <sstream>
@@ -20,21 +21,34 @@
 
 namespace details {
 
-inline std::string parametrize(std::filesystem::path &&path) {
-  return parametrize(path.string());
-}
-
-inline std::string parametrize(const std::string &s) {
-  return '"'+s+"'";
+template <typename T>
+std::string parametrize(T &&p) {
+  // TR_FUNC;
+  return std::forward<T>(p);
 }
 
 template <typename T>
-T parametrize(T &&p) {
-  return std::forward<T>(p);
+std::string parametrize(T *p) {
+  // TR_FUNC;
+  std::ostringstream out;
+  out << p;
+  return out.str();
+}
+
+inline std::string parametrize(const std::string &s) {
+  // TR_FUNC;
+  return '"'+s+'"';
+}
+
+inline std::string parametrize(const std::filesystem::path &p) {
+  // TR_FUNC;
+  std::filesystem::path preferred{p};
+  return parametrize( preferred.make_preferred().generic_string());
 }
 
 template<typename ...Args>
 std::string arguments(Args&&... values) {
+  // TR_FUNC;
   std::ostringstream out;
   std::string delim = "";
   // [fold expression(since C++17)](https://en.cppreference.com/w/cpp/language/fold)
