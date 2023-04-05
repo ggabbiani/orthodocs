@@ -265,10 +265,7 @@ if (ODOX_DOT_GRAPH)
   find_program(ODOX_DOT_EXE dot REQUIRED)
 endif()
 
-# On Windows a patch must be applied to the ANTLR4 cmake files
-if (WIN32)
-  find_program(DIFF_EXE diff REQUIRED)
-endif()
+find_program(DIFF_EXE diff REQUIRED)
 
 ###############################################################################
 # commons
