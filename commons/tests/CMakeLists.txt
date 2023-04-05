@@ -13,12 +13,14 @@ add_executable(boost_graph1 boost_graph1.cpp)
 add_executable(boost_graph2 boost_graph2.cpp)
 
 add_executable(varia_graph1 varia_graph1.cpp)
+target_link_libraries(varia_graph1 PRIVATE commons)
 add_executable(varia_graph2 varia_graph2.cpp)
+target_link_libraries(varia_graph2 PRIVATE commons)
 
-set_target_properties(varia_graph1 varia_graph2
-  PROPERTIES
-    INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/include"
-)
+# set_target_properties(varia_graph1 varia_graph2
+#   PROPERTIES
+#     INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/include"
+# )
 
 FetchContent_Declare(
   termcolor
