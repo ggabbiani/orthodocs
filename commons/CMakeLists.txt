@@ -30,7 +30,8 @@ configure_file(spdx_config.h.in include/commons/spdx_config.h @ONLY)
 add_subdirectory(spdx)
 
 add_library(commons STATIC
-  $<$<BOOL:${ODOX_DOT_GRAPH}>:src/dgraph.cpp>
+  # $<$<BOOL:${ODOX_DOT_GRAPH}>:src/dgraph.cpp>
+  src/dgraph.cpp
   src/document.cpp
   src/exceptions.cpp
   src/extensions.cpp
