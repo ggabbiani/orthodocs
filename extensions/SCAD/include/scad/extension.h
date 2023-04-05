@@ -25,7 +25,7 @@ public:
   static language::Extension *builder(std::string_view language_id);
   Extension();
 
-  Document::Owner parse(const std::filesystem::path &source) const override;
+  Document::Owner parse(const std::filesystem::path &source, Document::Id id) const override;
   void analyze(Annotation &anno) const override;
 
   const char *sourcePostfix() const override;

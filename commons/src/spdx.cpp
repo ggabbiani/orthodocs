@@ -63,9 +63,7 @@ void Listener::exitLicense_and_beyond(License_and_beyondContext *ctx) {
   auto id   = ctx->ID()->getText();
   auto data = make_unique<spdx::Data>();
 
-  spdlog::debug("id: {}",id);
   data->position  = ctx->ID()->getSymbol()->getStartIndex();
-  spdlog::debug("data->position: {}",data->position);
   data->length    = ctx->ID()->getSymbol()->getStopIndex() - data->position + 1;
   const spdx::LicenseList::Item *lic  = nullptr;
   if (ctx->PLUS()) {
@@ -103,17 +101,17 @@ void analyze(doc::Annotation &annotation) {
   static const spdx::db<spdx::LicenseList>   licenses{Option::dataDir()/fs::path(SPDX_LICENSES_JSON)};
   static const spdx::db<spdx::ExceptionList> exceptions{Option::dataDir()/fs::path(SPDX_EXCEPTIONS_JSON)};
 
-  if (Option::verbosity()<=spdlog::level::debug) {
-    cout  << licenses.size() << " SPDX Licenses:\n"
-        << "version: " << licenses.version() << '\n'
-        << "date   : " << std::put_time(licenses.date(),"%Y/%m/%d") << '\n'
-        << endl;
+  // if (Option::verbosity()<=spdlog::level::debug) {
+  //   cout  << licenses.size() << " SPDX Licenses:\n"
+  //       << "version: " << licenses.version() << '\n'
+  //       << "date   : " << std::put_time(licenses.date(),"%Y/%m/%d") << '\n'
+  //       << endl;
 
-    cout  << exceptions.size() << " SPDX Exceptions:\n"
-        << "version: " << exceptions.version() << '\n'
-        << "date   : " << std::put_time(exceptions.date(),"%Y/%m/%d") << '\n'
-        << endl;
-  }
+  //   cout  << exceptions.size() << " SPDX Exceptions:\n"
+  //       << "version: " << exceptions.version() << '\n'
+  //       << "date   : " << std::put_time(exceptions.date(),"%Y/%m/%d") << '\n'
+  //       << endl;
+  // }
 
   ANTLRInputStream  in(annotation.data());
   SPDXLexer         lexer(&in);

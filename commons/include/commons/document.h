@@ -181,10 +181,29 @@ using SubToC = ToC;
 class Document {
   using path  = std::filesystem::path;
 public:
-  using Owner = std::unique_ptr<Document>;
   using Index = std::set<doc::Item::Owner, doc::Item::Less>;
+  using Id    = std::size_t;
+  using Owner = std::unique_ptr<Document>;
+  using List  = std::vector<Owner>;
 
-  explicit Document(const path &source) : source(source) {}
+  /*
+   * used by document graph
+   */
+  struct Vertex {
+    const Document *document;
+  };
+
+  /*
+   * used by document graph
+   */
+  struct Edge {
+    /**
+     * can be "use" or "include" eventually containing the stereotype
+     */
+    const std::string type;
+  };
+
+  Document(const path &source, int id) : source{source}, id{id} {}
 
   /**
    * return the number of item of type «T»
@@ -231,10 +250,10 @@ public:
     explicit operator T* () {return this->items[0];}
   };
 
-  Index index;
-  const path source;
+  Index       index;
+  const path  source;
+  const int   id;
 };
-using DocumentList = std::vector<std::unique_ptr<Document>>;
 
 namespace doc {
 

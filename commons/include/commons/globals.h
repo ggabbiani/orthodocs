@@ -63,6 +63,11 @@ public:
   static const std::string &language() {return _language;}
   /**
    * how package dependencies are documented (default "text")
+   * Possible values:
+   *
+   * - text (default)
+   * - graph
+   * - svg
    */
   static const std::string &pkg_deps() {return _pkg_deps;}
   /**

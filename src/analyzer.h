@@ -9,7 +9,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <commons/dgraph.h>
 #include <commons/document.h>
+
+#include <boost/graph/adjacency_list.hpp>
 
 #include <filesystem>
 #include <iostream>
@@ -32,7 +35,7 @@ class Extension;
  */
 class Analyzer {
 public:
-  using Dictionary  = doc::xref::Dictionary;
+  using Dictionary      = doc::xref::Dictionary;
 
   explicit Analyzer(language::Extension *language): _language(language) {}
 
@@ -59,7 +62,7 @@ public:
   );
 
   // documents getter
-  const DocumentList &documents() const {return _docs;}
+  const Document::List &documents() const {return _docs;}
 
   // ToC getter
   const doc::ToC &toc() const {return _toc;}
@@ -79,7 +82,8 @@ private:
     // resulting list of source files matching «extension»
     FileSet &result
   );
-  DocumentList           _docs;
-  doc::ToC               _toc;
-  language::Extension   *_language;
+  Document::List       _docs;
+  doc::ToC             _toc;
+  language::Extension *_language;
+  doc::Graph          _graph;
 };

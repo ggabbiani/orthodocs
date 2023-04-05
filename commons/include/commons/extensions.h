@@ -35,9 +35,10 @@ public:
    */
   static Extension *factory(const std::string &language_id);
 
-  virtual Document::Owner parse(const std::filesystem::path &source) const = 0;
+  virtual Document::Owner parse(const std::filesystem::path &source, Document::Id id) const = 0;
+
   /**
-   * Analizes a document annotation for cross-references and enrich the
+   * Analyzes a document annotation for cross-references and enrich the
    * annotation with the analysis results.
    */
   virtual void analyze(Annotation &anno) const = 0;
@@ -68,7 +69,7 @@ class Extension {
 public:
   using Dictionary    = ::doc::xref::Dictionary;
   using Document      = ::Document;
-  using DocumentList  = ::DocumentList;
+  using DocumentList  = ::Document::List;
   using Item          = ::doc::Item;
   using Language      = language::Extension;
   using ToC           = ::doc::ToC;

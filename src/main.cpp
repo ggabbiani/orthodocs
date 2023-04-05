@@ -76,13 +76,14 @@ string canonical_dir(string &dir) {
  * transforms to source root relative.
  */
 string sroot_relative(string &sub) {
-  string error;
-  if (!Option::sroot().empty()) {
-    cwd sroot(Option::sroot());
-    sub = fs::relative(sub,Option::sroot()).string();
-  } else
-    error = "«source tree root» is missing";
-  return error;
+  if (Option::sroot().empty())
+    return "«source tree root» is missing";
+  if (fs::path(sub).is_absolute())
+    sub = fs::relative(sub,Option::sroot()).make_preferred().generic_string();
+  cwd sroot(Option::sroot());
+  if (!fs::exists(sub))
+    return "«"+sub+"» not existing";
+  return "";
 }
 
 enum {
@@ -132,7 +133,7 @@ std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s
   else if (s=="error")    return to_underlying(spdlog::level::err);
   else if (s=="critical") return to_underlying(spdlog::level::critical);
   else if (s=="off")      return to_underlying(spdlog::level::off);
-  else throw(domain_error(ERR_INFO+"unknown spdlog::level enumeration '"+string(s)+'\''));
+  else throw domain_error(error::info("unknown spdlog::level enumeration '"+string(s)+"'"));
 }
 
 struct LogLevelLess {
@@ -142,12 +143,12 @@ struct LogLevelLess {
   }
 };
 
-string diagnosis(string &level) {
-  // if (level=="debug") {
-    spdlog::debug("Data dir: {0}",Option::dataDir().string());
-  // }
-  return string();
-}
+// string diagnosis(string &level) {
+//   // if (level=="debug") {
+//     spdlog::debug("Data dir: {0}",Option::dataDir().string());
+//   // }
+//   return string();
+// }
 
 }
 

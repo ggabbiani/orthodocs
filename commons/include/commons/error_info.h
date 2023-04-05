@@ -11,13 +11,21 @@
 // #include <debug/trace.h>
 
 #include <filesystem>
+#include <source_location>
 #include <sstream>
 #include <string>
 
 // see [C++ Trick — Easy Debugging / Logging](https://codeforces.com/blog/entry/91347)
 #define ERR_CALL(...) std::string(__FILE__)+":"+std::to_string(__LINE__)+" - "+std::string(__func__)+"("+::details::arguments(__VA_ARGS__)+")"
+// #define ERR_CALL(...) std::format("{}:{} - {}({})",__FILE__,__LINE__,__func__,::details::arguments(__VA_ARGS__))
 
-#define ERR_INFO std::string(__FILE__)+":"+std::to_string(__LINE__)+" - "
+namespace error {
+
+inline std::string info(const std::string_view &message,std::source_location loc = std::source_location::current()) {
+  return std::string(loc.file_name())+":"+std::to_string(loc.line())+" - "+std::string(message);
+}
+
+} // namespace error
 
 namespace details {
 

@@ -69,7 +69,7 @@ void Extension::analyze(Annotation &anno) const {
         data.substr(pos,match.length(0)),                       // token to be substituted with reference
         data.substr(match.position(1)+offset,match.length(1))   // literal to be searched for in the exclusion vocabulary
       );
-      spdlog::trace("Adding analytic data token {}",analysis->token);
+      // spdlog::trace("Adding analytic data token {}",analysis->token);
       add(anno,analysis.release());
       t += pos+len;
     }
@@ -87,7 +87,7 @@ Extension::Extension() : language::Extension(ID) {
   }
 }
 
-unique_ptr<::Document> Extension::parse(const fs::path &source) const {
+Document::Owner Extension::parse(const fs::path &source, Document::Id id) const {
   // change to source root
   cwd source_root(Option::sroot());
   ifstream          is(source);
@@ -106,7 +106,7 @@ unique_ptr<::Document> Extension::parse(const fs::path &source) const {
   #ifndef ODOX_SCAD_VISITORS
 
   // source parse listener
-  Listener  listener(source,&tokens);
+  Listener  listener(source,&tokens,id);
   // parse tree depth-first traverse
   tree::ParseTreeWalker  walker;
   // creation of the document

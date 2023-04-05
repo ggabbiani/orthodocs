@@ -30,7 +30,7 @@ ostream &Node::write(ostream &os,Node::Map &node_map) {
     os << label << '[' << name() << "]";
     defined = true;
     if (auto [i,success] = node_map.try_emplace(name(),*this); !success)
-      throw std::domain_error(ERR_INFO+"Duplicate key «"+i->first+"» in same node map");
+      throw std::domain_error(error::info("Duplicate key «"+i->first+"» in same node map"));
   } else
     os << label;
   return os;

@@ -35,7 +35,13 @@ void Analyzer::document(fs::path source) {
   if (source.begin()!=source.end() && *source.begin()==".")
     source = subpath(source,++source.begin());
   try {
-    auto document = _language->parse(source);
+    auto document  = _language->parse(source,_docs.size());
+  #ifdef NDEBUG
+    _graph.add(document.get());
+  #else
+    auto id = _graph.add(document.get());
+    assert(id==document->id);
+  #endif //  NDEBUG
     // copy document contents to the Table of Contents
     doc::toc::add(document.get(),_toc);
     // move document in the documents list
@@ -55,6 +61,14 @@ auto Analyzer::buildDocuments() -> void {
       document(file);
       bar++;
     }
+
+    spdlog::trace("vertices = {");
+    for (auto i:_graph.vertices()) {
+      auto document = _graph.vertex(i).document;
+      spdlog::trace("graph id: {}, document id: {}, {}",i,document->id,document->source.string());
+    }
+    spdlog::trace('}');
+
   } catch(...) {
     indicators::show_console_cursor(true);
     throw;
@@ -123,7 +137,8 @@ void Analyzer::lookup(const FileSet &sources, const char *extension, FileSet &re
           lookup(FileSet{entry_path},extension,result);
         }
       }
-    } else
-      throw domain_error(ERR_INFO+"what is this '"+path.string()+"'?");
+    } else {
+      throw std::domain_error(error::info("what is this '"+fs::path(path).make_preferred().generic_string()+"'?"));
+    }
   }
 }

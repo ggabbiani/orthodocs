@@ -15,7 +15,7 @@ using namespace std;
 
 namespace writer {
 
-void Extension::save(const ::DocumentList &docs) {
+void Extension::save(const ::Document::List &docs) {
   try {
     ::Bar bar(docs,"documents saved");
     for(const auto &doc: docs) {

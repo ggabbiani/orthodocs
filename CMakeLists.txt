@@ -40,9 +40,13 @@ cmake_dependent_option(ODOX_FUNC_TESTS  "Functional tests"        ON "ODOX_TESTS
 cmake_dependent_option(ODOX_OTHER_TESTS "More experimental tests" ON "ODOX_TESTS" OFF)
 cmake_dependent_option(ODOX_UNIT_TESTS  "Unit tests"              ON "ODOX_TESTS" OFF)
 
-option(ODOX_EXPERIMENTAL                  "Experimental features"   OFF )
-cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers" OFF "ODOX_EXPERIMENTAL" OFF)
+option(ODOX_EXPERIMENTAL                  "Incomplete features"   OFF )
+cmake_dependent_option(ODOX_SCAD_VISITORS "Alternative AST walkers"             OFF "ODOX_EXPERIMENTAL" OFF)
+cmake_dependent_option(ODOX_DOT_GRAPH     "Alternative graph via dot/graphviz"  OFF "ODOX_EXPERIMENTAL" OFF)
 
+###############################################################################
+# This package description is formatted in lines of max 80 chars.
+# It is used to produce the README.md file and to be included in RPM packages.
 string(CONCAT ODOX_PACKAGE_DESCRIPTION
   "${PROJECT_NAME} is an API documentation generator and static analysis tool for the\n"
   "OpenSCAD scripting language"
@@ -50,6 +54,8 @@ string(CONCAT ODOX_PACKAGE_DESCRIPTION
 string(REPLACE "\n" "\n;" ODOX_PACKAGE_DESCRIPTION_LIST "${ODOX_PACKAGE_DESCRIPTION}")
 configure_file(README.md.in "${PROJECT_SOURCE_DIR}/README.md" @ONLY)
 
+###############################################################################
+# Position independent code (PIC) mandatory when building shared libs
 set(CMAKE_POSITION_INDEPENDENT_CODE ${ODOX_SHARED_LIBS})
 if (CMAKE_POSITION_INDEPENDENT_CODE)
   # Check if PIE is supported on the build system
@@ -61,17 +67,22 @@ if (CMAKE_POSITION_INDEPENDENT_CODE)
     )
   endif()
 endif()
+
+###############################################################################
 # C++ standard features set to C++20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # disabling GNU extension make cmake use -std=c++20 and not -std=gnu++20
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+###############################################################################
 # disable in-source builds
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR “In-source build detected!”)
 endif()
 
+###############################################################################
+# default build type set to 'Release'
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
   message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
@@ -82,11 +93,17 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/bin" )
 
-# CMAKE_INSTALL_PREFIX setup
-# cmake_print_variables(
-#   CMAKE_SIZEOF_VOID_P
-#   CMAKE_SYSTEM_NAME
-# )
+###############################################################################
+# CMake install (per-user) default locations configuration.
+# =============================================================================
+# CMake decision not to provide a convenient cmake un-install feature, leads to
+# problems WHEN MODIFYING THE INSTALLATION DETAILS BEFORE EXECUTING THE XARGS
+# DRIVEN UN-INSTALL PROCEDURE. In such a condition a subsequent cmake install
+# will overwrite the build/install_manifest.txt loosing any information about
+# the installed item locations. We mitigate the problem configuring the CMake
+# install in a per-user/single directory basis.
+# =============================================================================
+# For the CPack install (system-wide installation) see CMakeCPack.cmake.
 if (UNIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
 elseif(WIN32)
@@ -94,19 +111,15 @@ elseif(WIN32)
   # cmake-style path with forward-slashes (/).
   file(TO_CMAKE_PATH "$ENV{LOCALAPPDATA}\\${CMAKE_PROJECT_NAME}" CMAKE_INSTALL_PREFIX)
 endif()
-
-# BUILD INSTALL LOCATIONS (for PACKAGE INSTALL LOCATIONS see CMakeCPack.cmake)
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKEDIR CMake)
 else()
   set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
 endif()
-set(CMAKE_INSTALL_CMAKEDIR "${DEF_INSTALL_CMAKEDIR}")
+set(CMAKE_INSTALL_CMAKEDIR      "${DEF_INSTALL_CMAKEDIR}")
 set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDIR}")
-
-set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
-set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
-
+set(CMAKE_INSTALL_DATADIR       "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+set(CMAKE_INSTALL_FULL_DATADIR  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 # Report to user
 file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" __native_cmake_install_prefix__)
 message(STATUS "cmake-install prefix: '${__native_cmake_install_prefix__}'")
@@ -115,19 +128,19 @@ foreach(p LIB BIN INCLUDE CMAKE DATA DOC)
   message(STATUS "${p} path: ${_path}")
   unset(_path)
 endforeach()
-
-# used during tests
+# used during DEVELOPMENT
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
-message(STATUS "build-time data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
+message(STATUS "Development data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
+
 ###############################################################################
-# propedeutics for antrl4cpp
+# propaedeutic for antrl4cpp
 ###############################################################################
 find_program(PATCH patch)
 
 # Specify the version of the antlr4 library needed for this project.
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
-# to a zip file containing the libary source.
+# to a zip file containing the library source.
 set(ANTLR4_TAG 4.12.0)
 
 # prepares the structure for using the CMake macros provided
@@ -194,7 +207,7 @@ find_package(ANTLR REQUIRED)
 ###############################################################################
 
 ###############################################################################
-# propedeutics for orthodocs
+# propaedeutic for orthodocs
 ###############################################################################
 if (ODOX_SHARED_LIBS)
   add_library(antlr4::runtime ALIAS antlr4_shared)
@@ -233,24 +246,29 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
 
-# SHARED version for boost libraries (it should be the default)
+# SHARED version for boost libraries
 set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
-
 find_package(Python 3.10 COMPONENTS Interpreter)
+if (NOT Python_FOUND)
+  message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
+endif()
+###############################################################################
+# Boost Unit Test Framework seems to introduce an ICU dependency on Windows
 if (ODOX_TESTS AND WIN32)
   find_package(ICU REQUIRED COMPONENTS dt in uc)
 endif()
 
-# The ODOX_DOT variable is used while configuring commons/config.h.in
+# ODOX_DOT_EXE is used in commons/config.h.in
 # TODO: add this dependecy in the cpack section too
-# find_program(ODOX_DOT_EXE dot REQUIRED)
-
-if (NOT Python_FOUND)
-  message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
+if (ODOX_DOT_GRAPH)
+  find_program(ODOX_DOT_EXE dot REQUIRED)
 endif()
 
-find_program(DIFF_EXE diff)
+# On Windows a patch must be applied to the ANTLR4 cmake files
+if (WIN32)
+  find_program(DIFF_EXE diff REQUIRED)
+endif()
 
 ###############################################################################
 # commons
@@ -327,15 +345,36 @@ install(
     COMPONENT runtime
 )
 
+function(config_wrapper IN OUT)
+  set(flags)
+  set(opts DATADIR MODE EXECUTABLE)
+  set(multi)
+  cmake_parse_arguments(arg "${flags}" "${opts}" "${multi}" ${ARGN})
+  if (arg_UNPARSED_ARGUMENTS OR NOT IN OR NOT OUT)
+    message(FATAL_ERROR "Parameter(s) missing")
+  endif()
+  file(TO_NATIVE_PATH "${arg_DATADIR}"  __full_datadir__)
+  set(__exe__         "${arg_EXECUTABLE}")
+  set(__mode__        "${arg_MODE}")
+  configure_file(${IN} ${OUT}
+    FILE_PERMISSIONS OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+    @ONLY
+  )
+endfunction(config_wrapper)
+
 # main wrapper
 if (UNIX)
-  set(__full_datadir__  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
-  set(__full_exe__      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}")
-  set(__mode__          "user install")
-  configure_file(
-    packaging/unix/orthodocs.in
-    packaging/unix/orthodocs
-    @ONLY
+  # development wrapper
+  config_wrapper(packaging/unix/orthodocs.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/orthodocs"
+    MODE        "development"
+    DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
+    EXECUTABLE  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}"
+  )
+  # cmake-install
+  config_wrapper(packaging/unix/orthodocs.in packaging/unix/orthodocs
+    MODE        "cmake-install"
+    DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
+    EXECUTABLE  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}"
   )
   install(
     FILES
@@ -348,13 +387,17 @@ if (UNIX)
       OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
   )
 elseif(WIN32 OR MINGW)
-  file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"  __full_datadir__)
-  set(__exe__         "${ODOX}")
-  set(__mode__        "user install")
-  configure_file(
-    packaging/windows/orthodocs.bat.in
-    packaging/windows/orthodocs.bat
-    @ONLY
+  # development wrapper
+  config_wrapper(packaging/windows/orthodocs.bat.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/orthodocs.bat"
+    MODE        "development"
+    DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
+    EXECUTABLE  "${ODOX}"
+  )
+  # cmake-install
+  config_wrapper(packaging/windows/orthodocs.bat.in packaging/windows/orthodocs.bat
+    MODE        "cmake-install"
+    DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
+    EXECUTABLE  "${ODOX}"
   )
   install(
     FILES

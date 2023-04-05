@@ -106,8 +106,8 @@ string nextAnnoData(antlr4::BufferedTokenStream *stream, const antlr4::ParserRul
 
 namespace scad {
 
-Listener::Listener(const fs::path &pkg_source,antlr4::BufferedTokenStream *s)
-: _tokens(s), _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source)) {
+Listener::Listener(const path &pkg_source,antlr4::BufferedTokenStream *s, int doc_id)
+: _tokens(s), _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source,doc_id)) {
 }
 
 void Listener::enterPkg(Parser::PkgContext *ctx) {
@@ -126,7 +126,7 @@ void Listener::exitPkg(Parser::PkgContext *ctx) {
 #endif // NDEBUG
 
   if (auto [i,success] = _document->index.emplace(move(pkg)); !success)
-    throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
+    throw std::domain_error(error::info("Duplicate key «"+(*i)->documentKey()+"» in same document"));
   curr_item.pop();
   curr_package  = nullptr;
 }
@@ -185,7 +185,7 @@ void Listener::exitFunction_def(Parser::Function_defContext *ctx)  {
     if (auto data  = prevAnnoData(_tokens, ctx); !data.empty())
       annotate(func.get(), data);
     if (auto [i,success] = _document->index.emplace(move(func)); !success)
-      throw std::domain_error(ERR_INFO+"Duplicate key «"+(*i)->documentKey()+"» in same document");
+      throw std::domain_error(error::info("Duplicate key «"+(*i)->documentKey()+"» in same document"));
   }
   curr_item.pop();
 }
@@ -210,7 +210,7 @@ void Listener::exitModule_def(Parser::Module_defContext * ctx) {
     if (auto data  = prevAnnoData(_tokens, ctx); !data.empty())
       annotate(mod.get(), data);
     if (auto [i,success] = _document->index.emplace(move(mod)); !success)
-      throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
+      throw std::domain_error(error::info("Key «"+(*i)->documentKey()+"» already present in document"));
   }
   curr_item.pop();
 }
@@ -266,7 +266,7 @@ void Listener::exitAssignment(Parser::AssignmentContext *ctx) {
       if (auto data = prevAnnoData(_tokens, ctx); !data.empty())
         annotate(curr_variable.top().get(),data);
       if (auto [i,success] = _document->index.emplace(move(var)); !success)
-        throw std::domain_error(ERR_INFO+"Key «"+(*i)->documentKey()+"» already present in document");
+        throw std::domain_error(error::info("Key «"+(*i)->documentKey()+"» already present in document"));
     }
     curr_variable.pop();
   }
