@@ -215,7 +215,8 @@ int main(int argc, const char *argv[]) {
     app.add_flag(opt[FLG_ORTHODOX].name, Option::_orthodox,opt[FLG_ORTHODOX].desc)
       ->default_val(true);
     app.add_option(opt[OPT_DATA_DIR].name, Option::_data_dir, opt[OPT_DATA_DIR].desc)
-      ->check(CLI::ExistingDirectory);
+      ->check(CLI::ExistingDirectory)
+      ->group("");  // hidden option: is managed by wrapper
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);
