@@ -77,6 +77,7 @@ parse_test(NAME assert        RULE pkg  FILE assert.scad        FAIL_REGULAR_EXP
 parse_test(NAME assignments   RULE pkg  FILE assignment.scad    FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME comments      RULE pkg  FILE comments.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME error         RULE pkg  FILE error.scad         PASS_REGULAR_EXPRESSION DEFAULT)
+parse_test(NAME functions     RULE pkg  FILE functions.scad     FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME func_lit      RULE pkg  FILE func_lit.scad      FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME func_lit_bug  RULE pkg  FILE bug.scad           FAIL_REGULAR_EXPRESSION DEFAULT)
 parse_test(NAME if_statement  RULE pkg  FILE if_statement.scad  FAIL_REGULAR_EXPRESSION DEFAULT)
