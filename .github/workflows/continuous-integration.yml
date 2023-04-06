@@ -247,7 +247,7 @@ jobs:
 
   staging:
     needs: [fedora-integration, macos-integration, ubuntu-integration, windows-integration]
-    name: Staging
+    name: staging
     runs-on: ubuntu-latest
     environment: dev
     env:
