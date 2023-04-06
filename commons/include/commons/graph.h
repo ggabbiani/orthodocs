@@ -51,7 +51,7 @@ class graph {
       m_freed_vertex_ids.erase(new_vertex_id);
       m_vertices[new_vertex_id] = vertex{new_vertex_id, data};
     } else {
-      new_vertex_id = std::ssize(m_vertices);
+      new_vertex_id = m_vertices.size();
       m_vertices.emplace_back(new_vertex_id, data);
     }
 
@@ -65,7 +65,7 @@ class graph {
   }
 
   bool is_vertex_present(std::ptrdiff_t vertex_id) const {
-    return is_id_in_use(vertex_id, (std::ssize(m_vertices) - 1), m_freed_vertex_ids);
+    return is_id_in_use(vertex_id, m_vertices.size()-1, m_freed_vertex_ids);
   }
 
   void remove_vertex(std::ptrdiff_t vertex_id) {
@@ -80,7 +80,7 @@ class graph {
   }
 
   int amount_vertices() const {
-    return (std::ssize(m_vertices) - std::ssize(m_freed_vertex_ids));
+    return (m_vertices.size()-m_freed_vertex_ids.size());
   }
 
   void clear() {
@@ -98,7 +98,7 @@ class graph {
       m_freed_edge_ids.erase(new_edge_id);
       m_edges[new_edge_id] = edge{new_edge_id, from_vertex_id, to_vertex_id, data};
     } else {
-      new_edge_id = std::ssize(m_edges);
+      new_edge_id = m_edges.size();
       m_edges.emplace_back(new_edge_id, from_vertex_id, to_vertex_id, data);
     }
 
@@ -130,7 +130,7 @@ class graph {
   }
 
   bool is_edge_present(std::ptrdiff_t edge_id) const {
-    return is_id_in_use(edge_id, (std::ssize(m_edges) - 1), m_freed_edge_ids);
+    return is_id_in_use(edge_id, m_edges.size()-1, m_freed_edge_ids);
   }
 
   void remove_edge(std::ptrdiff_t edge_id) {
@@ -138,7 +138,7 @@ class graph {
   }
 
   std::ptrdiff_t amount_edges() const {
-    return (std::ssize(m_edges) - std::ssize(m_freed_edge_ids));
+    return (m_edges.size()-m_freed_edge_ids.size());
   }
 
   void clear_edges() {
@@ -163,8 +163,8 @@ class graph {
   std::set<std::ptrdiff_t> vertex_ids() const {
     std::set<std::ptrdiff_t> ids;
 
-    for (std::ptrdiff_t i = 0; i < std::ssize(m_vertices); i++) {
-      if (!m_freed_vertex_ids.contains(i)) {
+    for (std::ptrdiff_t i = 0; i < m_vertices.size(); i++) {
+      if (m_freed_vertex_ids.find(i)==m_freed_vertex_ids.end()) {
         ids.insert(i);
       }
     }
@@ -175,8 +175,8 @@ class graph {
   std::set<std::ptrdiff_t> edge_ids() const {
     std::set<std::ptrdiff_t> ids;
 
-    for (std::ptrdiff_t i = 0; i < std::ssize(m_edges); i++) {
-      if (!m_freed_vertex_ids.contains(i)) {
+    for (std::ptrdiff_t i = 0; i < m_edges.size(); i++) {
+      if (m_freed_vertex_ids.find(i)==m_freed_vertex_ids.end()) {
         ids.insert(i);
       }
     }
@@ -198,7 +198,7 @@ class graph {
     graph_json["graph"]["nodes"] = nlohmann::json::array();
 
     for (const auto& vertex : m_vertices) {
-      if (!m_freed_vertex_ids.contains(vertex.id())) {
+      if (m_freed_vertex_ids.find(vertex.id())==m_freed_vertex_ids.end()) {
         nlohmann::json vertex_json;
 
         vertex_json["id"] = vertex.id();
@@ -216,7 +216,7 @@ class graph {
     graph_json["graph"]["edges"] = nlohmann::json::array();
 
     for (const auto& edge : m_edges) {
-      if (!m_freed_edge_ids.contains(edge.id())) {
+      if (m_freed_edge_ids.find(edge.id())==m_freed_edge_ids.end()) {
         nlohmann::json edge_json;
 
         edge_json["id"] = edge.id();
@@ -240,13 +240,13 @@ class graph {
     out << "digraph {\n";
 
     for (const auto& v : m_vertices) {
-      if (!m_freed_vertex_ids.contains(v.id())) {
+      if (m_freed_vertex_ids.find(v.id())==m_freed_vertex_ids.end()) {
         out << "\t" << v.id() << " [label=\"(" << v.id() << ") " << v.data() << "\"]\n";
       }
     }
 
     for (const auto& e : m_edges) {
-      if (!m_freed_edge_ids.contains(e.id())) {
+      if (m_freed_edge_ids.find(e.id())==m_freed_edge_ids.end()) {
         out << "\t" << e.source_vertex_id() << " -> " << e.target_vertex_id() << " [label=\"(" << e.id() << ") "
             << e.data() << "\"]\n";
       }
@@ -337,7 +337,7 @@ class graph {
   };
 
   bool is_id_in_use(std::ptrdiff_t id, std::ptrdiff_t max_id_in_use, std::set<std::ptrdiff_t> freed_ids) const {
-    return ((id >= 0) && (id <= max_id_in_use) && !(freed_ids.contains(id)));
+    return ((id >= 0) && (id <= max_id_in_use) && (freed_ids.find(id)==freed_ids.end()));
   }
 
   std::vector<vertex> m_vertices;
