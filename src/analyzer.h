@@ -12,8 +12,6 @@
 #include <commons/dgraph.h>
 #include <commons/document.h>
 
-#include <boost/graph/adjacency_list.hpp>
-
 #include <filesystem>
 #include <iostream>
 #include <memory>
