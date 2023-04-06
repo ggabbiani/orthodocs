@@ -9,8 +9,8 @@ target_link_libraries(parse
   CLI11::CLI11
 )
 
-add_executable(boost_graph1 boost_graph1.cpp)
-add_executable(boost_graph2 boost_graph2.cpp)
+# add_executable(boost_graph1 boost_graph1.cpp)
+# add_executable(boost_graph2 boost_graph2.cpp)
 
 add_executable(varia_graph1 varia_graph1.cpp)
 target_link_libraries(varia_graph1 PRIVATE commons)
@@ -30,5 +30,5 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(termcolor)
 
-add_executable(new-graph new-graph.cpp)
-target_link_libraries(new-graph termcolor debug::trace)
+# add_executable(new-graph new-graph.cpp)
+# target_link_libraries(new-graph nlohmann_json::nlohmann_json termcolor debug::trace)
