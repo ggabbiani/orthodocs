@@ -12,10 +12,6 @@
 
 namespace doc {
 
-Graph::Graph() {
-
-}
-
 auto Graph::add(const Document *document) -> Id {
   return _alist.add_vertex(VertexData{document});
 }

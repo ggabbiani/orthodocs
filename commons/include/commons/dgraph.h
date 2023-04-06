@@ -23,7 +23,7 @@ public:
   using Id            = std::ptrdiff_t;
   using IdSet         = std::set<Id>;
 
-  Graph();
+  Graph() = default;
   Id add(const Document *document);
   IdSet vertices() const;
   const VertexData &vertex(Id i) const;
