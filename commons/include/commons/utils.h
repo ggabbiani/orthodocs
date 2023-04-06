@@ -40,6 +40,7 @@ inline std::string utf8(std::u32string const& utf32) {
   return utf8;
 }
 
+// FIXME: evaluate fixing 'codecvt_utf8' deprecation using utf8cpp in place of it
 inline std::u32string utf32(std::string const& utf8) {
   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cnv;
   std::u32string utf32 = cnv.from_bytes(utf8);
