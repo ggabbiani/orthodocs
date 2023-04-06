@@ -69,8 +69,8 @@ if (CMAKE_POSITION_INDEPENDENT_CODE)
 endif()
 
 ###############################################################################
-# C++ standard features set to C++20
-set(CMAKE_CXX_STANDARD 20)
+# C++ standard features set to C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # disabling GNU extension make cmake use -std=c++20 and not -std=gnu++20
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -248,7 +248,7 @@ FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
 
 # SHARED version for boost libraries
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.71 REQUIRED COMPONENTS graph unit_test_framework)
+find_package(Boost 1.71 REQUIRED COMPONENTS unit_test_framework)
 find_package(Python 3.10 COMPONENTS Interpreter)
 if (NOT Python_FOUND)
   message(AUTHOR_WARNING "Python version >= 3.10 required: no version bump and unit test possible")
