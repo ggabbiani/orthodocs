@@ -11,7 +11,6 @@
 // #include <debug/trace.h>
 
 #include <filesystem>
-#include <source_location>
 #include <sstream>
 #include <string>
 
@@ -21,8 +20,12 @@
 
 namespace error {
 
-inline std::string info(const std::string_view &message,std::source_location loc = std::source_location::current()) {
-  return std::string(loc.file_name())+":"+std::to_string(loc.line())+" - "+std::string(message);
+inline std::string info(
+  const std::string_view &message,
+  int line              = __builtin_LINE(), // Captures line of caller
+  const char* file      = __builtin_FILE(),
+  [[maybe_unused]] const char* function = __builtin_FUNCTION()) {
+  return std::string(file)+":"+std::to_string(line)+" - "+std::string(message);
 }
 
 } // namespace error
