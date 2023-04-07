@@ -22,10 +22,10 @@ set(CPACK_PACKAGE_VERSION             ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PAC
 set(CPACK_RESOURCE_FILE_LICENSE       "${PROJECT_SOURCE_DIR}/LICENSE")
 if (CMAKE_BUILD_TYPE STREQUAL Release)
   set(CPACK_STRIP_FILES TRUE)
-  message(STATUS "Packaged executable strip: ${CPACK_STRIP_FILES}")
 else()
-  message(AUTHOR_WARNING "Packaging a ${CMAKE_BUILD_TYPE} build type: binaries will contain debug information")
+  set(CPACK_STRIP_FILES FALSE)
 endif()
+message(STATUS "Packaged executable strip: ${CPACK_STRIP_FILES}")
 
 # source generator
 set(CPACK_SOURCE_GENERATOR            "ZIP;TGZ")

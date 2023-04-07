@@ -362,20 +362,21 @@ endfunction(config_wrapper)
 # main wrapper
 if (UNIX)
   # development wrapper
-  config_wrapper(packaging/unix/orthodocs.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/orthodocs"
+  set(ODOX_WRAPPER orthodocs)
+  config_wrapper(packaging/unix/${ODOX_WRAPPER}.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}"
     MODE        "development"
     DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
     EXECUTABLE  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}"
   )
   # cmake-install
-  config_wrapper(packaging/unix/orthodocs.in packaging/unix/orthodocs
+  config_wrapper(packaging/unix/${ODOX_WRAPPER}.in packaging/unix/${ODOX_WRAPPER}
     MODE        "cmake-install"
     DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
     EXECUTABLE  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}"
   )
   install(
     FILES
-      "${PROJECT_BINARY_DIR}/packaging/unix/orthodocs"
+      "${PROJECT_BINARY_DIR}/packaging/unix/${ODOX_WRAPPER}"
     TYPE
       BIN
     COMPONENT
@@ -385,20 +386,21 @@ if (UNIX)
   )
 elseif(WIN32 OR MINGW)
   # development wrapper
-  config_wrapper(packaging/windows/orthodocs.bat.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/orthodocs.bat"
+  set(ODOX_WRAPPER orthodocs.bat)
+  config_wrapper(packaging/windows/${ODOX_WRAPPER}.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}"
     MODE        "development"
     DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
     EXECUTABLE  "${ODOX}"
   )
   # cmake-install
-  config_wrapper(packaging/windows/orthodocs.bat.in packaging/windows/orthodocs.bat
+  config_wrapper(packaging/windows/${ODOX_WRAPPER}.in packaging/windows/${ODOX_WRAPPER}
     MODE        "cmake-install"
     DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
     EXECUTABLE  "${ODOX}"
   )
   install(
     FILES
-      "${PROJECT_BINARY_DIR}/packaging/windows/orthodocs.bat"
+      "${PROJECT_BINARY_DIR}/packaging/windows/${ODOX_WRAPPER}"
     TYPE
       BIN
     COMPONENT
