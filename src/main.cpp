@@ -122,7 +122,7 @@ struct {
   {"-s,--src-root",               "source tree root - either an absolute or current directory relative path"                    },
   {"-t,--toc",                    "generate a Table of Contents in the document tree root"                                      },
   {"-V,--verbosity",              "set spdlog verbosity"                                                                        },
-  {"-v,--version",                "orthodocs version " ODOX_VERSION_STR                                                         },
+  {"-v,--version",                "orthodocs version " ODOX_VERSION_STR " commit " ODOX_VERSION_COMMIT                          },
 };
 
 std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s) {
