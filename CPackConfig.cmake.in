@@ -24,6 +24,11 @@ if (UNIX)
   set(__full_datadir__  "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@")
   set(__exe__           "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX_WRAPPER@")
   set(__mode__          "package-install")
+  configure_file(
+    @PROJECT_SOURCE_DIR@/packaging/unix/@ODOX_WRAPPER@.in
+    @PROJECT_BINARY_DIR@/packaging/unix/@ODOX_WRAPPER@
+    @ONLY
+  )
 elseif(WIN32 OR MINGW)
   file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"  __full_datadir__)
   set(__exe__         "@ODOX@")
@@ -31,9 +36,9 @@ elseif(WIN32 OR MINGW)
   # CPACK_PACKAGE_INSTALL_DIRECTORY is in cmake file system format
   # ... but it seems that NSIS generator needs it in native one ...
   file(TO_NATIVE_PATH "@CPACK_PACKAGE_INSTALL_DIRECTORY@"  CPACK_PACKAGE_INSTALL_DIRECTORY)
+  configure_file(
+    @PROJECT_SOURCE_DIR@/packaging/windows/@ODOX_WRAPPER@.in
+    @PROJECT_BINARY_DIR@/packaging/windows/@ODOX_WRAPPER@
+    @ONLY
+  )
 endif()
-configure_file(
-  @PROJECT_SOURCE_DIR@/packaging/windows/@ODOX_WRAPPER@.in
-  @PROJECT_BINARY_DIR@/packaging/windows/@ODOX_WRAPPER@
-  @ONLY
-)
