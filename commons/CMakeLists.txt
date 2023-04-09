@@ -57,7 +57,7 @@ target_link_libraries(commons
     nlohmann_json::nlohmann_json
     spdlog::spdlog
     spdx::parser
-    # debug::trace
+    # cpp::trace
   PRIVATE
     $<$<PLATFORM_ID:Windows>:utf8::cpp>
 )

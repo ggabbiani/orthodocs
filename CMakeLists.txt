@@ -72,7 +72,7 @@ endif()
 # C++ standard features set to C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# disabling GNU extension make cmake use -std=c++20 and not -std=gnu++20
+# disabling GNU extension make cmake use -std=c++17 and not -std=gnu++17
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ###############################################################################
@@ -88,6 +88,7 @@ if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 endif()
 
+###############################################################################
 # build directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/lib" )
@@ -98,10 +99,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/bin" )
 # =============================================================================
 # CMake decision not to provide a convenient cmake un-install feature, leads to
 # problems WHEN MODIFYING THE INSTALLATION DETAILS BEFORE EXECUTING THE XARGS
-# DRIVEN UN-INSTALL PROCEDURE. In such a condition a subsequent cmake install
-# will overwrite the build/install_manifest.txt loosing any information about
-# the installed item locations. We mitigate the problem configuring the CMake
-# install in a per-user/single directory basis.
+# DRIVEN UN-INSTALL PROCEDURE. In such a condition subsequent cmake
+# installations overwrite the build/install_manifest.txt loosing information
+# about the currently installed items. To mitigate the problem CMake
+# installation is configured as per-user/single directory basis.
 # =============================================================================
 # For the CPack install (system-wide installation) see CMakeCPack.cmake.
 if (UNIX)
@@ -221,8 +222,7 @@ FetchContent_Declare(utfcpp
 )
 FetchContent_Declare(cpptrace
   GIT_REPOSITORY https://ggabbiani@bitbucket.org/ggabbiani/cpp-trace.git
-  # GIT_TAG        a66ae4145779c56dc0f9f98a631656417dd77de8 # v2.3.0
-  # CMAKE_ARGS -DBUILD_TESTING:BOOL=OFF
+  GIT_TAG        v1.6.10
 )
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
@@ -244,7 +244,14 @@ FetchContent_Declare(json
   GIT_TAG        v3.11.2
 )
 
-FetchContent_MakeAvailable(cli11 cpptrace json indicators spdlog utfcpp)
+FetchContent_MakeAvailable(
+  cli11
+  cpptrace
+  json
+  indicators
+  spdlog
+  utfcpp
+)
 
 # SHARED version for boost libraries
 set(Boost_USE_STATIC_LIBS OFF)
@@ -443,3 +450,9 @@ endif()
 if (ODOX_PKG)
   include(CMakeCPack.cmake)
 endif()
+
+cmake_print_properties(TARGETS cpp::trace PROPERTIES
+  LINK_LIBRARIES
+  INTERFACE_INCLUDE_DIRECTORIES
+  PRIVATE_INCLUDE_DIRECTORIES
+)
