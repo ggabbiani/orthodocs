@@ -122,13 +122,7 @@ set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDI
 set(CMAKE_INSTALL_DATADIR       "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
 set(CMAKE_INSTALL_FULL_DATADIR  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 # Report to user
-file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" __native_cmake_install_prefix__)
-message(STATUS "cmake-install prefix: '${__native_cmake_install_prefix__}'")
-foreach(p LIB BIN INCLUDE CMAKE DATA DOC)
-  file(TO_NATIVE_PATH ${CMAKE_INSTALL_${p}DIR} _path )
-  message(STATUS "${p} path: ${_path}")
-  unset(_path)
-endforeach()
+cdk_report("LIB;BIN;INCLUDE;CMAKE;DATA;DOC")
 # used during DEVELOPMENT
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
 message(STATUS "Development data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
