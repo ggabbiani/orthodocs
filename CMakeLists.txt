@@ -85,7 +85,7 @@ endif()
 # default build type set to 'Release'
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-  message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
+  cdk_message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}")
 endif()
 
 ###############################################################################
@@ -125,7 +125,7 @@ set(CMAKE_INSTALL_FULL_DATADIR  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR
 cdk_report("LIB;BIN;INCLUDE;CMAKE;DATA;DOC")
 # used during DEVELOPMENT
 set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
-message(STATUS "Development data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
+cdk_message(STATUS "Development data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
 
 ###############################################################################
 # propaedeutic for antrl4cpp
@@ -158,7 +158,7 @@ if (NOT EXISTS "${ODOX_ANTLR4_CPP_CMAKE_DIR}")
     WORKING_DIRECTORY
       "${ODOX_ANTLR4_CPP_CMAKE_DIR}"
   )
-  message(STATUS "Created antlr4 Cpp source directory ${ODOX_ANTLR4_CPP_CMAKE_DIR}")
+  cdk_message(STATUS "Created antlr4 Cpp source directory ${ODOX_ANTLR4_CPP_CMAKE_DIR}")
   if (WIN32)
     if (PATCH)
       execute_process(
@@ -169,7 +169,7 @@ if (NOT EXISTS "${ODOX_ANTLR4_CPP_CMAKE_DIR}")
         COMMAND_ERROR_IS_FATAL
           ANY
       )
-      message(STATUS "Patch applied to ${ODOX_ANTLR4_CPP_CMAKE_DIR}/ExternalAntlr4Cpp.cmake")
+      cdk_message(STATUS "Patch applied to ${ODOX_ANTLR4_CPP_CMAKE_DIR}/ExternalAntlr4Cpp.cmake")
     else()
       message(WARNING "No patch command found, ANTLR4 Cpp runtime build could fail on Windows systems")
     endif()
@@ -240,12 +240,19 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(
   cli11
-  cpptrace
   json
   indicators
   spdlog
   utfcpp
 )
+
+# Solution to the wrong static lib dependency installation from:
+# [cmake - Disable install for FetchContent - Stack Overflow](https://stackoverflow.com/questions/65527126/disable-install-for-fetchcontent)
+FetchContent_GetProperties(cpptrace)
+if(NOT cpptrace_POPULATED)
+  FetchContent_Populate(cpptrace)
+  add_subdirectory(${cpptrace_SOURCE_DIR} ${cpptrace_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # SHARED version for boost libraries
 set(Boost_USE_STATIC_LIBS OFF)
