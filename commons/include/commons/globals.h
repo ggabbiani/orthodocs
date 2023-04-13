@@ -75,13 +75,25 @@ private:
 
 template <typename T>
 struct Opt : public _impl::Base<T> {
-  using Super = _impl::Base<T>;
   Opt(const std::string &name, const std::string &desc, T &&def={})
-  : Super{name,desc},defaultValue(std::move(def)) {
+  : _impl::Base<T>{name,desc},defaultValue(std::move(def)) {
     this->value = defaultValue;
   }
 
   const T defaultValue;
+};
+
+template <typename T>
+class Env : public Opt<T> {
+public:
+  Env(const std::string &name, const std::string &desc, const char *env)
+  : Opt<T>{name,desc,Env::get(env)} {}
+private:
+  static T get(const char *env) {
+    assert(env);
+    const auto* val = getenv(env);
+    return val ? T{val} : T{};
+  }
 };
 
 using Flag = Opt<bool>;
@@ -128,7 +140,7 @@ extern const Flag admonitions;
  * * ${ODOX_DATADIR_ENV} if ODOX_DATADIR_ENV is set
  * * otherwise ODOX_INSTALL_FULL_DATADIR
  */
-extern const Opt<std::filesystem::path> dataDir;
+extern const Env<std::filesystem::path> dataDir;
 /**
  * defines the annotation prologue string
  */

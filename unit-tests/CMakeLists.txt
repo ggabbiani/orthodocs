@@ -80,9 +80,10 @@ function (doc_test)
   batch_test(
     NAME ${DOC_NAME}
     SERIAL ${DOC_SERIAL}
-    CMD1 "$<TARGET_FILE:${ODOX}> --data-dir \"${ODOX_DATA_OUTPUT_DIRECTORY}\" --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
+    CMD1 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER} --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
     CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
+  cdk_message(STATUS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER} --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}")
   # set_property(TEST ${DOC_NAME} PROPERTY LABELS DOCUMENT DIFF)
   set_tests_properties(${DOC_NAME}
     PROPERTIES LABELS "DOCUMENT;DIFF;Python"
@@ -131,7 +132,6 @@ boost_test(NAME UnitTests
 
 cmake_print_variables(
   Boost_LIBRARIES
-  ODOX_DATA_OUTPUT_DIRECTORY
 )
 
 if (Python_FOUND)

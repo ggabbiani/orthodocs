@@ -26,12 +26,14 @@ const Flag admonitions{
   " corresponding emoji"
 };
 
-const Opt<fs::path> dataDir{
+const Env<fs::path> dataDir{
   // name
   "--data-dir",
   // description
   "path to data directory, when not passed is retrieved from the environment"
-  " variable '" ODOX_DATADIR_ENV "'"
+  " variable '" ODOX_DATADIR_ENV "'",
+  // environment variable name
+  ODOX_DATADIR_ENV
 };
 
 const Opt<std::string> decorations{
