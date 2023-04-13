@@ -54,7 +54,7 @@ private:
     auto anno = comment->getText();
     if (auto style = factory(anno)) {
       auto value  = style->manage(anno);
-      if (cli::admonitions.value)
+      if (cli::admonitions())
         mk_admonitions(value);
       set(item->annotation, value);
     }
