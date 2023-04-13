@@ -101,18 +101,6 @@ void analyze(doc::Annotation &annotation) {
   static const spdx::db<spdx::LicenseList>   licenses{cli::dataDir()/fs::path(SPDX_LICENSES_JSON)};
   static const spdx::db<spdx::ExceptionList> exceptions{cli::dataDir()/fs::path(SPDX_EXCEPTIONS_JSON)};
 
-  // if (Option::verbosity()<=spdlog::level::debug) {
-  //   cout  << licenses.size() << " SPDX Licenses:\n"
-  //       << "version: " << licenses.version() << '\n'
-  //       << "date   : " << std::put_time(licenses.date(),"%Y/%m/%d") << '\n'
-  //       << endl;
-
-  //   cout  << exceptions.size() << " SPDX Exceptions:\n"
-  //       << "version: " << exceptions.version() << '\n'
-  //       << "date   : " << std::put_time(exceptions.date(),"%Y/%m/%d") << '\n'
-  //       << endl;
-  // }
-
   ANTLRInputStream  in(annotation.data());
   SPDXLexer         lexer(&in);
   CommonTokenStream tokens(&lexer);
