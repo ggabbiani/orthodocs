@@ -62,7 +62,7 @@ string Package::tocKey(const string &s) {
 }
 
 string Package::tocKey() const {
-  return Option::prefix_abbreviation(path.stem().string())+" ("+type+')';
+  return cli::prefixAbbreviation(path.stem().string())+" ("+type+')';
 }
 
 /******************************************************************************
@@ -95,7 +95,7 @@ const char *Single::id() {
 
 bool Single::check(const string &text) {
   // text in caption group #1
-  static const regex re{R"(//)"+Option::decorations()+R"(\s((.|\n)*))"};
+  static const regex re{R"(//)"+cli::decorations()+R"(\s((.|\n)*))"};
   smatch match;
   auto success = regex_search(text,match,re);
   if (success)
@@ -105,9 +105,9 @@ bool Single::check(const string &text) {
 
 bool Fine::check(const string &text) {
   // text in caption group #2
-  // Option::decorations()=="@" ⟹ (/\*@\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
-  // Option::decorations()==""  ⟹ (/\*\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
-  static const regex re{R"((/\*)"+Option::decorations()+R"(\s*\n)((\s*\*\s?.*\n)*)(\s*\*/))"};
+  // cli::decorations()=="@" ⟹ (/\*@\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
+  // cli::decorations()==""  ⟹ (/\*\s*\n)((\s*\*\s?.*\n)*)(\s*\*/)
+  static const regex re{R"((/\*)"+cli::decorations()+R"(\s*\n)((\s*\*\s?.*\n)*)(\s*\*/))"};
   smatch match;
   auto success  = regex_search(text,match,re);
   if (success) {
@@ -155,9 +155,9 @@ const char *Block::id() {
 
 bool Block::check(const string &text) {
   // text in caption group #2
-  // Option::decorations()=="@" ⇒ (/\*@)((.|\n)*)(\*/)
-  // Option::decorations()==""  ⇒ (/\*)((.|\n)*)(\*/)
-  static const std::regex re{R"((/\*)"+Option::decorations()+R"()((.|\n)*)(\*/))"};
+  // cli::decorations()=="@" ⇒ (/\*@)((.|\n)*)(\*/)
+  // cli::decorations()==""  ⇒ (/\*)((.|\n)*)(\*/)
+  static const std::regex re{R"((/\*)"+cli::decorations()+R"()((.|\n)*)(\*/))"};
   smatch match;
   auto success = regex_search(text,match,re);
   if (success)

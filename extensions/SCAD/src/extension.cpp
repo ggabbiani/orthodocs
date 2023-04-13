@@ -89,7 +89,7 @@ Extension::Extension() : language::Extension(ID) {
 
 Document::Owner Extension::parse(const fs::path &source, Document::Id id) const {
   // change to source root
-  cwd source_root(Option::sroot());
+  cwd source_root(cli::srcRoot());
   ifstream          is(source);
   ANTLRInputStream  in(is);
   SCADLexer         lexer(&in);

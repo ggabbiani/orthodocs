@@ -123,10 +123,10 @@ Extension::Extension(Dictionary &dict,const language::Extension *lang)
 void Extension::save(const Document &doc) {
   auto &source = doc.source;
   assert(source.is_relative());
-  assert(Option::droot().is_absolute());
+  assert(cli::docRoot().is_absolute());
 
   try {
-    cwd doc_root(Option::droot());
+    cwd doc_root(cli::docRoot());
 
     if (source.has_parent_path()) {
       ::doc::URI directory  = source.parent_path();
@@ -147,11 +147,11 @@ void Extension::save(const Document &doc) {
 }
 
 void Extension::save(const ToC &toc) {
-  assert(Option::droot().is_absolute());
+  assert(cli::docRoot().is_absolute());
 
   try {
     ::Bar bar(toc,"items in ToC");
-    cwd pwd(Option::droot());
+    cwd pwd(cli::docRoot());
     fs::path document_source("toc.md");
     ofstream out(document_source);
     out << H("Table of Contents",1) << endl;
@@ -196,7 +196,7 @@ void Extension::write(const Document &document, const Package *pkg,ostream &out)
       << endl;
 
   if (pkg->includes.size() || pkg->uses.size()) {
-    if (boost::iequals(Option::pkg_deps(),"graph")) {
+    if (boost::iequals(cli::pkg_deps(),"graph")) {
       out << H("Dependencies",2) << '\n'
           << "```mermaid\n"
           << "graph LR" << endl;
@@ -386,7 +386,7 @@ void Extension::graphs(const ToC &toc, const FileSet &dirs) {
   try {
     ::Bar bar(dirs,"graphs created");
     // change working directory to «document root»
-    cwd document_root(Option::droot());
+    cwd document_root(cli::docRoot());
     // from here we move on each directory passed in the FileSet «dirs»
     for(auto &dir: dirs) {
       bar.status(dir.string());

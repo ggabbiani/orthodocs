@@ -54,7 +54,7 @@ void Analyzer::document(fs::path source) {
 auto Analyzer::buildDocuments() -> void {
   try {
     FileSet files;
-    lookup(Option::sources().size() ? Option::sources() : FileSet{"."}, _language->sourcePostfix(),files);
+    lookup(cli::sources().size() ? cli::sources() : FileSet{"."}, _language->sourcePostfix(),files);
     Bar bar(files,"sources analyzed");
     for(const auto &file: files) {
       bar.status(file.string());
@@ -122,7 +122,7 @@ void Analyzer::xref() const {
 }
 
 void Analyzer::lookup(const FileSet &sources, const char *extension, FileSet &result) {
-  cwd pwd(Option::sroot());
+  cwd pwd(cli::srcRoot());
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)

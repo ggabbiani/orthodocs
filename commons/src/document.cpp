@@ -25,11 +25,11 @@ string Item::documentKey() const {
 }
 
 bool Item::privateId() const {
-  return !Option::private_prefix().empty() && name.substr(0,Option::private_prefix().length())==Option::private_prefix();
+  return !cli::private_prefix().empty() && name.substr(0,cli::private_prefix().length())==cli::private_prefix();
 }
 
 string Item::tocKey() const {
-  return Option::prefix_abbreviation(name)+" ("+type+')';
+  return cli::prefixAbbreviation(name)+" ("+type+')';
 }
 
 Signature Item::_signature() const {

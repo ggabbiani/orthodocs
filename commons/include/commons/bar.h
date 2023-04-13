@@ -36,19 +36,19 @@ public:
   Bar & operator = (Bar &&) = delete;
   // set text as postfix
   void status([[maybe_unused]] const std::string_view &text) {
-    if (Option::verbosity()<=Option::Verbosity::info || Option::verbosity()!=Option::Verbosity::off) {
+    if (cli::verbosity()<=cli::Verbosity::info || cli::verbosity()!=cli::Verbosity::off) {
       _bar.set_option(indicators::option::PostfixText{text});
       _bar.print_progress();
     }
   }
   // update progress bar
   void operator ++(int) {
-    if (Option::verbosity()<=Option::Verbosity::info || Option::verbosity()!=Option::Verbosity::off)
+    if (cli::verbosity()<=cli::Verbosity::info || cli::verbosity()!=cli::Verbosity::off)
       _bar.tick();
   }
   ~Bar() {
     try {
-      if ((Option::verbosity()<=Option::Verbosity::info || Option::verbosity()!=Option::Verbosity::off)
+      if ((cli::verbosity()<=cli::Verbosity::info || cli::verbosity()!=cli::Verbosity::off)
         && !std::uncaught_exceptions()) {
           status(_end);
           _bar.mark_as_completed();

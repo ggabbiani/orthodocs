@@ -65,7 +65,7 @@ private:
   void annotate(ANNOTABLE *item, const std::string &comment) const {
     // comment has been already checked, so style is !=nullptr
     auto data = StyleFactory::instance()(comment)->manage(comment);
-    if (Option::admonitions())
+    if (cli::admonitions())
       mk_admonitions(data);
     set(item->annotation, data);
   }

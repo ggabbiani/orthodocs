@@ -141,8 +141,8 @@ void Listener::enterIncl(Parser::InclContext *ctx) {
     error_code  error;  // we manage fs error: no need for exception here...
     auto        inc_canonical = fs::canonical(inc_path,error);
 
-    if (!static_cast<bool>(error) && is_sub_of(inc_canonical,Option::sroot())) {
-      auto requisite = fs::relative(inc_canonical,Option::sroot());
+    if (!static_cast<bool>(error) && is_sub_of(inc_canonical,cli::srcRoot())) {
+      auto requisite = fs::relative(inc_canonical,cli::srcRoot());
       curr_package->includes.emplace((requisite.parent_path()/requisite.stem()).string());
     }
   } catch(...) {
@@ -159,8 +159,8 @@ void Listener::enterUse(SCADParser::UseContext *ctx) {
   error_code  error;  // we manage fs error: no need for exception here...
   auto        use_canonical = fs::canonical(use_path,error);
 
-  if (!static_cast<bool>(error) && is_sub_of(use_canonical,Option::sroot())) {
-    auto requisite = fs::relative(use_canonical,Option::sroot());
+  if (!static_cast<bool>(error) && is_sub_of(use_canonical,cli::srcRoot())) {
+    auto requisite = fs::relative(use_canonical,cli::srcRoot());
     curr_package->uses.emplace((requisite.parent_path()/requisite.stem()).string());
   }
 }
@@ -231,7 +231,7 @@ void Listener::exitParameter(Parser::ParameterContext *ctx) {
   auto RIGHT    = nextAnnoData(_tokens, ctx);
 #endif // NDEBUG
   if (!curr_item.empty()) {
-    if (auto data = Option::orthodox() ? prevAnnoData(_tokens, ctx) : nextAnnoData(_tokens, ctx); !data.empty())
+    if (auto data = cli::orthodox() ? prevAnnoData(_tokens, ctx) : nextAnnoData(_tokens, ctx); !data.empty())
       annotate(curr_parameter.get(),data);
     curr_item.top()->parameters.push_back(move(curr_parameter));
   }

@@ -24,7 +24,7 @@ using namespace std;
 namespace fs=std::filesystem;
 
 void lookup(const FileSet &sources, const char *extension, FileSet &result) {
-  cwd pwd(Option::sroot());
+  cwd pwd(cli::srcRoot());
   for(auto &path: sources) {
     if (fs::is_regular_file(path)) {
       if (!extension || path.extension()==extension)
@@ -53,7 +53,7 @@ int main(int argc, const char *argv[]) {
   app.add_option("-s,--src-root", sroot, "Source root directory")
     ->required()
     ->check(CLI::ExistingDirectory);
-  app.add_option("sources", Option::_sources, "Directories or files in any combination: paths can be passed either as relative to «Source root» or absolute")
+  app.add_option(cli::sources.name, cli::sources.value, cli::sources.desc)
     ->transform(CLI::Validator(
       [&sroot] (string &file) -> string {
         if (auto path = fs::path(file); path.is_relative())
@@ -71,7 +71,7 @@ int main(int argc, const char *argv[]) {
 
     // lookup for annotation files (*.anno)
     FileSet src_files;
-    lookup(Option::sources().size() ? Option::sources() : FileSet{"."},".anno",src_files);
+    lookup(cli::sources().size() ? cli::sources() : FileSet{"."},".anno",src_files);
 
     string annotation;
     string fname;

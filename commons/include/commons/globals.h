@@ -13,7 +13,15 @@
 
 #include <spdlog/spdlog.h>
 #include <filesystem>
+#include <map>
 #include <string>
+
+  #ifdef BOOST_TEST_MODULE
+  extern int main(int argc, char *argv[]);
+  struct ut_custom_datadir;
+  #else
+  extern int main(int argc, const char *argv[]);
+  #endif
 
 /**
  * Convenient namespace for command line passed program options.
@@ -22,107 +30,175 @@
  * values during argument parsing while providing read-only access to the rest
  * of the world.
  */
-class Option {
+namespace cli {
+
+template <typename T> class Opt;
+template <typename T> class Map;
+
+namespace _impl {
+
+template <typename T=bool>
+class Base {
   #ifdef BOOST_TEST_MODULE
-  friend int main(int argc, char *argv[]);
-  friend struct ut_custom_datadir;
+  friend int ::main(int argc, char *argv[]);
+  friend struct ::ut_custom_datadir;
   #else
-  friend int main(int argc, const char *argv[]);
+  friend int ::main(int argc, const char *argv[]);
   #endif
+
+  template <typename _T>
+  friend class cli::Opt;
+  template <typename _T>
+  friend class cli::Map;
+
 public:
-  using Verbosity = spdlog::level::level_enum;
+  using Type = T;
+
+  Base(const std::string &name, const std::string &desc)
+  : name{name}, desc{desc} {}
+
+  const std::string name;
+  const std::string desc;
 
   /**
-   * when true, admonitions emoji are enabled for the annotation.
+   * function operator acts as value getter
    */
-  static bool admonitions() {return _admonitions;}
-  /**
-   * data dir in canonical form in the following order of evaluation:
-   *
-   * * the value passed in the command line if any
-   * * ${ODOX_DATADIR_ENV} if ODOX_DATADIR_ENV is set
-   * * otherwise ODOX_INSTALL_FULL_DATADIR
-   */
-  static std::filesystem::path dataDir();
-  /**
-   * document root in canonical form
-   */
-  static const std::filesystem::path &droot() {return _droot;}
-  /**
-   * defines the annotation prologue string
-   */
-  static const std::string &decorations() {return _decorations;}
-  /**
-   * set of directory for partial dependencies graphs
-   */
-  static const FileSet &graphs() {return _graphs;}
-  /**
-   * defines the language processor to be used.
-   * For now only "scad" is supported.
-   */
-  static const std::string &language() {return _language;}
-  /**
-   * how package dependencies are documented (default "text")
-   * Possible values:
-   *
-   * - text (default)
-   * - graph
-   * - svg
-   */
-  static const std::string &pkg_deps() {return _pkg_deps;}
-  /**
-   * ignore this package prefix in the Table of Contents sort
-   */
-  static const std::vector<std::string> &ignore_prefix() {return _ignore_prefix;}
-  /**
-   * wether to follow orthodox annotation rules or not.
-   */
-  static bool &orthodox() {return _orthodox;}
-  /**
-   * if name matches any of the ignored prefixes then abbreviate
-   */
-  static std::string prefix_abbreviation(const std::string &name);
-  /**
-   * prefix used for private (i.e. not to be documented) IDs (variable,
-   * function, module or whatever ...)
-   */
-  static const std::string &private_prefix() {return _private_prefix;}
-  /**
-   * directories or files in any combination: paths can be passed either as
-   * relative to «Source root» or absolute.
-   */
-  static const FileSet &sources() {return _sources;}
-  /**
-   * source root in canonical form
-   */
-  static const std::filesystem::path &sroot() {return _sroot;}
-  /**
-   * when true, toc generation in document root is enabled
-   */
-  static bool toc() {return _toc;}
-  /**
-   * defines the language processor to be used.
-   * For now only "markdown" is supported.
-   */
-  static const std::string &writer() {return _writer;}
-  /**
-   * enables warnings
-   */
-  static Verbosity verbosity() {return _verbosity;}
+  const Type& operator () () const {
+    return value;
+  }
+
 private:
-  static bool                     _admonitions;
-  static std::filesystem::path    _data_dir;
-  static std::string              _decorations;
-  static std::filesystem::path    _droot;
-  static FileSet                  _graphs;
-  static std::vector<std::string> _ignore_prefix;
-  static std::string              _language;
-  static bool                     _orthodox;
-  static std::string              _pkg_deps;
-  static std::string              _private_prefix;
-  static FileSet                  _sources;
-  static std::filesystem::path    _sroot;
-  static bool                     _toc;
-  static Verbosity                _verbosity;
-  static std::string              _writer;
+  mutable Type value;
 };
+
+} // namespace _impl
+
+template <typename T>
+struct Opt : public _impl::Base<T> {
+  using Super = _impl::Base<T>;
+  Opt(const std::string &name, const std::string &desc, T &&def={})
+  : Super{name,desc},defaultValue(std::move(def)) {
+    this->value = defaultValue;
+  }
+
+  const T defaultValue;
+};
+
+using Flag = Opt<bool>;
+
+class Version : public Opt<bool> {
+  using Opt::Opt;
+
+  /**
+   * Version flag actually doesn't hold any value hence no getter
+   */
+  const Type& operator () () const = delete;
+};
+
+template <typename T>
+struct Map : public _impl::Base<T> {
+  using Super = _impl::Base<T>;
+  using Key   = std::string;
+  using M     = std::map<Key,T>;
+  Map(const std::string &name, const std::string &desc, M &&m, const T &def={})
+  : Super{name,desc},map(std::move(m)),defaultValue(value2key(def)) {
+    this->value = map.at(defaultValue);
+  }
+  const M   map;
+  // default value is in input (i.e Key) format
+  const Key defaultValue;
+private:
+  // return the unique map key associated to «value»
+  Key value2key(T value) {
+    for(const auto& [k,v]: this->map)
+      if (v==value)
+        return k;
+    throw std::domain_error("Unmapped value");
+  }
+};
+
+/**
+ * when true, admonitions emoji are enabled for the annotation.
+ */
+extern const Flag admonitions;
+/**
+ * data dir in canonical form in the following order of evaluation:
+ *
+ * * the value passed in the command line if any
+ * * ${ODOX_DATADIR_ENV} if ODOX_DATADIR_ENV is set
+ * * otherwise ODOX_INSTALL_FULL_DATADIR
+ */
+extern const Opt<std::filesystem::path> dataDir;
+/**
+ * defines the annotation prologue string
+ */
+extern const Opt<std::string> decorations;
+/**
+ * document root in canonical form
+ */
+extern const Opt<std::filesystem::path> docRoot;
+/**
+ * source root in canonical form
+ */
+extern const Opt<std::filesystem::path> srcRoot;
+/**
+ * directories or files in any combination: paths can be passed either as
+ * relative to «source root» or absolute.
+ */
+extern const Opt<FileSet> sources;
+/**
+ * when true, toc generation in document root is enabled
+ */
+extern const Flag toc;
+/**
+ * ignore this package prefix in the Table of Contents sort
+ */
+extern const Opt<std::vector<std::string>> ignorePrefix;
+/**
+ * if name matches any of the ignored prefixes then abbreviate
+ */
+extern std::string prefixAbbreviation(const std::string &name);
+/**
+ * how package dependencies are documented (default "text")
+ * Possible values:
+ *
+ * - text (default)
+ * - graph
+ * - svg
+ */
+extern const Opt<std::string> pkg_deps;
+/**
+ * set of directory for partial dependencies graphs
+ */
+extern const Opt<FileSet>     graphs;
+/**
+ * prefix used for private (i.e. not to be documented) IDs (variable,
+ * function, module or whatever ...)
+ */
+extern const Opt<std::string> private_prefix;
+/**
+ * guess what ...
+ */
+extern const Version version;
+
+using Verbosity = spdlog::level::level_enum;
+/**
+ * enables warnings
+ */
+extern const Map<Verbosity> verbosity;
+/**
+ * wether to follow orthodox annotation rules or not.
+ */
+extern const Flag orthodox;
+/**
+ * defines the language processor to be used.
+ * For now only "scad" is supported.
+ */
+extern const Opt<std::string> language;
+/**
+ * defines the language processor to be used.
+ * For now only "markdown" is supported.
+ */
+extern const Opt<std::string> writer;
+
+} // namespace cli

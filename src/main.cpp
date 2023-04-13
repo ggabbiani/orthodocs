@@ -76,79 +76,15 @@ string canonical_dir(string &dir) {
  * transforms to source root relative.
  */
 string sroot_relative(string &sub) {
-  if (Option::sroot().empty())
+  if (cli::srcRoot().empty())
     return "«source tree root» is missing";
   if (fs::path(sub).is_absolute())
-    sub = fs::relative(sub,Option::sroot()).make_preferred().generic_string();
-  cwd sroot(Option::sroot());
+    sub = fs::relative(sub,cli::srcRoot()).make_preferred().generic_string();
+  cwd sroot(cli::srcRoot());
   if (!fs::exists(sub))
     return "«"+sub+"» not existing";
   return "";
 }
-
-enum {
-  FLG_ADMONITIONS,
-  OPT_DATA_DIR,
-  OPT_DECORATIONS,
-  OPT_DOC_ROOT,
-  OPT_GRAPHS,
-  OPT_IGNORE,
-  OPT_PRIVATE,
-  OPT_DEPS,
-  FLG_ORTHODOX,
-  OPT_SOURCES,
-  OPT_SRC_ROOT,
-  FLG_TOC,
-  OPT_VERBOSITY,
-  FLG_VERSION,
-};
-
-struct {
-  const char *name;
-  const char *desc;
-} const opt[] = {
-  {"-a,--admonitions",            "when enabled any admonition found in annotations will be enriched with a corresponding emoji"},
-  {"--data-dir",                  "absolute path to data directory: touch only if you know what you do"                         },
-  {"--decorations",               "defines the prefix used inside comments to distinguish a simple comment from an annotation"
-                                  " Set to '' means no decorations, and all the comments are interpreted as annotations."       },
-  {"-d,--doc-root",               "document tree root - either an absolute or current directory relative path"                  },
-  {"-g,--graphs",                 "list of root relative directories where placing graphs"                                      },
-  {"-i,--ignore-prefix",          "ignore this package prefix in the Table of Contents sort"                                    },
-  {"-p,--private",                "prefix used for private (not to be documented) IDs (variable, function, module or whatever)" },
-  {"--pd,--pkg-deps",             "set package dependencies representation by text list or by a dependency graph (default TEXT)"},
-  {"-o,--orthodox,!--unorthodox", "comments for parameters are preceding their formal definition"                               },
-  {"sources",                     "«source root» sub-trees and/or files - either as absolute or «source root» relative path."
-                                  " If missing all the «source root» content sources will be scanned"                           },
-  {"-s,--src-root",               "source tree root - either an absolute or current directory relative path"                    },
-  {"-t,--toc",                    "generate a Table of Contents in the document tree root"                                      },
-  {"-V,--verbosity",              "set spdlog verbosity"                                                                        },
-  {"-v,--version",                "orthodocs version " ODOX_VERSION_STR " commit " ODOX_VERSION_COMMIT                          },
-};
-
-std::underlying_type_t<spdlog::level::level_enum> to_logLevel(std::string_view s) {
-  if      (s=="trace")    return to_underlying(spdlog::level::trace);
-  else if (s=="debug")    return to_underlying(spdlog::level::debug);
-  else if (s=="info")     return to_underlying(spdlog::level::info);
-  else if (s=="warn")     return to_underlying(spdlog::level::warn);
-  else if (s=="error")    return to_underlying(spdlog::level::err);
-  else if (s=="critical") return to_underlying(spdlog::level::critical);
-  else if (s=="off")      return to_underlying(spdlog::level::off);
-  else throw domain_error(error::info("unknown spdlog::level enumeration '"+string(s)+"'"));
-}
-
-struct LogLevelLess {
-  using is_transparent = void;
-  inline bool operator() (std::string_view lhs, std::string_view rhs) const {
-    return to_logLevel(lhs)<to_logLevel(rhs);
-  }
-};
-
-// string diagnosis(string &level) {
-//   // if (level=="debug") {
-//     spdlog::debug("Data dir: {0}",Option::dataDir().string());
-//   // }
-//   return string();
-// }
 
 }
 
@@ -177,60 +113,48 @@ int main(int argc, const char *argv[]) {
 
     spdlog::set_pattern("%^[%l]%$ %v");
 
-    app.add_flag(   opt[FLG_ADMONITIONS].name ,Option::_admonitions  ,opt[FLG_ADMONITIONS].desc);
-    auto sroot_opt = app.add_option( opt[OPT_SRC_ROOT].name    ,Option::_sroot        ,opt[OPT_SRC_ROOT].desc)
+    app.add_flag(cli::admonitions.name ,cli::admonitions.value ,cli::admonitions.desc);
+    auto sroot_opt = app.add_option(cli::srcRoot.name, cli::srcRoot.value, cli::srcRoot.desc)
       ->required()
       ->transform(CLI::Validator(existing_canonical_dir,"DIR(existing)"));
-    app.add_option(opt[OPT_DECORATIONS].name, Option::_decorations, opt[OPT_DECORATIONS].desc)
-      ->default_val("!");
-    app.add_option(opt[OPT_DOC_ROOT].name,Option::_droot, opt[OPT_DOC_ROOT].desc)
+    app.add_option(cli::decorations.name, cli::decorations.value, cli::decorations.desc)
+      ->default_val(cli::decorations.defaultValue);
+    app.add_option(cli::docRoot.name, cli::docRoot.value, cli::docRoot.desc)
       ->required()
       ->transform(CLI::Validator(canonical_dir,"DIR"));
-    auto sources_opt = app.add_option(opt[OPT_SOURCES].name, Option::_sources, opt[OPT_SOURCES].desc)
+    auto sources_opt = app.add_option(cli::sources.name, cli::sources.value, cli::sources.desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-    app.add_flag(opt[FLG_TOC].name,Option::_toc,opt[FLG_TOC].desc);
-    app.add_option(opt[OPT_IGNORE].name,Option::_ignore_prefix,opt[OPT_IGNORE].desc);
-    app.add_option(opt[OPT_DEPS].name,Option::_pkg_deps,opt[OPT_DEPS].desc)
-      ->check(CLI::IsMember({"GRAPH", "TEXT", "SVG"}, CLI::ignore_case));
-    auto graph_opt = app.add_option(opt[OPT_GRAPHS].name,Option::_graphs,opt[OPT_GRAPHS].desc)
+    app.add_flag(cli::toc.name, cli::toc.value, cli::toc.desc);
+    app.add_option(cli::ignorePrefix.name,cli::ignorePrefix.value, cli::ignorePrefix.desc);
+    app.add_option(cli::pkg_deps.name, cli::pkg_deps.value, cli::pkg_deps.desc)
+      ->check(CLI::IsMember({"graph", "text", "svg"}, CLI::ignore_case))
+      ->default_val(cli::pkg_deps.defaultValue);
+    auto graph_opt = app.add_option(cli::graphs.name, cli::graphs.value, cli::graphs.desc)
       ->transform(CLI::Validator(sroot_relative,"PATH(existing)"));
-    app.add_option(opt[OPT_PRIVATE].name, Option::_private_prefix, opt[OPT_PRIVATE].desc)
-      ->default_val("__");
-    app.set_version_flag(opt[FLG_VERSION].name, opt[FLG_VERSION].desc);
-    app.add_option(opt[OPT_VERBOSITY].name,Option::_verbosity,opt[OPT_VERBOSITY].desc)
-      ->transform(
-        CLI::CheckedTransformer(
-          map<string, spdlog::level::level_enum, LogLevelLess >(
-            {
-              {"trace",     spdlog::level::trace    },
-              {"debug",     spdlog::level::debug    },
-              {"info",      spdlog::level::info     },
-              {"warn",      spdlog::level::warn     },
-              {"error",     spdlog::level::err      },
-              {"critical",  spdlog::level::critical },
-              {"off",       spdlog::level::off      }
-            }
-          )))
-      ->default_val("error");
-    app.add_flag(opt[FLG_ORTHODOX].name, Option::_orthodox,opt[FLG_ORTHODOX].desc)
-      ->default_val(true);
-    app.add_option(opt[OPT_DATA_DIR].name, Option::_data_dir, opt[OPT_DATA_DIR].desc)
-      ->check(CLI::ExistingDirectory)
-      ->group("");  // hidden option: is managed by wrapper
+    app.add_option(cli::private_prefix.name, cli::private_prefix.value, cli::private_prefix.desc)
+      ->default_val(cli::private_prefix.defaultValue);
+    app.set_version_flag(cli::version.name, cli::version.desc);
+    app.add_option(cli::verbosity.name,cli::verbosity.value,cli::verbosity.desc)
+      ->transform(CLI::CheckedTransformer(cli::verbosity.map))
+      ->default_val(cli::verbosity.defaultValue);
+    app.add_flag(cli::orthodox.name, cli::orthodox.value, cli::orthodox.desc)
+      ->default_val(cli::orthodox.defaultValue);
+    app.add_option(cli::dataDir.name, cli::dataDir.value, cli::dataDir.desc)
+      ->check(CLI::ExistingDirectory);
 
     sources_opt->needs(sroot_opt);
     graph_opt->needs(sroot_opt);
 
     app.parse(argc, argv);
-    assert(Option::_droot.is_absolute());
-    assert(Option::_sroot.is_absolute());
-    spdlog::set_level(Option::verbosity());
+    assert(cli::docRoot().is_absolute());
+    assert(cli::srcRoot().is_absolute());
+    spdlog::set_level(cli::verbosity());
 
     // in debug mode print some diagnosis infos
-    spdlog::debug("Data dir: '{0}'",Option::dataDir().string());
+    spdlog::debug("Data dir: '{0}'",cli::dataDir.value.string());
 
     // desired language extension for source analysis
-    auto language = language::Extension::factory(Option::language());
+    auto language = language::Extension::factory(cli::language());
     // language analyst setup
     Analyzer analyst(language);
     // in-memory source tree analysis production
@@ -240,15 +164,15 @@ int main(int argc, const char *argv[]) {
     // gather cross-reference data from all the annotations
     analyst.xref();
     // desired writer extension
-    auto writer = writer::Extension::factory(Option::writer(),dict,language);
+    auto writer = writer::Extension::factory(cli::writer(),dict,language);
     // save documents
     writer->save(analyst.documents());
     // save table of contents
-    if (Option::toc())
+    if (cli::toc())
       writer->save(analyst.toc());
     // save graphs
-    if (Option::graphs().size())
-      writer->graphs(analyst.toc(),Option::graphs());
+    if (cli::graphs().size())
+      writer->graphs(analyst.toc(),cli::graphs());
   } catch (const CLI::Error &error) {
     // CLI parsing errors
     result  = app.exit(error);
