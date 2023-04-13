@@ -10,7 +10,9 @@
 
 // private
 #include "listener.h"
+#ifdef ODOX_SCAD_VISITORS
 #include "visitor.h"
+#endif // ODOX_SCAD_VISITORS
 
 // public
 #include <scad/extension.h>
