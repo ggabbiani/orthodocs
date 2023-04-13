@@ -106,7 +106,7 @@ string nextAnnoData(antlr4::BufferedTokenStream *stream, const antlr4::ParserRul
 
 namespace scad {
 
-Listener::Listener(const path &pkg_source,antlr4::BufferedTokenStream *s, int doc_id)
+Listener::Listener(const path &pkg_source,antlr4::BufferedTokenStream *s, Document::Id doc_id)
 : _tokens(s), _pkg_path(pkg_source), _document(make_unique<::Document>(pkg_source,doc_id)) {
 }
 

@@ -38,7 +38,7 @@ public:
   using Token                 = antlr4::Token;
   using path                  = std::filesystem::path;
 
-  Listener(const path &pkg_source,antlr4::BufferedTokenStream *s, int doc_id);
+  Listener(const path &pkg_source,antlr4::BufferedTokenStream *s, Document::Id doc_id);
 
   // return the Document's ownership to the calling environment
   Document::Owner releaseDocument() {return std::move(_document);};
