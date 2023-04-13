@@ -359,7 +359,7 @@ function(config_wrapper IN OUT)
     message(FATAL_ERROR "Parameter(s) missing")
   endif()
   file(TO_NATIVE_PATH "${arg_DATADIR}"  __full_datadir__)
-  set(__exe__         "${arg_EXECUTABLE}")
+  file(TO_NATIVE_PATH "${arg_EXECUTABLE}" __exe__)
   set(__mode__        "${arg_MODE}")
   configure_file(${IN} ${OUT}
     FILE_PERMISSIONS OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
@@ -398,13 +398,13 @@ elseif(WIN32 OR MINGW)
   config_wrapper(packaging/windows/${ODOX_WRAPPER}.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}"
     MODE        "development"
     DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
-    EXECUTABLE  "${ODOX}"
+    EXECUTABLE  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}"
   )
   # cmake-install
   config_wrapper(packaging/windows/${ODOX_WRAPPER}.in packaging/windows/${ODOX_WRAPPER}
     MODE        "cmake-install"
     DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
-    EXECUTABLE  "${ODOX}"
+    EXECUTABLE  "${CMAKE_INSTALL_PREFIX}/${ODOX}"
   )
   install(
     FILES
