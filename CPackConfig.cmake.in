@@ -19,8 +19,38 @@ if(EXISTS ${CPACK_PROPERTIES_FILE})
   include(${CPACK_PROPERTIES_FILE})
 endif()
 
-# wrapper for main
-if (UNIX)
+###############################################################################
+# orthodocs customizations
+include("@CMAKE_CURRENT_SOURCE_DIR@/cmake-sdk/modules/cdk.cmake")
+include("@PROJECT_SOURCE_DIR@/config-wrapper.cmake")
+
+###############################################################################
+# wrapper
+
+set_if(ODOX_ABS_PACKAGE_DATADIR
+  IF_UNIX "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@"
+  IF_WIN TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"
+)
+set_if(ODOX_ABS_PACKAGE_EXECUTABLE
+  IF_UNIX "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@"
+  IF_WIN TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_BINDIR@/@ODOX@"
+)
+# CPACK_PACKAGE_INSTALL_DIRECTORY is in cmake file system format
+# ... but it seems that NSIS generator needs it in native one ...
+set_if(CPACK_PACKAGE_INSTALL_DIRECTORY
+  IF_UNIX "@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+  IF_WIN  TO_NATIVE_PATH "@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+)
+
+config_wrapper(
+  "@ODOX_ABS_IN_WRAPPER@"
+  "@ODOX_ABS_INSTALL_WRAPPER@"
+  MODE        "PACKAGE"
+  DATADIR     "${ODOX_ABS_PACKAGE_DATADIR}"
+  EXECUTABLE  "${ODOX_ABS_PACKAGE_EXECUTABLE}"
+)
+
+if (BURP_UNIX)
   set(__full_datadir__  "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@")
   set(__exe__           "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@")
   set(__mode__          "package-install")
@@ -29,7 +59,7 @@ if (UNIX)
     @PROJECT_BINARY_DIR@/packaging/unix/@ODOX_WRAPPER@
     @ONLY
   )
-elseif(WIN32 OR MINGW)
+elseif(BURP_WIN32)
   file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"  __full_datadir__)
   file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_BINDIR@/@ODOX@" __exe__)
   set(__mode__        "package-install")

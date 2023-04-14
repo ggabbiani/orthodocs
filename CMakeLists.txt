@@ -105,27 +105,25 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROJECT_BINARY_DIR}/bin" )
 # installation is configured as per-user/single directory basis.
 # =============================================================================
 # For the CPack install (system-wide installation) see CMakeCPack.cmake.
-if (UNIX)
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local")
-elseif(WIN32)
+set_if(CMAKE_INSTALL_PREFIX
+  IF_UNIX "$ENV{HOME}/.local"
   # value from Windows environment variable must be converted into a
   # cmake-style path with forward-slashes (/).
-  file(TO_CMAKE_PATH "$ENV{LOCALAPPDATA}\\${CMAKE_PROJECT_NAME}" CMAKE_INSTALL_PREFIX)
-endif()
-if(WIN32 AND NOT CYGWIN)
-  set(DEF_INSTALL_CMAKEDIR CMake)
-else()
-  set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
-endif()
-set(CMAKE_INSTALL_CMAKEDIR      "${DEF_INSTALL_CMAKEDIR}")
+  IF_WIN TO_CMAKE_PATH "$ENV{LOCALAPPDATA}\\${CMAKE_PROJECT_NAME}"
+)
+set_if(CMAKE_INSTALL_CMAKEDIR
+  IF_UNIX "share/cmake/${PROJECT_NAME}"
+  IF_WIN  CMake
+)
 set(CMAKE_INSTALL_FULL_CMAKEDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_CMAKEDIR}")
 set(CMAKE_INSTALL_DATADIR       "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
 set(CMAKE_INSTALL_FULL_DATADIR  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 # Report to user
 cdk_report("LIB;BIN;INCLUDE;CMAKE;DATA;DOC")
-# used during DEVELOPMENT
-set(ODOX_DATA_OUTPUT_DIRECTORY      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
-cdk_message(STATUS "Development data dir: '${ODOX_DATA_OUTPUT_DIRECTORY}'")
+###############################################################################
+# CMake build default locations configuration.
+set(ODOX_ABS_BUILD_DATADIR      "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}")
+cdk_message(STATUS "Build data dir: '${ODOX_ABS_BUILD_DATADIR}'")
 
 ###############################################################################
 # propaedeutic for antrl4cpp
@@ -315,8 +313,9 @@ endif()
 ###############################################################################
 # main program
 ###############################################################################
-# cmake_print_variables(ORTHODOCS_INCS ORTHODOCS_LIBS)
+# main executable
 set(ODOX orthodocs-main)
+set(ODOX_ABS_BUILD_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}")
 
 add_executable(${ODOX}
   src/analyzer.cpp
@@ -350,73 +349,52 @@ install(
     COMPONENT runtime
 )
 
-function(config_wrapper IN OUT)
-  set(flags)
-  set(opts DATADIR MODE EXECUTABLE)
-  set(multi)
-  cmake_parse_arguments(arg "${flags}" "${opts}" "${multi}" ${ARGN})
-  if (arg_UNPARSED_ARGUMENTS OR NOT IN OR NOT OUT)
-    message(FATAL_ERROR "Parameter(s) missing")
-  endif()
-  file(TO_NATIVE_PATH "${arg_DATADIR}"  __full_datadir__)
-  file(TO_NATIVE_PATH "${arg_EXECUTABLE}" __exe__)
-  set(__mode__        "${arg_MODE}")
-  configure_file(${IN} ${OUT}
-    FILE_PERMISSIONS OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-    @ONLY
-  )
-endfunction(config_wrapper)
+###############################################################################
+# wrapper
+include(config-wrapper.cmake)
+set_if(ODOX_WRAPPER
+  IF_UNIX orthodocs
+  IF_WIN orthodocs.bat
+)
+set_if(ODOX_INSTALL_WRAPPER
+  IF_UNIX packaging/unix/${ODOX_WRAPPER}
+  IF_WIN  packaging/windows/${ODOX_WRAPPER}
+)
+set(ODOX_IN_WRAPPER           ${ODOX_INSTALL_WRAPPER}.in)
+set(ODOX_ABS_IN_WRAPPER       "${PROJECT_SOURCE_DIR}/${ODOX_IN_WRAPPER}")
+set(ODOX_ABS_INSTALL_WRAPPER  "${PROJECT_BINARY_DIR}/${ODOX_INSTALL_WRAPPER}")
 
-# main wrapper
-if (UNIX)
-  # development wrapper
-  set(ODOX_WRAPPER orthodocs)
-  config_wrapper(packaging/unix/${ODOX_WRAPPER}.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}"
-    MODE        "development"
-    DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
-    EXECUTABLE  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}"
-  )
-  # cmake-install
-  config_wrapper(packaging/unix/${ODOX_WRAPPER}.in packaging/unix/${ODOX_WRAPPER}
-    MODE        "cmake-install"
-    DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
-    EXECUTABLE  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}"
-  )
-  install(
-    FILES
-      "${PROJECT_BINARY_DIR}/packaging/unix/${ODOX_WRAPPER}"
-    TYPE
-      BIN
-    COMPONENT
-      runtime
-    PERMISSIONS
-      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
-elseif(WIN32 OR MINGW)
-  # development wrapper
-  set(ODOX_WRAPPER orthodocs.bat)
-  config_wrapper(packaging/windows/${ODOX_WRAPPER}.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}"
-    MODE        "development"
-    DATADIR     "${ODOX_DATA_OUTPUT_DIRECTORY}"
-    EXECUTABLE  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX}"
-  )
-  # cmake-install
-  config_wrapper(packaging/windows/${ODOX_WRAPPER}.in packaging/windows/${ODOX_WRAPPER}
-    MODE        "cmake-install"
-    DATADIR     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}"
-    EXECUTABLE  "${CMAKE_INSTALL_PREFIX}/${ODOX}"
-  )
-  install(
-    FILES
-      "${PROJECT_BINARY_DIR}/packaging/windows/${ODOX_WRAPPER}"
-    TYPE
-      BIN
-    COMPONENT
-      runtime
-    PERMISSIONS
-      OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
-endif()
+#############################################################################
+# BUILD wrapper
+cmake_print_variables(ODOX_INSTALL_WRAPPER ODOX_IN_WRAPPER)
+set(ODOX_ABS_BUILD_WRAPPER    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER}")
+config_wrapper(${ODOX_IN_WRAPPER} "${ODOX_ABS_BUILD_WRAPPER}"
+  MODE        "BUILD"
+  DATADIR     "${ODOX_ABS_BUILD_DATADIR}"
+  EXECUTABLE  "${ODOX_ABS_BUILD_EXECUTABLE}"
+)
+#############################################################################
+# INSTALL wrapper
+set_if(ODOX_ABS_INSTALL_EXECUTABLE
+  IF_UNIX "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${ODOX}"
+  IF_WIN  "${CMAKE_INSTALL_PREFIX}/${ODOX}"
+)
+set(ODOX_ABS_INSTALL_DATADIR    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+config_wrapper(${ODOX_IN_WRAPPER} ${ODOX_INSTALL_WRAPPER}
+  MODE        "INSTALL"
+  DATADIR     "${ODOX_ABS_INSTALL_DATADIR}"
+  EXECUTABLE  "${ODOX_ABS_INSTALL_EXECUTABLE}"
+)
+install(
+  FILES
+    "${ODOX_ABS_INSTALL_WRAPPER}"
+  TYPE
+    BIN
+  COMPONENT
+    runtime
+  PERMISSIONS
+    OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
 
 install(
   FILES
