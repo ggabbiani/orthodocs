@@ -10,5 +10,5 @@
 @echo off
 setlocal enableextensions
 set "ODOX_DATADIR=@__abs_datadir__@"
-@__abs_exe__@ %*
+"@__abs_exe__@" %*
 endlocal
