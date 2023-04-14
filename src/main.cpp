@@ -237,7 +237,9 @@ int main(int argc, const char *argv[]) {
     // save graphs
     if (Option::graphs().size())
       writer->graphs(analyst.toc(),Option::graphs());
-  } catch (const CLI::Error &error) {
+  } catch (const CLI::Success &no_error) {
+    result  = app.exit(no_error);
+  } catch (const CLI::ParseError &error) {
     print_exception(error);
     result  = app.exit(error);
   } catch(const RcException &error) {
