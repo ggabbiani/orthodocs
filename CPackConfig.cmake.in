@@ -26,7 +26,6 @@ include("@PROJECT_SOURCE_DIR@/config-wrapper.cmake")
 
 ###############################################################################
 # wrapper
-
 set_if(ODOX_ABS_PACKAGE_DATADIR
   IF_UNIX "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@"
   IF_WIN TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"
@@ -41,7 +40,8 @@ set_if(CPACK_PACKAGE_INSTALL_DIRECTORY
   IF_UNIX "@CPACK_PACKAGE_INSTALL_DIRECTORY@"
   IF_WIN  TO_NATIVE_PATH "@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 )
-
+# ODOX_ABS_INSTALL_WRAPPER is used also as PACKAGE config output to leverage
+# a single install(FILES ...) from the CMakeLists.txt
 config_wrapper(
   "@ODOX_ABS_IN_WRAPPER@"
   "@ODOX_ABS_INSTALL_WRAPPER@"
@@ -49,26 +49,3 @@ config_wrapper(
   DATADIR     "${ODOX_ABS_PACKAGE_DATADIR}"
   EXECUTABLE  "${ODOX_ABS_PACKAGE_EXECUTABLE}"
 )
-
-if (BURP_UNIX)
-  set(__full_datadir__  "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@")
-  set(__exe__           "@CPACK_PACKAGING_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@ODOX@")
-  set(__mode__          "package-install")
-  configure_file(
-    @PROJECT_SOURCE_DIR@/packaging/unix/@ODOX_WRAPPER@.in
-    @PROJECT_BINARY_DIR@/packaging/unix/@ODOX_WRAPPER@
-    @ONLY
-  )
-elseif(BURP_WIN32)
-  file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_DATADIR@"  __full_datadir__)
-  file(TO_NATIVE_PATH "@CPACK_NSIS_INSTALL_ROOT@/@CPACK_PACKAGE_INSTALL_DIRECTORY@/@CMAKE_INSTALL_BINDIR@/@ODOX@" __exe__)
-  set(__mode__        "package-install")
-  # CPACK_PACKAGE_INSTALL_DIRECTORY is in cmake file system format
-  # ... but it seems that NSIS generator needs it in native one ...
-  file(TO_NATIVE_PATH "@CPACK_PACKAGE_INSTALL_DIRECTORY@"  CPACK_PACKAGE_INSTALL_DIRECTORY)
-  configure_file(
-    @PROJECT_SOURCE_DIR@/packaging/windows/@ODOX_WRAPPER@.in
-    @PROJECT_BINARY_DIR@/packaging/windows/@ODOX_WRAPPER@
-    @ONLY
-  )
-endif()

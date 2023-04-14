@@ -83,7 +83,7 @@ function (doc_test)
     CMD1 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER} --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}"
     CMD2 "$<IF:$<BOOL:${CMAKE_HOST_UNIX}>,${DIFF_EXE},\"${DIFF_EXE}\"> ${DOC_COMPARE} ${DOC_ROOT}"
   )
-  cdk_message(STATUS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER} --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}")
+  # cdk_message(STATUS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ODOX_WRAPPER} --src-root ${DOC_SOURCES} --doc-root ${DOC_ROOT} --verbosity off ${DOC_OPTIONS}")
   # set_property(TEST ${DOC_NAME} PROPERTY LABELS DOCUMENT DIFF)
   set_tests_properties(${DOC_NAME}
     PROPERTIES LABELS "DOCUMENT;DIFF;Python"

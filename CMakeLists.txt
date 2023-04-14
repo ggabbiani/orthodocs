@@ -426,9 +426,3 @@ endif()
 if (ODOX_PKG)
   include(CMakeCPack.cmake)
 endif()
-
-cmake_print_properties(TARGETS cpp::trace PROPERTIES
-  LINK_LIBRARIES
-  INTERFACE_INCLUDE_DIRECTORIES
-  PRIVATE_INCLUDE_DIRECTORIES
-)

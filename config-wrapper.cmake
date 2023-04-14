@@ -1,4 +1,4 @@
-include(CMakePrintHelpers)
+# include(CMakePrintHelpers)
 
 # cmake for wrapper
 function(config_wrapper IN OUT)
@@ -16,5 +16,5 @@ function(config_wrapper IN OUT)
     FILE_PERMISSIONS OWNER_EXECUTE OWNER_READ OWNER_WRITE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
     @ONLY
   )
-  cmake_print_variables(__mode__ __abs_datadir__ __abs_exe__ )
+  # cmake_print_variables(__mode__ __abs_datadir__ __abs_exe__ )
 endfunction(config_wrapper)
