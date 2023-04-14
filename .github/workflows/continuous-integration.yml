@@ -2,7 +2,9 @@ name: Integration and deployment
 
 on:
   push:
-    branches: [ "trunk" ]
+    branches:
+      - trunk
+      - 'maint-**'
   pull_request:
     branches: [ "trunk" ]
 
